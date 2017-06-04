@@ -1,0 +1,3 @@
+python-nest>=3.0
+PyYAML
+google-api-python-client
