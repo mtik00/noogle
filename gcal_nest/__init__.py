@@ -11,7 +11,13 @@ This module holds the main interface for the gcal_nest package.
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
 __creationDate__ = '08-JUN-2017'
-__version__ = '1.0.0'
+__version__ = '1.0.0b1'
 
 
 # Globals #####################################################################
+def main():
+    # get new events
+    # put them in cache, if they aren't there already
+    # see if we need to do anything
+    # do it!
+    pass

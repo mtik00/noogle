@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         classifiers=[
-            'Development Status :: 5 - Production/Stable',
+            'Development Status :: 4 - Beta',
             'Environment :: Console',
             'License :: OSI Approved :: MIT License',
             'Programming Language :: Python',

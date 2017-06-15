@@ -5,9 +5,11 @@ This module holds the cache for the gcal_nest application.
 '''
 
 # Imports #####################################################################
+import os
 import sqlite3
+from contextlib import contextmanager
 
-from .settings import settings
+from .settings import USER_FOLDER
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -17,6 +19,18 @@ __version__ = '1.0.0'
 
 # Globals #####################################################################
 CACHE = None
+DB_INIT = '''
+CREATE TABLE IF NOT EXISTS events (
+    id integer PRIMARY KEY,
+    name text NOT NULL,
+    event_id integer NOT NULL,
+    calendar_id text NOT NULL,
+    parent_event_id integer,
+    state integer,
+    scheduled_date text NOT NULL,
+    actioned_date text
+);
+'''
 
 
 def get_cache():
@@ -28,13 +42,50 @@ def get_cache():
     return CACHE
 
 
+class Event(object):
+    def __init__(self):
+        self.name = None
+        self.event_id = None
+        self.calendar_id = None
+        self.parent_event_id = None
+        self.state = None
+        self.scheduled_date = None
+        self.actioned_date = None
+
+    def from_db(self, db_tuple):
+        '''Initialize this object from a db row / tuple.'''
+        (
+            _, self.name, self.event_id, self.calendar_id,
+            self.parent_event_id, self.state, self.scheduled_date,
+            self.actioned_date) = db_tuple
+
+
 class Cache(object):
     '''
     This object holds the application cache.
     '''
 
-    def __init__(self):
-        self.conn = sqlite3.connect('example.db')
+    insert_sql = '''
+            INSERT INTO events(name,event_id,calendar_id,parent_event_id,state,scheduled_date,actioned_date)
+            VALUES(?,?,?,?,?,?,?)
+    '''
+
+    def __init__(self, path=None):
+        if not os.path.isdir(USER_FOLDER):
+            os.makedirs(USER_FOLDER)
+
+        self.default_path = os.path.join(USER_FOLDER, 'gcal_nest.db')
+        self.conn = sqlite3.connect(path or self.default_path)
+        self.cursor = self.conn.cursor()
+
+    def __del__(self):
+        if self.conn:
+            self.conn.close()
+
+    @contextmanager
+    def committed(self):
+        yield self
+        self.conn.commit()
 
     def history(self):
         '''
@@ -48,3 +99,42 @@ class Cache(object):
         '''
         # Cache the current date/time, event name, etc
         pass
+
+    def add(self, item, commit=True):
+        if isinstance(item, Event):
+            return self.add_event(item, commit)
+
+        self.conn.execute(Cache.insert_sql, item)
+
+    def add_event(self, event, commit=True):
+        self.conn.execute(
+            Cache.insert_sql,
+            tuple([
+                event.name,
+                event.event_id,
+                event.calendar_id,
+                event.parent_event_id,
+                event.state,
+                event.scheduled_date,
+                event.actioned_date
+            ])
+        )
+
+
+def main():
+    cache = Cache()
+    cache.cursor.execute('DROP TABLE IF EXISTS events;')
+    cache.cursor.execute(DB_INIT)
+
+    e = Event()
+    e.name = "nest:50"
+    e.event_id = 1
+    e.calendar_id = "primary"
+    e.scheduled_date = "today!"
+
+    with cache.committed() as c:
+        c.add(e)
+
+
+if __name__ == '__main__':
+    main()
