@@ -5,7 +5,8 @@ This module holds the interface to Google calendar.
 '''
 
 # Imports #####################################################################
-# from .settings import settings
+from __future__ import print_function
+from .settings import USER_FOLDER
 import os
 import argparse
 import datetime
@@ -25,7 +26,7 @@ __creationDate__ = '08-JUN-2017'
 
 # Globals #####################################################################
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-CLIENT_SECRET_FILE = 'env/google_client_secret.json'
+CLIENT_SECRET_FILE = os.path.join(USER_FOLDER, 'google_client_secret.json')
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 

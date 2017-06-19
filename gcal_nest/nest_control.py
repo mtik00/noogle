@@ -32,7 +32,9 @@ def setup():
     client_secret = settings.get('nest.product-secret') or os.environ.get('NEST_PRODUCT_SECRET')
 
     if not(client_id and client_secret):
-        raise ValueError("You must enter your Nest product ID and product secret!  See setup instructions.")
+        raise ValueError(
+            "You must enter your Nest product ID and product "
+            "secret!  See setup instructions.")
 
     if not os.path.isdir(USER_FOLDER):
         os.makedirs(USER_FOLDER)

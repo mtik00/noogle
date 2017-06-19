@@ -57,6 +57,7 @@ def parse_args(default_args=None):
 
 
 def show_events():
+    '''Display the next events.'''
     events = get_next_events()
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
@@ -70,7 +71,6 @@ def main():
 
     get_logger()
     args = parse_args()
-    print(args)
     project_settings = get_settings()
 
     if args.show_settings:

@@ -14,7 +14,6 @@ from .settings import USER_FOLDER
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
 __creationDate__ = '05-JUN-2017'
-__version__ = '1.0.0'
 
 
 # Globals #####################################################################
@@ -43,6 +42,7 @@ def get_cache():
 
 
 class Event(object):
+    '''Describes a single event stored in cache.'''
     def __init__(self):
         self.name = None
         self.event_id = None
@@ -66,7 +66,8 @@ class Cache(object):
     '''
 
     insert_sql = '''
-            INSERT INTO events(name,event_id,calendar_id,parent_event_id,state,scheduled_date,actioned_date)
+            INSERT INTO events(name,event_id,calendar_id,parent_event_id,
+            state,scheduled_date,actioned_date)
             VALUES(?,?,?,?,?,?,?)
     '''
 
@@ -84,6 +85,7 @@ class Cache(object):
 
     @contextmanager
     def committed(self):
+        '''Yields an auto-commited cache object'''
         yield self
         self.conn.commit()
 
@@ -101,12 +103,21 @@ class Cache(object):
         pass
 
     def add(self, item, commit=True):
+        '''
+        Add a single item to the cache.
+        '''
         if isinstance(item, Event):
             return self.add_event(item, commit)
 
         self.conn.execute(Cache.insert_sql, item)
 
+        if commit:
+            self.conn.commit()
+
     def add_event(self, event, commit=True):
+        '''
+        Add a single event to the cache.
+        '''
         self.conn.execute(
             Cache.insert_sql,
             tuple([
@@ -120,6 +131,9 @@ class Cache(object):
             ])
         )
 
+        if commit:
+            self.conn.commit()
+
 
 def main():
     cache = Cache()
@@ -131,9 +145,10 @@ def main():
     e.event_id = 1
     e.calendar_id = "primary"
     e.scheduled_date = "today!"
+    cache.add(e)
 
-    with cache.committed() as c:
-        c.add(e)
+    # with cache.committed() as c:
+    #     c.add(e)
 
 
 if __name__ == '__main__':

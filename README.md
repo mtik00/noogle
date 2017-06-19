@@ -27,12 +27,13 @@ In this example, we're going to be storing some credentials and application setu
 in `env/env.bat` (or `env/env.sh` on Linux).
 
 **NOTE** I highly recommend using a virtual environment for this!
-1.  Create your application ([configuration file](#Configuration)).
 1.  Install `gcal_nest` and its requirements
+1.  Create your application ([configuration file](#Configuration)).
 
 ## Google OAuth 2.0 Setup
 
 1.  Create an application using [Google API](https://console.developers.google.com/flows/enableapi?apiid=calendar&pli=1)
+1.  Download the credentials to `~/.gcal_nest/google_client_secret.json`
 1.  Run the `gcal_nest` setup for Google: `python -m gcal_nest.cli --gcal-setup`
 1.  Follow the prompts to allow this computer to access your contacts.
 1.  Run the script again to ensure you have the credentials stored (you should not
