@@ -73,7 +73,7 @@ class Settings(object):
         Validates the settings to ensure they're correct.
         '''
         start = self.get('google calendar.default-start-time')
-        if not re.match('^\d+:\d{2}$', start):
+        if not re.match(r'^\d+:\d{2}$', start):
             raise ValueError(
                 ("google calendar.default-start-time ({0}) not "
                  "in correct format: H:mm").format(start)

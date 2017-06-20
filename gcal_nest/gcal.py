@@ -68,18 +68,23 @@ def setup(noauth_local_webserver=False):
     Set up your credentials for access to google calendar.
     '''
     get_credentials(noauth_local_webserver=noauth_local_webserver)
-    events, timezone = get_next_events()
+    events, _ = get_next_events()
     if not events:
         print('No upcoming events found.')
+        return
 
     for event in events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+        print(
+            "{:<19s}({:^9}) {}".format(
+                event.scheduled_date.format('YYYY-MM-DD h:mmA'),
+                event.state,
+                event.name)
+        )
 
 
-def get_next_events(max_results=10, q='nest'):
+def get_next_events(max_results=10, q_filter='nest'):
     '''
-    Returns a list of events filtered by ``q``.
+    Returns a list of events filtered by ``q_filter``.
 
     :param int max_results: The maximum number of results to return
     :param str q: This is the "advanced search syntax" item
@@ -93,13 +98,8 @@ def get_next_events(max_results=10, q='nest'):
 
     events_result = service.events().list(
         calendarId='primary', timeMin=now, maxResults=max_results,
-        singleEvents=True, orderBy='startTime', q=q).execute()
+        singleEvents=True, orderBy='startTime', q=q_filter).execute()
 
     temp_events = events_result.get('items', [])
-    events = []
-    for event in temp_events:
-        e = Event()
-        e.from_dict(event, timezone)
-        events.append(e)
-
+    events = [Event(event=x, timezone=timezone) for x in temp_events]
     return (events, timezone)

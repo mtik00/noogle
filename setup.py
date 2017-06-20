@@ -2,13 +2,7 @@
 '''obfuscator package setup script.'''
 from __future__ import print_function
 import os
-import sys
-
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    print("ERROR: This package requires setuptools in order to install.", file=sys.stderr)
-    sys.exit(1)
+from setuptools import setup, find_packages
 
 
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -24,7 +18,13 @@ if __name__ == '__main__':
         download_url=(
             "https://github.com/mtik00/gcal_nest/releases/download/v{0}/"
             "gcal_nest-{0}.tar.gz").format("1.0.0"),
-        install_requires=["python-nest>=3.0", "google-api-python-client", "pkg_resources"],
+        install_requires=[
+            "python-nest>=3.0",
+            "google-api-python-client",
+            "pkg_resources",
+            "arrow",
+            "click",
+        ],
         packages=find_packages(exclude=('fabfile',)),
         zip_safe=True,
         include_package_data=True,
