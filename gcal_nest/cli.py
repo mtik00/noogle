@@ -18,6 +18,8 @@ from gcal_nest import __version__ as library_version
 from gcal_nest.gcal import setup as gcal_setup, get_next_events
 from gcal_nest.nest_control import setup as nest_setup
 from gcal_nest.cache import get_cache
+from gcal_nest import main
+from gcal_nest.helpers import print_log
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -35,15 +37,37 @@ class Ctx(object):
     def __init__(self):
         self.logger = get_logger()
         self.project_settings = get_settings()
+        self.cache = get_cache()
+        self.quiet = False
 
 
 CONTEXT = click.make_pass_decorator(Ctx, ensure=True)
 
 
 @click.group(help=HELP)
-def cli():
+@click.option('--quiet', '-q', is_flag=True, help='Only report errors')
+@CONTEXT
+def cli(ctx, quiet):
     '''Run the gcal_nest command-line application'''
-    pass
+    ctx.quiet = quiet
+
+
+@cli.command(name="init")
+@click.confirmation_option(prompt='Are you sure you want to clear the cache and settings?')
+@CONTEXT
+def init(ctx):
+    '''
+    Clears the cache and sets default settings
+    '''
+    print_log(ctx, 'Initializing cache...', nl=False)
+    ctx.cache.init()
+    print_log(ctx, '...done')
+    print_log(ctx, '...cache file at: %s' % ctx.cache.default_path)
+
+    print_log(ctx, 'Initializing user settings...', nl=False)
+    ctx.project_settings.make_user_settings()
+    print_log(ctx, '...done')
+    print_log(ctx, '...settings file at: %s' % ctx.project_settings._user_path)
 
 
 @cli.group()
@@ -55,9 +79,9 @@ def show():
 @show.command()
 @CONTEXT
 def events(ctx):
-    '''Display the next events.'''
+    '''Display the next events from Google calendar'''
 
-    nest_events, _ = get_next_events()
+    nest_events = get_next_events()
 
     for event in nest_events:
         print(
@@ -68,6 +92,25 @@ def events(ctx):
         )
 
 
+@show.command()
+@CONTEXT
+def cache(ctx):
+    '''
+    Shows the cached events
+    '''
+    # For the pager to work, we need to create one big string.
+    str_events = []
+    for event in ctx.cache.events():
+        str_events.append(
+            "{:<19s}({:^9}) {}".format(
+                event.scheduled_date.format('YYYY-MM-DD h:mmA'),
+                event.state,
+                event.name)
+        )
+
+    click.echo_via_pager("\n".join(str_events))
+
+
 @cli.group()
 def setup():
     '''Run the setup for Google calendar or Nest'''
@@ -75,7 +118,10 @@ def setup():
 
 
 @setup.command()
-@click.option('--noauth-local-webserver', is_flag=True)
+@click.option(
+    '--noauth-local-webserver',
+    is_flag=True,
+    help="don't use a local webserver for authentication")
 @CONTEXT
 def gcal(ctx, noauth_local_webserver):
     '''Set up Google calendar'''
@@ -94,28 +140,18 @@ def gcal(ctx, noauth_local_webserver):
 @CONTEXT
 def nest(ctx):
     '''Set up Nest'''
-    ctx
+    ctx.logger.debug('calling `nest_setup`')
     nest_setup()
+    ctx.logger.debug('...done')
 
 
 @cli.command()
 @CONTEXT
 def go(ctx):
     '''Run the main function'''
-    # Grab the next 10 events
-    my_events, _ = get_next_events(max_results=10)
-
-    # Add them to the cache if they aren't already there
-    cache = get_cache()
-
-    for event in my_events:
-        if not cache.exists(event.event_id):
-            print("caching new event: {0}".format(event))
-            cache.add_event(event)
-
-    # Get all events that haven't been actioned
-    my_events = [x for x in cache.waiting()]
-    print(my_events)
+    ctx.logger.debug('calling `main`')
+    return main(ctx)
+    ctx.logger.debug('...done')
 
 
 @cli.group()
@@ -128,7 +164,9 @@ def settings():
 @CONTEXT
 def make_settings(ctx):
     '''Creates a copy of application settings in your home directory'''
+    ctx.logger.debug('calling `make_user_settings`')
     ctx.project_settings.make_user_settings()
+    ctx.logger.debug('...done')
 
 
 @settings.command(name="show")

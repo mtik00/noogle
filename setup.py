@@ -21,7 +21,7 @@ if __name__ == '__main__':
         install_requires=[
             "python-nest>=3.0",
             "google-api-python-client",
-            "pkg_resources",
+            "setuptools",
             "arrow",
             "click",
         ],
@@ -49,6 +49,6 @@ if __name__ == '__main__':
         long_description=open(os.path.join(THIS_DIR, "README.md")).read(),
 
         entry_points={
-            'console_scripts': ['gcal_nest=gcal_nest.cli:main'],
+            'console_scripts': ['gcal_nest=gcal_nest.cli:cli'],
         }
     )

@@ -7,12 +7,12 @@ This module holds the cache for the gcal_nest application.
 # Imports #####################################################################
 import os
 import sqlite3
-from contextlib import contextmanager
 
 import arrow
 
 from .settings import USER_FOLDER
 from .event import Event
+from .helpers import print_log
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -23,14 +23,14 @@ __creationDate__ = '05-JUN-2017'
 CACHE = None
 DB_INIT = '''
 CREATE TABLE IF NOT EXISTS events (
-    id integer PRIMARY KEY,
+    event_id integer NOT NULL PRIMARY KEY,   -- direct from google calendar
     name text NOT NULL,
-    event_id integer NOT NULL UNIQUE,
     calendar_id text NOT NULL,
     parent_event_id integer,
     state integer,
-    scheduled_date text NOT NULL,
-    actioned_date text
+    scheduled_date integer NOT NULL,    -- stored as a timestamp so we can sort easier
+    actioned_date text,
+    timezone text
 );
 '''
 
@@ -51,8 +51,8 @@ class Cache(object):
 
     insert_sql = '''
             INSERT INTO events(name,event_id,calendar_id,parent_event_id,
-            state,scheduled_date,actioned_date)
-            VALUES(?,?,?,?,?,?,?)
+            state,scheduled_date,actioned_date,timezone)
+            VALUES(?,?,?,?,?,?,?,?)
     '''
 
     def __init__(self, path=None):
@@ -155,13 +155,36 @@ class Cache(object):
                 event.calendar_id,
                 event.parent_event_id,
                 event.state,
-                str(event.scheduled_date),
-                event.actioned_date
+                event.scheduled_date.timestamp,
+                event.actioned_date.timestamp if event.actioned_date else None,
+                event.timezone
             ])
         )
 
         if commit:
             self.conn.commit()
+
+    def add_if_not_exists(self, ctx, events, commit=True):
+        for event in events:
+            if not self.exists(event.event_id):
+                print_log(ctx, "caching new event: {0}".format(event))
+                self.add_event(event)
+
+    def init(self):
+        '''
+        Clear/create the cache.
+        '''
+        self.conn.execute('DROP TABLE IF EXISTS events;')
+        self.conn.execute(DB_INIT)
+
+    def events(self):
+        '''
+        Iterate through all events in reversed order.
+        '''
+        for row in self.conn.execute('SELECT * FROM events ORDER BY scheduled_date DESC'):
+            yield Event(
+                db_dict=dict(zip(self.columns, row))
+            )
 
 
 def main():

@@ -68,7 +68,7 @@ def setup(noauth_local_webserver=False):
     Set up your credentials for access to google calendar.
     '''
     get_credentials(noauth_local_webserver=noauth_local_webserver)
-    events, _ = get_next_events()
+    events = get_next_events()
     if not events:
         print('No upcoming events found.')
         return
@@ -101,5 +101,5 @@ def get_next_events(max_results=10, q_filter='nest'):
         singleEvents=True, orderBy='startTime', q=q_filter).execute()
 
     temp_events = events_result.get('items', [])
-    events = [Event(event=x, timezone=timezone) for x in temp_events]
-    return (events, timezone)
+    events = [Event(gcal_event=x, timezone=timezone) for x in temp_events]
+    return events
