@@ -6,7 +6,6 @@ This module holds the interface to Google calendar.
 
 # Imports #####################################################################
 from __future__ import print_function
-from .settings import USER_FOLDER
 import os
 import argparse
 import datetime
@@ -18,6 +17,7 @@ from oauth2client import tools
 from oauth2client.file import Storage
 
 from .settings import USER_FOLDER
+from .event import Event
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -68,7 +68,7 @@ def setup(noauth_local_webserver=False):
     Set up your credentials for access to google calendar.
     '''
     get_credentials(noauth_local_webserver=noauth_local_webserver)
-    events = get_next_events()
+    events, timezone = get_next_events()
     if not events:
         print('No upcoming events found.')
 
@@ -89,9 +89,17 @@ def get_next_events(max_results=10, q='nest'):
     service = discovery.build('calendar', 'v3', http=http)
     now = datetime.datetime.utcnow().isoformat() + 'Z'
 
+    timezone = service.settings().get(setting='timezone').execute()['value']
+
     events_result = service.events().list(
         calendarId='primary', timeMin=now, maxResults=max_results,
         singleEvents=True, orderBy='startTime', q=q).execute()
 
-    events = events_result.get('items', [])
-    return events
+    temp_events = events_result.get('items', [])
+    events = []
+    for event in temp_events:
+        e = Event()
+        e.from_dict(event, timezone)
+        events.append(e)
+
+    return (events, timezone)

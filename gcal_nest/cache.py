@@ -9,7 +9,10 @@ import os
 import sqlite3
 from contextlib import contextmanager
 
+import arrow
+
 from .settings import USER_FOLDER
+from .event import Event
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -22,7 +25,7 @@ DB_INIT = '''
 CREATE TABLE IF NOT EXISTS events (
     id integer PRIMARY KEY,
     name text NOT NULL,
-    event_id integer NOT NULL,
+    event_id integer NOT NULL UNIQUE,
     calendar_id text NOT NULL,
     parent_event_id integer,
     state integer,
@@ -39,25 +42,6 @@ def get_cache():
         CACHE = Cache()
 
     return CACHE
-
-
-class Event(object):
-    '''Describes a single event stored in cache.'''
-    def __init__(self):
-        self.name = None
-        self.event_id = None
-        self.calendar_id = None
-        self.parent_event_id = None
-        self.state = None
-        self.scheduled_date = None
-        self.actioned_date = None
-
-    def from_db(self, db_tuple):
-        '''Initialize this object from a db row / tuple.'''
-        (
-            _, self.name, self.event_id, self.calendar_id,
-            self.parent_event_id, self.state, self.scheduled_date,
-            self.actioned_date) = db_tuple
 
 
 class Cache(object):
@@ -78,29 +62,74 @@ class Cache(object):
         self.default_path = os.path.join(USER_FOLDER, 'gcal_nest.db')
         self.conn = sqlite3.connect(path or self.default_path)
         self.cursor = self.conn.cursor()
+        self._columns = []
 
     def __del__(self):
-        if self.conn:
+        try:
             self.conn.close()
+        except:
+            pass
 
-    @contextmanager
-    def committed(self):
-        '''Yields an auto-commited cache object'''
-        yield self
-        self.conn.commit()
+    @property
+    def columns(self):
+        if self._columns:
+            return self._columns
 
-    def history(self):
+        cursor = self.conn.execute('select * from events')
+        self._columns = [description[0] for description in cursor.description]
+        return self._columns
+
+    def exists(self, event_id):
         '''
-        Return a listing of historic event data.
+        Checks the specified `event_id` and returns True if its in the cache.
         '''
-        pass
+        self.cursor.execute("SELECT count(*) FROM events WHERE event_id = ?", (event_id,))
+        data = self.cursor.fetchone()[0]
+        return data != 0
 
-    def do_event(self, event):
+    def waiting(self):
+        '''
+        Return all events from the cache that are waiting to be completed.
+        '''
+        self.cursor.execute("SELECT * FROM events WHERE state = ?", ('WAITING',))
+        data = self.cursor.fetchall()
+        events = [
+            Event(
+                db_dict=dict(zip(self.columns, x))
+            ) for x in data]
+
+        return sorted(events, key=lambda x: x.scheduled_date)
+
+    def do_event(self, event, commit=True):
         '''
         Mark the event as completed.
         '''
-        # Cache the current date/time, event name, etc
-        pass
+        if isinstance(event, basestring):
+            event_id = event
+        else:
+            event_id = event.event_id
+
+        self.cursor.execute(
+            """UPDATE events SET state = ? WHERE event_id = ? """,
+            ('COMPLETE', event_id)
+        )
+
+        if commit:
+            self.conn.commit()
+
+    def get_event(self, event_id):
+        '''
+        Returns the specified event, if it exists.
+        '''
+        self.cursor.execute("SELECT * FROM events WHERE event_id = ?", (event_id,))
+        data = self.cursor.fetchone()
+
+        if data:
+            return Event(
+                db_dict=dict(zip(self.columns, data))
+            )
+
+        return None
 
     def add(self, item, commit=True):
         '''
@@ -126,7 +155,7 @@ class Cache(object):
                 event.calendar_id,
                 event.parent_event_id,
                 event.state,
-                event.scheduled_date,
+                str(event.scheduled_date),
                 event.actioned_date
             ])
         )
@@ -144,11 +173,8 @@ def main():
     e.name = "nest:50"
     e.event_id = 1
     e.calendar_id = "primary"
-    e.scheduled_date = "today!"
-    cache.add(e)
-
-    # with cache.committed() as c:
-    #     c.add(e)
+    e.scheduled_date = arrow.now()
+    cache.add_event(e)
 
 
 if __name__ == '__main__':

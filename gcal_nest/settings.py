@@ -7,8 +7,13 @@ This module holds the interface to the application settings.
 # Imports #####################################################################
 from __future__ import print_function
 import os
-import ConfigParser
+import re
 import pkg_resources
+
+try:
+    import ConfigParser
+except ImportError:
+    import configparser
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -61,6 +66,19 @@ class Settings(object):
         self.user_config = ConfigParser.SafeConfigParser()
         self._loaded_paths = self.user_config.read(FILE_SEARCH)
 
+        self._validate()
+
+    def _validate(self):
+        '''
+        Validates the settings to ensure they're correct.
+        '''
+        start = self.get('google calendar.default-start-time')
+        if not re.match('^\d+:\d{2}$', start):
+            raise ValueError(
+                ("google calendar.default-start-time ({0}) not "
+                 "in correct format: H:mm").format(start)
+            )
+
     def get(self, key):
         '''
         Get a setting in the form of "section.key" (e.g. "nest.device").
@@ -97,6 +115,7 @@ class Settings(object):
             nest_device=self.get("nest.device"),
             nest_max_hold=self.get("nest.maximum-hold-days"),
             gcal_calendar_id=self.get("google calendar.calendar-name"),
+            default_start_time=self.get("google calendar.default-start-time"),
         )
 
     def as_string(self, mask=True):

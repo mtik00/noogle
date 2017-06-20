@@ -11,11 +11,14 @@ from __future__ import print_function
 import sys
 import argparse
 
+import arrow
+
 from gcal_nest.logger import get_logger
 from gcal_nest.settings import get_settings
 from gcal_nest import __version__ as library_version
 from gcal_nest.gcal import setup as gcal_setup, get_next_events
 from gcal_nest.nest_control import setup as nest_setup
+from gcal_nest.cache import get_cache
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -58,10 +61,29 @@ def parse_args(default_args=None):
 
 def show_events():
     '''Display the next events.'''
-    events = get_next_events()
+    events, _ = get_next_events()
+
     for event in events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+        print(
+            "{:<19s}({:^9}) {}".format(event.scheduled_date.format('YYYY-MM-DD h:mmA'), event.state, event.name)
+        )
+
+
+def go(project_settings, logger):
+    # Grab the next 10 events
+    events, timezone = get_next_events(max_results=10)
+
+    # Add them to the cache if they aren't already there
+    cache = get_cache()
+
+    for event in events:
+        if not cache.exists(event.event_id):
+            print("caching new event: {0}".format(event))
+            cache.add_event(event)
+
+    # Get all events that haven't been actioned
+    events = [x for x in cache.waiting()]
+    print(events)
 
 
 # Globals #####################################################################
@@ -69,7 +91,7 @@ def main():
     '''The main entry point for the CLI application'''
     print("Using gcal_nest v{0}\n".format(library_version))
 
-    get_logger()
+    logger = get_logger()
     args = parse_args()
     project_settings = get_settings()
 
@@ -86,6 +108,8 @@ def main():
         nest_setup()
     elif args.events:
         show_events()
+    else:
+        go(project_settings, logger)
 
 
 if __name__ == '__main__':
