@@ -35,11 +35,11 @@ CREATE TABLE IF NOT EXISTS events (
 '''
 
 
-def get_cache():
+def get_cache(debug=False):
     '''Return the application's Cache object.'''
     global CACHE  # pylint:disable=W0603
     if not CACHE:
-        CACHE = Cache()
+        CACHE = Cache(debug=debug)
 
     return CACHE
 
@@ -55,11 +55,15 @@ class Cache(object):
             VALUES(?,?,?,?,?,?,?,?)
     '''
 
-    def __init__(self, path=None):
+    def __init__(self, path=None, debug=False):
         if not os.path.isdir(USER_FOLDER):
             os.makedirs(USER_FOLDER)
 
-        self.default_path = os.path.join(USER_FOLDER, 'gcal_nest.db')
+        if debug:
+            self.default_path = os.path.join(USER_FOLDER, 'gcal_nest-debug.db')
+        else:
+            self.default_path = os.path.join(USER_FOLDER, 'gcal_nest.db')
+
         self.conn = sqlite3.connect(path or self.default_path)
         self.cursor = self.conn.cursor()
         self._columns = []

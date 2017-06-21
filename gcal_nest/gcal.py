@@ -82,13 +82,14 @@ def setup(noauth_local_webserver=False):
         )
 
 
-def get_next_events(max_results=10, q_filter='nest'):
+def get_next_events(max_results=10, q_filter=None):
     '''
     Returns a list of events filtered by ``q_filter``.
 
     :param int max_results: The maximum number of results to return
     :param str q: This is the "advanced search syntax" item
     '''
+    q_filter = q_filter or 'nest'
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
