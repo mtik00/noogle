@@ -111,8 +111,9 @@ class Settings(object):
         text = open(default_settings_file).read()
 
         return text.format(
-            nest_eco_temperature=self.get("nest.eco-temperature"),
             nest_device=self.get("nest.device"),
+            nest_structure=self.get("nest.structure"),
+            nest_eco_temperature=self.get("nest.eco-temperature"),
             nest_max_hold=self.get("nest.maximum-hold-days"),
             gcal_calendar_id=self.get("google calendar.calendar-name"),
             default_start_time=self.get("google calendar.default-start-time"),

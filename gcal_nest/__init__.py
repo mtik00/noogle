@@ -5,12 +5,6 @@ This module holds the main interface for the gcal_nest package.
 '''
 
 # Imports #####################################################################
-# from .settings import get_object as get_settings_object
-# from .logger import get_logger
-import logging
-
-import click
-
 from .gcal import get_next_events
 from .helpers import print_log
 

@@ -16,7 +16,7 @@ from gcal_nest.logger import get_logger
 from gcal_nest.settings import get_settings
 from gcal_nest import __version__ as library_version
 from gcal_nest.gcal import setup as gcal_setup, get_next_events
-from gcal_nest.nest_control import setup as nest_setup
+from gcal_nest.nest_control import setup as nest_setup, get_napi_thermostat
 from gcal_nest.cache import get_cache
 from gcal_nest import main
 from gcal_nest.helpers import print_log
@@ -39,6 +39,7 @@ class Ctx(object):
         self.project_settings = get_settings()
         self.cache = get_cache()
         self.quiet = False
+        self.napi = None
 
 
 CONTEXT = click.make_pass_decorator(Ctx, ensure=True)
@@ -78,10 +79,12 @@ def show():
 
 @show.command()
 @CONTEXT
-def events(ctx):
+@click.option(
+    '--max-events', default=10, help='maximum number of events to show')
+def events(ctx, max_events):
     '''Display the next events from Google calendar'''
 
-    nest_events = get_next_events()
+    nest_events = get_next_events(max_results=max_events)
 
     for event in nest_events:
         print(
@@ -109,6 +112,52 @@ def cache(ctx):
         )
 
     click.echo_via_pager("\n".join(str_events))
+
+
+@show.command()
+@CONTEXT
+def thermostat(ctx):
+    '''Show the current thermostat info'''
+    thermostat = get_napi_thermostat(ctx)
+
+    print_log(
+        ctx,
+        '%s : %s' % (
+            thermostat.structure.name,
+            thermostat.name)
+    )
+
+    setpoint = "%s%s (%s)" % (thermostat.target, thermostat.temperature_scale, thermostat.mode)
+    if thermostat.mode.lower() == 'eco':
+        setpoint = "%s%s (eco)" % (thermostat.eco_temperature.low, thermostat.temperature_scale)
+    print_log(ctx, '...current setpoint: %s' % setpoint)
+
+    print_log(
+        ctx,
+        '...current temperature: %s%s' % (
+            thermostat.temperature,
+            thermostat.temperature_scale
+        )
+    )
+
+    print_log(
+        ctx,
+        '...current humidity: %s%%' % thermostat.humidity
+    )
+
+    print_log(
+        ctx,
+        '...state: %s' % thermostat.hvac_state
+    )
+
+    print_log(
+        ctx,
+        '...eco temperatures: low={low}{scale}, high={high}{scale}'.format(
+            low=thermostat.eco_temperature.low,
+            scale=thermostat.temperature_scale,
+            high=thermostat.eco_temperature.high
+        )
+    )
 
 
 @cli.group()
@@ -141,7 +190,7 @@ def gcal(ctx, noauth_local_webserver):
 def nest(ctx):
     '''Set up Nest'''
     ctx.logger.debug('calling `nest_setup`')
-    nest_setup()
+    nest_setup(ctx)
     ctx.logger.debug('...done')
 
 
