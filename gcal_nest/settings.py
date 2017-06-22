@@ -55,6 +55,8 @@ class Settings(object):
     '''A simple interface to a project's settings stored as a dictionary.'''
 
     def __init__(self):
+        # Do our own converstions for certain items.  The ones built in to
+        # ConfigParser (e.g. `.getboolean()`) are finicky.
         self.conversions = {
             'general.use-logfile': self._to_bool_or_none
         }
@@ -62,16 +64,17 @@ class Settings(object):
         default_settings_file = pkg_resources.resource_filename(
             'gcal_nest', 'conf/gcal_nest_settings.ini')
 
-        self.default_config = ConfigParser.SafeConfigParser()
+        self.config = ConfigParser.SafeConfigParser()
 
         with open(default_settings_file) as fp:
-            self.default_config.readfp(fp)
+            self.config.readfp(fp)
 
-        self._user_path = os.path.join(os.path.expanduser('~'), ".gcal_nest", SETTINGS_FILENAME)
+        self._user_path = os.path.join(
+            os.path.expanduser('~'),
+            '.gcal_nest',
+            SETTINGS_FILENAME)
 
-        # Keep the two separate (why again?  I can't remember)
-        self.user_config = ConfigParser.SafeConfigParser()
-        self._loaded_paths = self.user_config.read(FILE_SEARCH)
+        self._loaded_paths = self.config.read(FILE_SEARCH)
 
         self._validate()
 
@@ -100,29 +103,20 @@ class Settings(object):
         '''
         Get a setting in the form of "section.key" (e.g. "nest.device").
         '''
-        # func = Settings.conversions.get(key, 'get')
         section, key = item.split('.', 1)
-
-        val = None
-        try:
-            val = self.user_config.get(section, key)
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-            val = self.default_config.get(section, key)
+        val = self.config.get(section, key)
 
         if item in self.conversions:
             return self.conversions[item](val)
 
         return val
 
-    def set(self, key, value):
+    def set(self, item, value):
         '''
         Set a setting in the form of `"section.key" = value` (e.g. "nest.device", 'Test').
         '''
-        section, key = key.split('.', 1)
-        try:
-            self.user_config.set(section, key, value)
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-            self.default_config.set(section, key, value)
+        section, key = item.split('.', 1)
+        self.config.set(section, key, value)
 
     def as_ini_file(self):
         '''
@@ -152,8 +146,8 @@ class Settings(object):
         '''
         lines = []
 
-        for section in self.default_config.sections():
-            for key in sorted(self.default_config.options(section)):
+        for section in self.config.sections():
+            for key in sorted(self.config.options(section)):
                 modfied_key = section + '.' + key
                 value = self.get(modfied_key)
                 if (value is not None) and mask and (modfied_key in SECRET_SETTINGS):
