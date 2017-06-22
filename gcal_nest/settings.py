@@ -22,7 +22,7 @@ __creationDate__ = '05-JUN-2017'
 # Globals #####################################################################
 
 _SETTINGS = None
-SETTINGS_FILENAME = 'gcal_nest_settings.ini'
+SETTINGS_FILENAME = 'gcal_nest.ini'
 USER_FOLDER = os.path.join(os.path.expanduser('~'), ".gcal_nest")
 FILE_SEARCH = [
     os.path.join("/etc/gcal_nest", SETTINGS_FILENAME),
@@ -53,6 +53,23 @@ def absjoin(*args):
 
 class Settings(object):
     '''A simple interface to a project's settings stored as a dictionary.'''
+    settings = {
+        'general': {
+            'use-logfile': True
+        },
+        'nest': {
+            'structure': None,
+            'device': None,
+            'eco-temperature': 50,
+            'maximum-hold-days': 10,
+            'product-id': None,
+            'product-secret': None
+        },
+        'calendar' : {
+            'name': 'primary',
+            'default-start-time': '9:00'
+        }
+    }
 
     def __init__(self):
         # Do our own converstions for certain items.  The ones built in to
@@ -61,20 +78,19 @@ class Settings(object):
             'general.use-logfile': self._to_bool_or_none
         }
 
-        default_settings_file = pkg_resources.resource_filename(
-            'gcal_nest', 'conf/gcal_nest_settings.ini')
-
-        self.config = ConfigParser.SafeConfigParser()
-
-        with open(default_settings_file) as fp:
-            self.config.readfp(fp)
+        config = ConfigParser.SafeConfigParser()
 
         self._user_path = os.path.join(
             os.path.expanduser('~'),
             '.gcal_nest',
             SETTINGS_FILENAME)
 
-        self._loaded_paths = self.config.read(FILE_SEARCH)
+        self._loaded_paths = config.read(FILE_SEARCH)
+
+        for section in config.sections():
+            for key, value in config.items(section):
+                if value is not None:
+                    self.settings[section][key] = value
 
         self._validate()
 
@@ -92,10 +108,10 @@ class Settings(object):
         '''
         Validates the settings to ensure they're correct.
         '''
-        start = self.get('google calendar.default-start-time')
+        start = self.settings['calendar']['default-start-time']
         if not re.match(r'^\d+:\d{2}$', start):
             raise ValueError(
-                ("google calendar.default-start-time ({0}) not "
+                ("calendar.default-start-time ({0}) not "
                  "in correct format: H:mm").format(start)
             )
 
@@ -104,7 +120,7 @@ class Settings(object):
         Get a setting in the form of "section.key" (e.g. "nest.device").
         '''
         section, key = item.split('.', 1)
-        val = self.config.get(section, key)
+        val = self.settings.get(section, {}).get(key, None)
 
         if item in self.conversions:
             return self.conversions[item](val)
@@ -116,7 +132,7 @@ class Settings(object):
         Set a setting in the form of `"section.key" = value` (e.g. "nest.device", 'Test').
         '''
         section, key = item.split('.', 1)
-        self.config.set(section, key, value)
+        self.settings[section][key] = value
 
     def as_ini_file(self):
         '''
@@ -131,13 +147,13 @@ class Settings(object):
         # FYI, we don't need to convert these values; They will default to
         # string(), which is fine.
         return text.format(
-            use_logfile=self.get("general.use-logfile"),
-            nest_device=self.get("nest.device"),
-            nest_structure=self.get("nest.structure"),
-            nest_eco_temperature=self.get("nest.eco-temperature"),
-            nest_max_hold=self.get("nest.maximum-hold-days"),
-            gcal_calendar_id=self.get("google calendar.calendar-name"),
-            default_start_time=self.get("google calendar.default-start-time"),
+            use_logfile="" if self.settings['general']['use-logfile'] is None else self.settings['general']['use-logfile'],
+            nest_device="" if self.settings['nest']['device'] is None else self.settings['nest']['device'],
+            nest_structure="" if self.settings['nest']['structure'] is None else self.settings['nest']['structure'],
+            nest_eco_temperature="" if self.settings['nest']['eco-temperature'] is None else self.settings['nest']['eco-temperature'],
+            nest_max_hold="" if self.settings['nest']['maximum-hold-days'] is None else self.settings['nest']['maximum-hold-days'],
+            gcal_calendar_id="" if self.settings['calendar']['name'] is None else self.settings['calendar']['name'],
+            default_start_time="" if self.settings['calendar']['default-start-time'] is None else self.settings['calendar']['default-start-time'],
         )
 
     def as_string(self, mask=True):
@@ -146,10 +162,10 @@ class Settings(object):
         '''
         lines = []
 
-        for section in self.config.sections():
-            for key in sorted(self.config.options(section)):
+        for section in sorted(self.settings.keys()):
+            for key in sorted(self.settings[section].keys()):
+                value = self.settings[section][key]
                 modfied_key = section + '.' + key
-                value = self.get(modfied_key)
                 if (value is not None) and mask and (modfied_key in SECRET_SETTINGS):
                     lines.append("%s.%s = <MASKED>" % (section, key))
                 elif value is not None:
