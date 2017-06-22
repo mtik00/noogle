@@ -171,7 +171,7 @@ class Cache(object):
     def add_if_not_exists(self, ctx, events, commit=True):
         for event in events:
             if not self.exists(event.event_id):
-                print_log(ctx, "caching new event: {0}".format(event))
+                print_log("caching new event: {0}".format(event))
                 self.add_event(event)
 
     def init(self):

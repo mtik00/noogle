@@ -29,12 +29,12 @@ def init():
     '''
     ctx = click.get_current_context().obj
 
-    print_log(ctx, 'Initializing cache...', nl=False)
+    print_log('Initializing cache...', nl=False)
     ctx.cache.init()
-    print_log(ctx, '...done')
-    print_log(ctx, '...cache file at: %s' % ctx.cache.default_path)
+    print_log('...done')
+    print_log('...cache file at: %s' % ctx.cache.default_path)
 
-    print_log(ctx, 'Initializing user settings...', nl=False)
+    print_log('Initializing user settings...', nl=False)
     ctx.project_settings.make_user_settings()
-    print_log(ctx, '...done')
-    print_log(ctx, '...settings file at: %s' % ctx.project_settings._user_path)
+    print_log('...done')
+    print_log('...settings file at: %s' % ctx.project_settings._user_path)

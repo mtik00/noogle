@@ -37,18 +37,18 @@ def go():
     # ctx.logger.fatal("doh!")
 
     # Grab the next 10 events
-    print_log(ctx, 'Reading events from Google calendar...', nl=False)
+    print_log('Reading events from Google calendar...', nl=False)
     q_filter = 'nestd' if ctx.debug else 'nest'
     my_events = get_next_events(max_results=10, q_filter=q_filter)
-    print_log(ctx, '...done')
+    print_log('...done')
 
     ctx.cache.add_if_not_exists(ctx, my_events)
 
     # for event in my_events:
     #     if not ctx.cache.exists(event.event_id):
-    #         print_log(ctx, "caching new event: {0}".format(event))
+    #         print_log("caching new event: {0}".format(event))
     #         ctx.cache.add_event(event)
 
     # Get all events that haven't been actioned
     my_events = [x for x in ctx.cache.waiting()]
-    print_log(ctx, my_events)
+    print_log(my_events)

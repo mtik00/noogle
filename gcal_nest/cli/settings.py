@@ -42,3 +42,5 @@ def show():
     '''Display the settings.'''
     ctx = click.get_current_context().obj
     ctx.project_settings.print_settings()
+    import pdb; pdb.set_trace()
+    print "here"

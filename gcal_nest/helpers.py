@@ -21,7 +21,9 @@ __license__ = 'Proprietary'
 
 
 # Globals #####################################################################
-def print_log(ctx, message, nl=True, log_level=logging.DEBUG):
+def print_log(message, nl=True, log_level=logging.DEBUG):
+    ctx = click.get_current_context().obj
+
     if not ctx.quiet:
         click.echo(message, nl=nl)
 

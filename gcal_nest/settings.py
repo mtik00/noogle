@@ -53,12 +53,15 @@ def absjoin(*args):
 
 class Settings(object):
     '''A simple interface to a project's settings stored as a dictionary.'''
+
     def __init__(self):
         default_settings_file = pkg_resources.resource_filename(
             'gcal_nest', 'conf/gcal_nest_settings.ini')
 
         self.default_config = ConfigParser.SafeConfigParser()
-        self.default_config.readfp(open(default_settings_file))
+
+        with open(default_settings_file) as fp:
+            self.default_config.readfp(fp)
 
         self._user_path = os.path.join(os.path.expanduser('~'), ".gcal_nest", SETTINGS_FILENAME)
 
@@ -111,6 +114,7 @@ class Settings(object):
         text = open(default_settings_file).read()
 
         return text.format(
+            use_logfile=str(self.get("general.use-logfile")),
             nest_device=self.get("nest.device"),
             nest_structure=self.get("nest.structure"),
             nest_eco_temperature=self.get("nest.eco-temperature"),

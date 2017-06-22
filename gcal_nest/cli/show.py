@@ -83,7 +83,6 @@ def thermostat():
     thermostat = get_napi_thermostat(ctx)
 
     print_log(
-        ctx,
         '%s : %s' % (
             thermostat.structure.name,
             thermostat.name)
@@ -92,10 +91,9 @@ def thermostat():
     setpoint = "%s%s (%s)" % (thermostat.target, thermostat.temperature_scale, thermostat.mode)
     if thermostat.mode.lower() == 'eco':
         setpoint = "%s%s (eco)" % (thermostat.eco_temperature.low, thermostat.temperature_scale)
-    print_log(ctx, '...current setpoint: %s' % setpoint)
+    print_log('...current setpoint: %s' % setpoint)
 
     print_log(
-        ctx,
         '...current temperature: %s%s' % (
             thermostat.temperature,
             thermostat.temperature_scale
@@ -103,17 +101,14 @@ def thermostat():
     )
 
     print_log(
-        ctx,
         '...current humidity: %s%%' % thermostat.humidity
     )
 
     print_log(
-        ctx,
         '...state: %s' % thermostat.hvac_state
     )
 
     print_log(
-        ctx,
         '...eco temperatures: low={low}{scale}, high={high}{scale}'.format(
             low=thermostat.eco_temperature.low,
             scale=thermostat.temperature_scale,
