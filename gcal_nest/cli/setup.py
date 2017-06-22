@@ -15,7 +15,7 @@ import sys
 import click
 
 from ..gcal import setup as gcal_setup
-from ..nest_control import setup as nest_setup
+from ..nest import setup as nest_setup
 
 
 # Metadata ####################################################################

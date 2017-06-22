@@ -5,7 +5,7 @@ This module has the class used to control the Nest thermostat.
 '''
 
 # Imports #####################################################################
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import os
 
 import nest

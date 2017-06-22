@@ -13,7 +13,7 @@ This module holds the cli `show` commands
 import click
 
 from ..gcal import get_next_events
-from ..nest_control import get_napi_thermostat
+from ..nest import get_napi_thermostat
 from ..helpers import print_log
 
 # Metadata ####################################################################
