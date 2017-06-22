@@ -55,6 +55,10 @@ class Settings(object):
     '''A simple interface to a project's settings stored as a dictionary.'''
 
     def __init__(self):
+        self.conversions = {
+            'general.use-logfile': self._to_bool_or_none
+        }
+
         default_settings_file = pkg_resources.resource_filename(
             'gcal_nest', 'conf/gcal_nest_settings.ini')
 
@@ -65,11 +69,21 @@ class Settings(object):
 
         self._user_path = os.path.join(os.path.expanduser('~'), ".gcal_nest", SETTINGS_FILENAME)
 
-        # Keep the two separate
+        # Keep the two separate (why again?  I can't remember)
         self.user_config = ConfigParser.SafeConfigParser()
         self._loaded_paths = self.user_config.read(FILE_SEARCH)
 
         self._validate()
+
+    def _to_bool_or_none(self, value):
+        '''
+        Tries to convert the value to a boolean or None.  We use this
+        because `ConfigParser.getboolean()` does not work with None.
+        '''
+        if value is None:
+            return None
+
+        return bool(re.match(r'^[1ty]', str(value), re.IGNORECASE))
 
     def _validate(self):
         '''
@@ -82,16 +96,23 @@ class Settings(object):
                  "in correct format: H:mm").format(start)
             )
 
-    def get(self, key):
+    def get(self, item):
         '''
         Get a setting in the form of "section.key" (e.g. "nest.device").
         '''
-        section, key = key.split('.', 1)
+        # func = Settings.conversions.get(key, 'get')
+        section, key = item.split('.', 1)
 
+        val = None
         try:
-            return self.user_config.get(section, key)
+            val = self.user_config.get(section, key)
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-            return self.default_config.get(section, key)
+            val = self.default_config.get(section, key)
+
+        if item in self.conversions:
+            return self.conversions[item](val)
+
+        return val
 
     def set(self, key, value):
         '''
@@ -113,8 +134,10 @@ class Settings(object):
 
         text = open(default_settings_file).read()
 
+        # FYI, we don't need to convert these values; They will default to
+        # string(), which is fine.
         return text.format(
-            use_logfile=str(self.get("general.use-logfile")),
+            use_logfile=self.get("general.use-logfile"),
             nest_device=self.get("nest.device"),
             nest_structure=self.get("nest.structure"),
             nest_eco_temperature=self.get("nest.eco-temperature"),
@@ -133,9 +156,9 @@ class Settings(object):
             for key in sorted(self.default_config.options(section)):
                 modfied_key = section + '.' + key
                 value = self.get(modfied_key)
-                if value and mask and (modfied_key in SECRET_SETTINGS):
+                if (value is not None) and mask and (modfied_key in SECRET_SETTINGS):
                     lines.append("%s.%s = <MASKED>" % (section, key))
-                elif value:
+                elif value is not None:
                     lines.append("%s.%s = %s" % (section, key, value))
                 else:
                     lines.append("%s.%s = <EMPTY>" % (section, key))
