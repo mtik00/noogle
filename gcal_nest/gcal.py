@@ -15,8 +15,9 @@ from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
+from googleapiclient.errors import HttpError
 
-from .settings import USER_FOLDER
+from .settings import USER_FOLDER, get_settings
 from .event import Event
 
 # Metadata ####################################################################
@@ -89,6 +90,7 @@ def get_next_events(max_results=10, q_filter='nest'):
     :param int max_results: The maximum number of results to return
     :param str q: This is the "advanced search syntax" item
     '''
+    calendar_id = get_settings().get('google calendar.calendar-name') or 'primary'
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
@@ -96,9 +98,15 @@ def get_next_events(max_results=10, q_filter='nest'):
 
     timezone = service.settings().get(setting='timezone').execute()['value']
 
-    events_result = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=max_results,
-        singleEvents=True, orderBy='startTime', q=q_filter).execute()
+    try:
+        events_result = service.events().list(
+            calendarId=calendar_id, timeMin=now, maxResults=max_results,
+            singleEvents=True, orderBy='startTime', q=q_filter).execute()
+    except HttpError as e:
+        if e.resp['status'] == '404':
+            raise ValueError('Could not find your calendar: "%s".  Please check your settings!' % calendar_id)
+
+        raise
 
     temp_events = events_result.get('items', [])
     events = [Event(gcal_event=x, timezone=timezone) for x in temp_events]
