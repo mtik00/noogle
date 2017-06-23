@@ -42,3 +42,23 @@ def show():
     '''Display the settings.'''
     ctx = click.get_current_context().obj
     ctx.project_settings.print_settings()
+
+
+@settings.command()
+@click.argument('name')
+@click.argument('value')
+def set(name, value):
+    '''Set a setting'''
+    project_settings = click.get_current_context().obj.project_settings
+    project_settings.set(name, value)
+    project_settings.save()
+    project_settings.print_settings()
+
+
+@settings.command()
+@click.argument('name')
+def get(name):
+    '''Show a setting'''
+    project_settings = click.get_current_context().obj.project_settings
+    value = project_settings.get(name)
+    click.echo('%s: %s' % (name, value))
