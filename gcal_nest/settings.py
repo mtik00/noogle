@@ -65,9 +65,10 @@ class Settings(object):
             'product-id': None,
             'product-secret': None
         },
-        'calendar' : {
+        'calendar': {
             'name': 'primary',
-            'default-start-time': '9:00'
+            'default-start-time': '9:00',
+            'lookback': 2,
         }
     }
 
@@ -75,7 +76,8 @@ class Settings(object):
         # Do our own converstions for certain items.  The ones built in to
         # ConfigParser (e.g. `.getboolean()`) are finicky.
         self.conversions = {
-            'general.use-logfile': self._to_bool_or_none
+            'general.use-logfile': self._to_bool_or_none,
+            'calendar.lookback': self._to_int
         }
 
         config = ConfigParser.SafeConfigParser()
@@ -93,6 +95,15 @@ class Settings(object):
                     self.settings[section][key] = value
 
         self._validate()
+
+    def _to_int(self, value):
+        '''
+        Tries to convert the value to an integer or None.
+        '''
+        if (value is None) or (not value.isdigit()):
+            return None
+
+        return int(value)
 
     def _to_bool_or_none(self, value):
         '''
@@ -154,6 +165,7 @@ class Settings(object):
             nest_max_hold="" if self.settings['nest']['maximum-hold-days'] is None else self.settings['nest']['maximum-hold-days'],
             gcal_calendar_id="" if self.settings['calendar']['name'] is None else self.settings['calendar']['name'],
             default_start_time="" if self.settings['calendar']['default-start-time'] is None else self.settings['calendar']['default-start-time'],
+            lookback="" if self.settings['calendar']['lookback'] is None else self.settings['calendar']['lookback'],
         )
 
     def as_string(self, mask=True):

@@ -8,9 +8,9 @@ This module holds the interface to Google calendar.
 from __future__ import print_function
 import os
 import argparse
-import datetime
 import httplib2
 
+import arrow
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
@@ -83,24 +83,31 @@ def setup(noauth_local_webserver=False):
         )
 
 
-def get_next_events(max_results=10, q_filter='nest'):
+def get_next_events(max_results=10, q_filter='nest', since=None):
     '''
     Returns a list of events filtered by ``q_filter``.
 
     :param int max_results: The maximum number of results to return
     :param str q: This is the "advanced search syntax" item
+    :param datetime since: Get the events since this date
     '''
-    calendar_id = get_settings().get('calendar.calendar-name') or 'primary'
+    calendar_id = get_settings().get('calendar.name') or 'primary'
+
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
-    now = datetime.datetime.utcnow().isoformat() + 'Z'
+
+    if since:
+        since = since.to('UTC').isoformat()
+    else:
+        lookback = get_settings().get('calendar.lookback') or 0
+        since = arrow.now().replace(days=-1 * lookback, hour=0, minute=0, second=0, microsecond=0).isoformat()
 
     timezone = service.settings().get(setting='timezone').execute()['value']
 
     try:
         events_result = service.events().list(
-            calendarId=calendar_id, timeMin=now, maxResults=max_results,
+            calendarId=calendar_id, timeMin=since, maxResults=max_results,
             singleEvents=True, orderBy='startTime', q=q_filter).execute()
     except HttpError as e:
         if e.resp['status'] == '404':

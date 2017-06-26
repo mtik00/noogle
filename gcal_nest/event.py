@@ -46,7 +46,6 @@ class Event(object):
 
     def from_db(self, db_dict):
         '''Initialize this object from a db row dict.'''
-        # import pdb; pdb.set_trace()
         self.name = db_dict['name']
         self.event_id = db_dict['event_id']
         self.calendar_id = db_dict['calendar_id']

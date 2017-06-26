@@ -11,6 +11,7 @@ This module holds the cli `show` commands
 
 # Imports #####################################################################
 import click
+import arrow
 
 from ..gcal import get_next_events
 from ..nest import get_napi_thermostat
@@ -44,7 +45,12 @@ def events(max_events):
     if ctx.debug:
         q = 'nestd'
 
-    nest_events = get_next_events(max_results=max_events, q_filter=q)
+    lookback = ctx.project_settings.get('calendar.lookback') or 0
+
+    since = arrow.now().replace(days=-1 * lookback, hour=0, minute=0, second=0, microsecond=0)
+
+    print_log('Showing events since %s' % since.strftime('%A, %d %B'))
+    nest_events = get_next_events(max_results=max_events, q_filter=q, since=since)
 
     for event in nest_events:
         print_log(
