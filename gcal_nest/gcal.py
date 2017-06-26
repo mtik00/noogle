@@ -90,7 +90,7 @@ def get_next_events(max_results=10, q_filter='nest'):
     :param int max_results: The maximum number of results to return
     :param str q: This is the "advanced search syntax" item
     '''
-    calendar_id = get_settings().get('google calendar.calendar-name') or 'primary'
+    calendar_id = get_settings().get('calendar.calendar-name') or 'primary'
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)

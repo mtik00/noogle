@@ -58,11 +58,12 @@ class Event(object):
 
     def from_gcal_dict(self, event, timezone):
         '''Initialize this object from a google calendar dict'''
-        default_start_time = get_settings().get('google calendar.default-start-time')
+        default_start_time = get_settings().get('calendar.default-start-time')
 
         self.name = event['summary']
         self.event_id = event['id']
         self.parent_event_id = None
+
         if 'date' in event['start']:
             self.scheduled_date = arrow.get(event['start']['date'] + ' ' + default_start_time + ' ' + timezone, 'YYYY-MM-DD H:mm ZZZ')
         else:
