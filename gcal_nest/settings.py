@@ -96,21 +96,25 @@ class Settings(object):
 
         self._validate()
 
-    def _to_int(self, value):
+    def _to_int(self, value, base=10):
         '''
         Tries to convert the value to an integer or None.
         '''
-        if (value is None) or (not value.isdigit()):
+        if isinstance(value, int):
+            return value
+        elif (value is None) or (not value.isdigit()):
             return None
 
-        return int(value)
+        return int(value, base=base)
 
     def _to_bool_or_none(self, value):
         '''
         Tries to convert the value to a boolean or None.  We use this
         because `ConfigParser.getboolean()` does not work with None.
         '''
-        if value is None:
+        if isinstance(value, bool):
+            return value
+        elif value is None:
             return None
 
         return bool(re.match(r'^[1ty]', str(value), re.IGNORECASE))
