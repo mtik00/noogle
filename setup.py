@@ -29,10 +29,11 @@ if __name__ == '__main__':
         zip_safe=True,
         include_package_data=True,
         test_suite="tests",
+        license='MIT',
 
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         classifiers=[
-            'Development Status :: 4 - Beta',
+            'Development Status :: 3 - Alpha',
             'Environment :: Console',
             'License :: OSI Approved :: MIT License',
             'Programming Language :: Python',
