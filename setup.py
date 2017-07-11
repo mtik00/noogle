@@ -14,6 +14,7 @@ if __name__ == '__main__':
         version="1.0.0",
         description="Google Calendar <--> Nest controller",
         author="Timothy McFadden",
+        author_email="tim@timandjamie.com",
         url="https://github.com/mtik00/gcal_nest",
         download_url=(
             "https://github.com/mtik00/gcal_nest/releases/download/v{0}/"
