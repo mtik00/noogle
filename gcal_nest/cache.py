@@ -6,6 +6,7 @@ This module holds the cache for the gcal_nest application.
 
 # Imports #####################################################################
 import os
+import sys
 import sqlite3
 
 import arrow
@@ -20,6 +21,11 @@ __creationDate__ = '05-JUN-2017'
 
 
 # Globals #####################################################################
+if sys.version_info.major == 2:
+    my_basestring = basestring
+else:
+    my_basestring = str
+
 CACHE = None
 DB_INIT = '''
 CREATE TABLE IF NOT EXISTS events (
@@ -99,7 +105,7 @@ class Cache(object):
         data = self.cursor.fetchall()
         events = [
             Event(
-                db_dict=dict(zip(self.columns, x))
+                db_dict=dict(list(zip(self.columns, x)))
             ) for x in data]
 
         return sorted(events, key=lambda x: x.scheduled_date)
@@ -108,7 +114,7 @@ class Cache(object):
         '''
         Mark the event as completed.
         '''
-        if isinstance(event, basestring):
+        if isinstance(event, my_basestring):
             event_id = event
         else:
             event_id = event.event_id
@@ -130,7 +136,7 @@ class Cache(object):
 
         if data:
             return Event(
-                db_dict=dict(zip(self.columns, data))
+                db_dict=dict(list(zip(self.columns, data)))
             )
 
         return None
@@ -187,7 +193,7 @@ class Cache(object):
         '''
         for row in self.conn.execute('SELECT * FROM events ORDER BY scheduled_date DESC'):
             yield Event(
-                db_dict=dict(zip(self.columns, row))
+                db_dict=dict(list(zip(self.columns, row)))
             )
 
 
