@@ -10,7 +10,7 @@ import os
 
 import nest
 
-from .compat import get_input
+from .compat import prompt
 from .settings import get_settings, USER_FOLDER
 
 
@@ -60,7 +60,7 @@ def get_nest_api(ctx):
 
     if napi.authorization_required:
         print('Go to ' + napi.authorize_url + ' to authorize, then enter PIN below')
-        pin = get_input("PIN: ")
+        pin = prompt("PIN: ")
         napi.request_token(pin)
 
     ctx.napi = napi

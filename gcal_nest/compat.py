@@ -8,6 +8,8 @@
 '''
 This module is used to provide compatability functions/objects between Python
 2 and Python 3.
+
+This is basically a rip-off of six.py, just a lot smaller.
 '''
 
 # Imports #####################################################################
@@ -20,17 +22,12 @@ __license__ = 'Proprietary'
 
 
 # Globals #####################################################################
-if sys.version_info.major == 2:
-    MY_BASESTRING = basestring
+PY2 = sys.version_info.major == 2
+PY3 = sys.version_info.major == 3
+
+if PY3:
+    string_types = str,
+    prompt = input
 else:
-    MY_BASESTRING = str
-
-
-def get_input(prompt):
-    '''
-    Python 2 and 3 compatible way of getting user input.
-    '''
-    if sys.version_info.major == 2:
-        return raw_input(prompt)
-    else:
-        return input(prompt)
+    string_types = basestring,
+    prompt = raw_input

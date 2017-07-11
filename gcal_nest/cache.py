@@ -6,7 +6,6 @@ This module holds the cache for the gcal_nest application.
 
 # Imports #####################################################################
 import os
-import sys
 import sqlite3
 
 import arrow
@@ -14,7 +13,7 @@ import arrow
 from .settings import USER_FOLDER
 from .event import Event
 from .helpers import print_log
-from .compat import MY_BASESTRING
+from .compat import string_types
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -110,7 +109,7 @@ class Cache(object):
         '''
         Mark the event as completed.
         '''
-        if isinstance(event, MY_BASESTRING):
+        if type(event) in string_types:
             event_id = event
         else:
             event_id = event.event_id
