@@ -1,1 +1,2 @@
 recursive-include gcal_nest *.*
+global-exclude *.py[cod]
