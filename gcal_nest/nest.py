@@ -10,12 +10,9 @@ import os
 
 import nest
 
+from .compat import get_input
 from .settings import get_settings, USER_FOLDER
 
-try:
-    input = raw_input
-except NameError:
-    pass
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -63,7 +60,7 @@ def get_nest_api(ctx):
 
     if napi.authorization_required:
         print('Go to ' + napi.authorize_url + ' to authorize, then enter PIN below')
-        pin = input("PIN: ")
+        pin = get_input("PIN: ")
         napi.request_token(pin)
 
     ctx.napi = napi

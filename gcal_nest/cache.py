@@ -14,6 +14,7 @@ import arrow
 from .settings import USER_FOLDER
 from .event import Event
 from .helpers import print_log
+from .compat import MY_BASESTRING
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -21,11 +22,6 @@ __creationDate__ = '05-JUN-2017'
 
 
 # Globals #####################################################################
-if sys.version_info.major == 2:
-    my_basestring = basestring
-else:
-    my_basestring = str
-
 CACHE = None
 DB_INIT = '''
 CREATE TABLE IF NOT EXISTS events (
@@ -114,7 +110,7 @@ class Cache(object):
         '''
         Mark the event as completed.
         '''
-        if isinstance(event, my_basestring):
+        if isinstance(event, MY_BASESTRING):
             event_id = event
         else:
             event_id = event.event_id

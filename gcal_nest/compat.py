@@ -1,30 +1,36 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python2.7
+# coding: utf-8
 ###############################################################################
 #                                                                             #
-#  Copyright (C) 2017 Broadcom Ltd.  All rights reserved.                     #
+#  Copyright (C) 2015-2017 Broadcom Ltd.  All rights reserved.                #
 #                                                                             #
 ###############################################################################
 '''
-This modules holds common project functions.
+This module is used to provide compatability functions/objects between Python
+2 and Python 3.
 '''
 
 # Imports #####################################################################
-import logging
-
-import click
+import sys
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
-__creationDate__ = '20-JUN-2017'
+__creationDate__ = '11-JUL-2017'
 __license__ = 'Proprietary'
 
 
 # Globals #####################################################################
-def print_log(message, nl=True, log_level=logging.DEBUG):
-    ctx = click.get_current_context().obj
+if sys.version_info.major == 2:
+    MY_BASESTRING = basestring
+else:
+    MY_BASESTRING = str
 
-    if not ctx.quiet:
-        click.echo(message, nl=nl)
 
-    ctx.logger.log(log_level, message)
+def get_input(prompt):
+    '''
+    Python 2 and 3 compatible way of getting user input.
+    '''
+    if sys.version_info.major == 2:
+        return raw_input(prompt)
+    else:
+        return input(prompt)
