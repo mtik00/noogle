@@ -8,12 +8,8 @@ This module holds the interface to the application settings.
 from __future__ import print_function
 import os
 import re
+import configparser
 import pkg_resources
-
-try:
-    import ConfigParser
-except ImportError:
-    import configparser
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -80,7 +76,7 @@ class Settings(object):
             'calendar.lookback': self._to_int
         }
 
-        config = ConfigParser.SafeConfigParser()
+        config = configparser.SafeConfigParser()
 
         self._user_path = os.path.join(
             os.path.expanduser('~'),
