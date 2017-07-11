@@ -7,6 +7,7 @@ This module holds the interface to Google calendar.
 # Imports #####################################################################
 from __future__ import print_function
 import os
+import sys
 import argparse
 import httplib2
 
@@ -27,7 +28,7 @@ __creationDate__ = '08-JUN-2017'
 
 # Globals #####################################################################
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-CLIENT_SECRET_FILE = os.path.join(USER_FOLDER, 'google_client_secret.json')
+CLIENT_SECRET_FILE = os.path.join(USER_FOLDER, 'google-client-secret.json')
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 
@@ -43,6 +44,14 @@ def get_credentials(noauth_local_webserver=False):
     Returns:
         Credentials, the obtained credential.
     """
+    if not os.path.exists(CLIENT_SECRET_FILE):
+        print('ERROR: Google client secrect not found at: %s' % CLIENT_SECRET_FILE)
+        print('...Download the JSON credentials from:')
+        print('...https://console.developers.google.com/apis/credentials')
+        print('...and put them here: %s' % CLIENT_SECRET_FILE)
+        print('Dont forget to rename the file!')
+        sys.exit(1)
+
     if not os.path.exists(USER_FOLDER):
         os.makedirs(USER_FOLDER)
     credential_path = os.path.join(
