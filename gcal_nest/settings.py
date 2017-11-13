@@ -8,7 +8,7 @@ This module holds the interface to the application settings.
 from __future__ import print_function
 import os
 import re
-import configparser
+import ConfigParser
 import pkg_resources
 
 # Metadata ####################################################################
@@ -76,7 +76,7 @@ class Settings(object):
             'calendar.lookback': self._to_int
         }
 
-        config = configparser.SafeConfigParser()
+        config = ConfigParser.SafeConfigParser()
 
         self._user_path = os.path.join(
             os.path.expanduser('~'),
@@ -177,8 +177,8 @@ class Settings(object):
         for section in sorted(self.settings.keys()):
             for key in sorted(self.settings[section].keys()):
                 value = self.settings[section][key]
-                modfied_key = section + '.' + key
-                if (value is not None) and mask and (modfied_key in SECRET_SETTINGS):
+                modified = section + '.' + key
+                if (value is not None) and mask and (modified in SECRET_SETTINGS):
                     lines.append("%s.%s = <MASKED>" % (section, key))
                 elif value is not None:
                     lines.append("%s.%s = %s" % (section, key, value))
