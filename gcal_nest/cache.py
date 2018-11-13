@@ -11,7 +11,7 @@ import sqlite3
 import arrow
 
 from .settings import USER_FOLDER
-from .event import Event
+from .event import Event, State
 from .helpers import print_log
 from .compat import string_types
 
@@ -96,7 +96,7 @@ class Cache(object):
         '''
         Return all events from the cache that are waiting to be completed.
         '''
-        self.cursor.execute("SELECT * FROM events WHERE state = ?", ('WAITING',))
+        self.cursor.execute("SELECT * FROM events WHERE state = ?", (State.waiting.value,))
         data = self.cursor.fetchall()
         events = [
             Event(

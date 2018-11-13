@@ -43,7 +43,7 @@ class Event(object):
 
     def __str__(self):
         return "{0}: {1}".format(
-            arrow.get(self.scheduled_date).format('YYYY-MM-DD HH:mmA'),
+            arrow.get(self.scheduled_date).format('YYYY-MM-DD HH:mm'),
             self.name,
         )
 
@@ -56,7 +56,7 @@ class Event(object):
         self.event_id = db_dict['event_id']
         self.calendar_id = db_dict['calendar_id']
         self.parent_event_id = db_dict['parent_event_id']
-        self.state = State[db_dict['state']]
+        self.state = State(db_dict['state'])
         self.scheduled_date = arrow.get(db_dict['scheduled_date']).to(db_dict['timezone'])
         self.actioned_date = arrow.get(db_dict['actioned_date']).to(db_dict['timezone'])
         self.timezone = db_dict['timezone']
