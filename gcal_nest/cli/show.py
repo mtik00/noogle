@@ -14,7 +14,7 @@ import click
 import arrow
 
 from ..gcal import get_next_events
-from ..nest import get_napi_thermostat
+from ..nest import get_napi_thermostat, get_nest_api
 from ..helpers import print_log
 
 # Metadata ####################################################################
@@ -121,3 +121,19 @@ def thermostat():
             high=thermostat.eco_temperature.high
         )
     )
+
+
+@show.command()
+def structures():
+    '''Show the structure information'''
+    ctx = click.get_current_context().obj
+    napi = get_nest_api(ctx)
+
+    for structure in napi.structures:
+        print('Structure %s' % structure.name)
+        print('    Away: %s' % structure.away)
+        print('    Devices:')
+
+        for device in structure.thermostats:
+            print('        Device: %s' % device.name)
+            print('            Temp: %0.1f' % device.temperature)
