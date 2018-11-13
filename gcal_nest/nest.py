@@ -27,13 +27,13 @@ def setup(ctx):
     napi = get_nest_api(ctx)
 
     for structure in napi.structures:
-        print ('Structure %s' % structure.name)
-        print ('    Away: %s' % structure.away)
-        print ('    Devices:')
+        print('Structure %s' % structure.name)
+        print('    Away: %s' % structure.away)
+        print('    Devices:')
 
         for device in structure.thermostats:
-            print ('        Device: %s' % device.name)
-            print ('            Temp: %0.1f' % device.temperature)
+            print('        Device: %s' % device.name)
+            print('            Temp: %0.1f' % device.temperature)
 
 
 def get_nest_api(ctx):
