@@ -137,3 +137,16 @@ def structures():
         for device in structure.thermostats:
             print('        Device: %s' % device.name)
             print('            Temp: %0.1f' % device.temperature)
+
+
+@show.command()
+def away():
+    '''Show the away state for the controlled thermostat'''
+    ctx = click.get_current_context().obj
+    napi = get_nest_api(ctx)
+
+    structure_name = ctx.project_settings.get('nest.structure')
+    structure = next((x for x in napi.structures if x.name == structure_name))
+
+    print('Structure: %s' % structure.name)
+    print('     Away: %s' % structure.away)

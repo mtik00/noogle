@@ -21,6 +21,7 @@ from .init import init
 from .setup import setup
 from .settings import settings
 from .main import go
+from .set_ import set_
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
@@ -63,3 +64,4 @@ cli.add_command(init)
 cli.add_command(setup)
 cli.add_command(settings)
 cli.add_command(go)
+cli.add_command(set_)

@@ -36,8 +36,8 @@ def setup(ctx):
             print('            Temp: %0.1f' % device.temperature)
 
 
-def get_nest_api(ctx):
-    if ctx.napi:
+def get_nest_api(ctx, refresh=False):
+    if ctx.napi and (not refresh):
         return ctx.napi
 
     settings = get_settings()
@@ -72,10 +72,13 @@ def get_structures(napi):
     return napi.structures
 
 
-def get_napi_thermostat(ctx, napi=None):
-    napi = get_nest_api(ctx)
+def get_napi_structure(ctx, napi=None):
+    '''
+    Returns the Structure object that matches the settings
+    '''
+    napi = napi or get_nest_api(ctx)
 
-    structure_name = ctx.project_settings.get('nest.structure')
+    structure_name = ctx.project_settings.get('nest.structure').lower()
     structure = None
     if structure_name:
         structure = next((x for x in napi.structures if x.name.lower() == structure_name), None)
@@ -84,6 +87,13 @@ def get_napi_thermostat(ctx, napi=None):
 
     if not structure:
         raise ValueError("Nest structure not found")
+
+    return structure
+
+def get_napi_thermostat(ctx, napi=None):
+    napi = get_nest_api(ctx)
+
+    structure = get_napi_structure(ctx, napi)
 
     thermostat_name = ctx.project_settings.get('nest.device')
     thermostat = None

@@ -56,6 +56,8 @@ in `env/env.bat` (or `env/env.sh` on Linux).
 1.  Run the script again to ensure you have the credentials stored (you should not
     be prompted again).
 
+**NOTE**: If you change the permissions through the Nest API, you must delete `~/.gcal_nest/nest-token.json` and re-run `gcal_nest setup nest`.
+
 # DSL
 `gcal_nest` depends on events in your calendar with specific next.
 
