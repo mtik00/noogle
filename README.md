@@ -47,7 +47,7 @@ in `env/env.bat` (or `env/env.sh` on Linux).
     `set NEST_PRODUCT_ID="ABCDEFG"`  
     `set NEST_PRODUCT_SECRET="ABCDEFG"`  
     Alternatively, you may insert these into `~/.gcal_nest/gcal_nest_settings.ini`
-1.  Run the `gcal_nest` setup for Nest: `python -m gcal_nest.cli --nest-setup`
+1.  Run the `gcal_nest` setup for Nest: `gcal_nest setup nest`
 1.  If presented with a URL:
     *   Go to the URL
     *   Click the `Accept` button
