@@ -8,8 +8,12 @@ This module holds the interface to the application settings.
 from __future__ import print_function
 import os
 import re
-import configparser
 import pkg_resources
+try:
+    import configparser
+except:
+    import ConfigParser as configparser
+
 
 # Metadata ####################################################################
 __author__ = 'Timothy McFadden'
