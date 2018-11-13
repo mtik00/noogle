@@ -5,6 +5,7 @@ This module holds the Event class.
 '''
 
 # Imports #####################################################################
+import enum
 import arrow
 
 from .settings import get_settings
@@ -15,7 +16,12 @@ __creationDate__ = '07-JUN-2017'
 
 
 # Globals #####################################################################
-STATES = ['WAITING', 'COMPLETE']
+class State(enum.Enum):
+    waiting = 0
+    complete = 1
+
+    def __str__(self):
+        return self.name
 
 
 class Event(object):
@@ -25,7 +31,7 @@ class Event(object):
         self.event_id = None
         self.calendar_id = 'primary'
         self.parent_event_id = None
-        self.state = 'WAITING'
+        self.state = State.waiting
         self.scheduled_date = None
         self.actioned_date = None
         self.timezone = None
@@ -42,7 +48,7 @@ class Event(object):
         )
 
     def waiting(self):
-        return str(self.state).lower() == 'waiting'
+        return self.state == State.waiting
 
     def from_db(self, db_dict):
         '''Initialize this object from a db row dict.'''
@@ -50,7 +56,7 @@ class Event(object):
         self.event_id = db_dict['event_id']
         self.calendar_id = db_dict['calendar_id']
         self.parent_event_id = db_dict['parent_event_id']
-        self.state = db_dict['state']
+        self.state = State[db_dict['state']]
         self.scheduled_date = arrow.get(db_dict['scheduled_date']).to(db_dict['timezone'])
         self.actioned_date = arrow.get(db_dict['actioned_date']).to(db_dict['timezone'])
         self.timezone = db_dict['timezone']
