@@ -21,11 +21,34 @@ __license__ = 'Proprietary'
 
 
 # Globals #####################################################################
-@click.command(name="init")
-@click.confirmation_option(prompt='Are you sure you want to clear the cache and settings?')
+@click.group(name='init')
 def init():
+    '''Initialize app'''
+    ctx = click.get_current_context()
+
+    # No reason to continue if we're in quiet mode
+    if ctx.obj.quiet:
+        ctx.exit()
+
+
+@init.command()
+@click.confirmation_option(prompt='Are you sure you want to clear the settings?')
+def settings():
     '''
-    Clears the cache and sets default settings
+    Sets default settings
+    '''
+    ctx = click.get_current_context().obj
+
+    print_log('Initializing user settings...', nl=False)
+    ctx.project_settings.make_user_settings()
+    print_log('...done')
+    print_log('...settings file at: %s' % ctx.project_settings._user_path)
+
+@init.command()
+@click.confirmation_option(prompt='Are you sure you want to clear the cache?')
+def cache():
+    '''
+    Clears the cache
     '''
     ctx = click.get_current_context().obj
 
@@ -33,8 +56,3 @@ def init():
     ctx.cache.init()
     print_log('...done')
     print_log('...cache file at: %s' % ctx.cache.default_path)
-
-    print_log('Initializing user settings...', nl=False)
-    ctx.project_settings.make_user_settings()
-    print_log('...done')
-    print_log('...settings file at: %s' % ctx.project_settings._user_path)

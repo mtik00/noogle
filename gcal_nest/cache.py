@@ -24,7 +24,7 @@ __creationDate__ = '05-JUN-2017'
 CACHE = None
 DB_INIT = '''
 CREATE TABLE IF NOT EXISTS events (
-    event_id integer NOT NULL PRIMARY KEY,   -- direct from google calendar
+    event_id text NOT NULL PRIMARY KEY,   -- direct from google calendar
     name text NOT NULL,
     calendar_id text NOT NULL,
     parent_event_id integer,
@@ -152,6 +152,7 @@ class Cache(object):
         '''
         Add a single event to the cache.
         '''
+        # import ipdb; ipdb.set_trace()
         self.conn.execute(
             Cache.insert_sql,
             tuple([
@@ -159,7 +160,7 @@ class Cache(object):
                 event.event_id,
                 event.calendar_id,
                 event.parent_event_id,
-                event.state,
+                event.state.value,
                 event.scheduled_date.timestamp,
                 event.actioned_date.timestamp if event.actioned_date else None,
                 event.timezone

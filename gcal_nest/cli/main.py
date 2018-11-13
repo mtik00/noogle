@@ -44,10 +44,10 @@ def go():
 
     ctx.cache.add_if_not_exists(ctx, my_events)
 
-    # for event in my_events:
-    #     if not ctx.cache.exists(event.event_id):
-    #         print_log("caching new event: {0}".format(event))
-    #         ctx.cache.add_event(event)
+    for event in my_events:
+        if not ctx.cache.exists(event.event_id):
+            print_log("caching new event: {0}".format(event))
+            ctx.cache.add_event(event)
 
     # Get all events that haven't been actioned
     my_events = [x for x in ctx.cache.waiting()]
