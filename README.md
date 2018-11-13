@@ -34,7 +34,7 @@ in `env/env.bat` (or `env/env.sh` on Linux).
 
 1.  Create an application using [Google API](https://console.developers.google.com/flows/enableapi?apiid=calendar&pli=1)
 1.  Download the credentials to `~/.gcal_nest/google_client_secret.json`
-1.  Run the `gcal_nest` setup for Google: `python -m gcal_nest.cli --gcal-setup`
+1.  Run the `gcal_nest` setup for Google: `gcal_nest setup gcal`
 1.  Follow the prompts to allow this computer to access your contacts.
 1.  Run the script again to ensure you have the credentials stored (you should not
     be prompted again).
