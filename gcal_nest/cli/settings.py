@@ -33,7 +33,7 @@ def make():
     ctx = click.get_current_context().obj
 
     ctx.logger.debug('calling `make_user_settings`')
-    ctx.project_settings.make_user_settings()
+    ctx.project_settings.make_user_settings(display_result=True)
     ctx.logger.debug('...done')
 
 
