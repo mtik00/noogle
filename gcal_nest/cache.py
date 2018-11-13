@@ -115,8 +115,8 @@ class Cache(object):
             event_id = event.event_id
 
         self.cursor.execute(
-            """UPDATE events SET state = ? WHERE event_id = ? """,
-            ('COMPLETE', event_id)
+            """UPDATE events SET state = ?, actioned_date = ? WHERE event_id = ? """,
+            (State.complete.value, arrow.now().timestamp, event_id)
         )
 
         if commit:
