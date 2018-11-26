@@ -6,3 +6,5 @@ inflect
 oauth2client
 python-nest>=3.0
 requests
+sqlalchemy==1.2.14
+sqlalchemy-utils==0.33.8
