@@ -1,5 +1,6 @@
 # TODO
 
+[ ] mailgun setup
 [ ] sqlalchemy?
 [ ] deployment
 [ ] `circusd` error reporting through `mailgun`
