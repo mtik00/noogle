@@ -32,5 +32,5 @@ def print_log(message, nl=True, log_level=logging.DEBUG):
     ctx.logger.log(log_level, message)
 
 
-def format_future_time(minutes, seconds=None):
-    return (datetime.now() + timedelta(minutes=minutes)).strftime('%d-%b-%Y %I:%M %p').upper()
+def format_future_time(minutes=0, seconds=0):
+    return (datetime.now() + timedelta(minutes=minutes, seconds=seconds)).strftime('%d-%b-%Y %I:%M %p').upper()

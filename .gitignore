@@ -1,4 +1,6 @@
 /.vscode
+/.direnv
+/junk.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

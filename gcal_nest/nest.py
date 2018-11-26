@@ -116,6 +116,38 @@ def get_thermostat(ctx):
     return get_napi_thermostat(ctx, napi)
 
 
+def do_away(ctx):
+    napi = get_nest_api(ctx)
+    structure = get_napi_structure(ctx, napi)
+
+    print('Structure: %s' % structure.name)
+
+    if structure.away != 'away':
+        structure.away = 'away'
+    else:
+        print('...already in "away" mode')
+
+    if structure.thermostats[0].mode != 'eco':
+        structure.thermostats[0].mode = 'eco'
+        print('...changed mode to "eco"')
+
+
+def do_home(ctx):
+    napi = get_nest_api(ctx)
+    structure = get_napi_structure(ctx, napi)
+
+    print('Structure: %s' % structure.name)
+
+    if structure.away != 'home':
+        structure.away = 'home'
+    else:
+        print('...already in "home" mode')
+
+    if structure.thermostats[0].mode != 'heat':
+        structure.thermostats[0].mode = 'heat'
+        print('...changed mode to "heat"')
+
+
 class NestControl(object):
     '''
     This object interfaces with the Nest API to control a Nest thermostat.
@@ -127,8 +159,10 @@ class NestControl(object):
         '''
         Performs a command according to the specification.
         '''
-        # NEST:ON (also set to 'Home')
-        # NEST:HOLD:##
+        # NEST:HOME
+        # NEST:AWAY
+
+        # Future reference:
         # NEST:HOLD:##:#d (hold temp for # days, then call NEST:OFF)
         # NEST:HOLD:##:#d:## (hold temp for # days, then set to ##)
         # NEST:OFF (set to default eco)

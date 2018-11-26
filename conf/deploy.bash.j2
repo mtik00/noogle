@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+today=`date +%Y-%m-%d-%H:%M:%S`
+
+# Check the folders ###########################################################
+if [[ ! -d {{app_log_dir}} ]]; then
+    echo "creating log dir"
+    mkdir -p {{app_log_dir}}
+    chown {{chown_socket}} {{app_log_dir}}/
+fi
+###############################################################################
+
+if [[ ! -d instance ]]; then
+    mkdir instance
+fi
+
+if [[ ! -e instance/env.sh ]]; then
+    echo "creating instance env vars file"
+    echo export SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1) > instance/env.sh
+    chmod +x instance/env.sh
+fi
+
+# Check the service ###########################################################
+if [[ ! -e {{service_path}}/{{service_name}} ]]; then
+    echo "creating the service"
+    cp _build/gcal-nest-systemd.service {{service_path}}/{{service_name}}
+    chmod 755 {{service_path}}/{{service_name}}
+    systemctl daemon-reload
+    systemctl enable {{service_name}}
+elif [[ -n `diff _build/gcal-nest-systemd.service {{service_path}}/{{service_name}}` ]]; then
+    echo "backing up existing service file"
+    mv {{service_path}}/{{service_name}} {{service_path}}/{{service_name}}.$today
+
+    echo "deploying the service"
+    cp _build/gcal-nest-systemd.service {{service_path}}/{{service_name}}
+    chmod 755 {{service_path}}/{{service_name}}
+    systemctl daemon-reload
+else
+    echo "no change detected in {{service_path}}/{{service_name}}"
+fi
+
+# We always want to restart the service to pick up the code changes.
+echo "restarting the service"
+systemctl restart {{service_name}}

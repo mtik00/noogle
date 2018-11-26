@@ -1,4 +1,8 @@
-python-nest>=3.0
-google-api-python-client
 arrow
+circus
 click
+google-api-python-client
+inflect
+oauth2client
+python-nest>=3.0
+requests

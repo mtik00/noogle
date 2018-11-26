@@ -10,7 +10,7 @@ import sqlite3
 
 import arrow
 
-from .settings import USER_FOLDER
+from .settings import SETTINGS_FOLDER
 from .event import Event, State
 from .helpers import print_log
 from .compat import string_types
@@ -26,12 +26,14 @@ DB_INIT = '''
 CREATE TABLE IF NOT EXISTS events (
     event_id text NOT NULL PRIMARY KEY,   -- direct from google calendar
     name text NOT NULL,
+    action integer NOT NULL,
     calendar_id text NOT NULL,
     parent_event_id integer,
     state integer,
     scheduled_date integer NOT NULL,    -- stored as a timestamp so we can sort easier
     actioned_date text,
-    timezone text
+    timezone text,
+    description text
 );
 '''
 
@@ -51,21 +53,22 @@ class Cache(object):
     '''
 
     insert_sql = '''
-            INSERT INTO events(name,event_id,calendar_id,parent_event_id,
-            state,scheduled_date,actioned_date,timezone)
-            VALUES(?,?,?,?,?,?,?,?)
+            INSERT INTO events(name,event_id,action,calendar_id,parent_event_id,
+            state,scheduled_date,actioned_date,timezone,description)
+            VALUES(?,?,?,?,?,?,?,?,?,?)
     '''
 
     def __init__(self, path=None, debug=False):
-        if not os.path.isdir(USER_FOLDER):
-            os.makedirs(USER_FOLDER)
+        if not os.path.isdir(SETTINGS_FOLDER):
+            os.makedirs(SETTINGS_FOLDER)
 
         if debug:
-            self.default_path = os.path.join(USER_FOLDER, 'gcal_nest-debug.db')
+            self.default_path = os.path.join(SETTINGS_FOLDER, 'gcal_nest-debug.db')
         else:
-            self.default_path = os.path.join(USER_FOLDER, 'gcal_nest.db')
+            self.default_path = os.path.join(SETTINGS_FOLDER, 'gcal_nest.db')
 
-        self.conn = sqlite3.connect(path or self.default_path)
+        self.path = path or self.default_path
+        self.conn = sqlite3.connect(self.path)
         self.cursor = self.conn.cursor()
         self._columns = []
 
@@ -152,18 +155,19 @@ class Cache(object):
         '''
         Add a single event to the cache.
         '''
-        # import ipdb; ipdb.set_trace()
         self.conn.execute(
             Cache.insert_sql,
             tuple([
                 event.name,
                 event.event_id,
+                event.action.value,
                 event.calendar_id,
                 event.parent_event_id,
                 event.state.value,
                 event.scheduled_date.timestamp,
                 event.actioned_date.timestamp if event.actioned_date else None,
-                event.timezone
+                event.timezone,
+                event.description,
             ])
         )
 
@@ -182,6 +186,7 @@ class Cache(object):
         '''
         self.conn.execute('DROP TABLE IF EXISTS events;')
         self.conn.execute(DB_INIT)
+        self.conn.commit()
 
     def events(self):
         '''

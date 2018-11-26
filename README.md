@@ -64,5 +64,19 @@ in `env/env.bat` (or `env/env.sh` on Linux).
 1.  All events must start with `NEST`
 1.  Each piece of the command must be separated with a colon (`:`)
 1.  Supported commands are:
-    *   `<temp>` : Holds the temperature at the given setpoint (e.g. `nest:65`)
-    *   `run` : Run normally until the next even (e.g. `nest:run`)
+    *   `away` : Sets the structure to `away` and the thermostat to `eco`
+    *   `home` : Sets the structure to `home` and the thermostat to `heat`
+
+A typical command looks like this: `nest:home:Spring Break!`.  The third field
+is an optional description.
+
+# Services
+There are two service scripts.  One script reads event from your Google calendar, and the other script reads the cache and controls the Nest API.
+
+These two scripts can be run using `circusd` like so:
+
+    circusd --daemon circus.ini
+
+You can control the daemon through the `circusctl` application.
+
+Read more about it here:  https://circus.readthedocs.io/en/latest/

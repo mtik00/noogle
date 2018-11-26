@@ -8,12 +8,11 @@ This module holds the interface to the application settings.
 from __future__ import print_function
 import os
 import re
-import ConfigParser
 import pkg_resources
 try:
-    import configparser
+    from configparser import ConfigParser
 except:
-    import ConfigParser as configparser
+    from ConfigParser import SafeConfigParser as ConfigParser
 
 
 # Metadata ####################################################################
@@ -25,9 +24,10 @@ __creationDate__ = '05-JUN-2017'
 _SETTINGS = None
 SETTINGS_FILENAME = 'gcal_nest.ini'
 USER_FOLDER = os.path.join(os.path.expanduser('~'), ".gcal_nest")
+SETTINGS_FOLDER = os.getenv('SETTINGS_FOLDER', USER_FOLDER)
 FILE_SEARCH = [
     os.path.join("/etc/gcal_nest", SETTINGS_FILENAME),
-    os.path.join(USER_FOLDER, SETTINGS_FILENAME),
+    os.path.join(SETTINGS_FOLDER, SETTINGS_FILENAME),
     os.path.abspath(os.path.join(os.curdir, SETTINGS_FILENAME)),
 ]
 
@@ -81,7 +81,7 @@ class Settings(object):
             'calendar.lookback': self._to_int
         }
 
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
 
         self._user_path = os.path.join(
             os.path.expanduser('~'),
@@ -203,7 +203,8 @@ class Settings(object):
             os.makedirs(dirname)
 
         text = self.as_ini_file()
-        open(path, 'wb').write(text)
+
+        open(path, 'wb').write(text.encode('utf-8'))
 
     def print_settings(self):
         '''Display the project settings'''
