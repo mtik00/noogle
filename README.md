@@ -1,12 +1,23 @@
+# TODO
+
+[ ] sqlalchemy?
+[ ] deployment
+[ ] `circusd` error reporting through `mailgun`
+[ ] documentation
+[ ] debug mode
+[ ] env var setup
+
 # Introduction
-Controlling your Nest thermostat with Google calendar events
+This project is used to control your Nest thermostat through your Google calendar using events.
 
 # Requirements
 
-We depend on these things:
+We depend on these things to communicate with Google and Nest APIs:
 
 *   [python-nest](https://pypi.python.org/pypi/python-nest)
 *   [google-api-python-client](https://developers.google.com/google-apps/calendar/quickstart/python)
+
+See `requirements.txt` for a complete list of requirements.
 
 # Configuration
 
@@ -15,7 +26,7 @@ settings.  You should probably create your own configuration file:
 
     python -mgcal_nest --make-user-settings
 
-This will create a file located at `~/.gcal_nest/gcal_nest_settings.ini`.
+This will create a file located at `~/.gcal_nest/gcal_nest_settings.ini`.  To change the location of the file, you must set the `SETTINGS_FOLDER` environment variable.
 
 This folder will also hold the OAuth tokens for both Google and Nest.  You may
 wish to change the access bits accordingly.
@@ -59,7 +70,9 @@ in `env/env.bat` (or `env/env.sh` on Linux).
 **NOTE**: If you change the permissions through the Nest API, you must delete `~/.gcal_nest/nest-token.json` and re-run `gcal_nest setup nest`.
 
 # DSL
-`gcal_nest` depends on events in your calendar with specific next.
+`gcal_nest` depends on events in your calendar with specific text.  All events should be in the form of:
+
+    nest:<command>:<description>
 
 1.  All events must start with `NEST`
 1.  Each piece of the command must be separated with a colon (`:`)
@@ -77,6 +90,6 @@ These two scripts can be run using `circusd` like so:
 
     circusd --daemon circus.ini
 
-You can control the daemon through the `circusctl` application.
+You can control the daemon through the `circusctl` application.  Read more about it here:  https://circus.readthedocs.io/en/latest/
 
-Read more about it here:  https://circus.readthedocs.io/en/latest/
+NOTE: For debug purposes, you may want to run `circusd circus.ini` (remove the `--daemon` option to run `circusd` in the foreground)
