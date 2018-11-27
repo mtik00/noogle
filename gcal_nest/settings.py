@@ -23,11 +23,12 @@ __creationDate__ = '05-JUN-2017'
 
 _SETTINGS = None
 SETTINGS_FILENAME = 'gcal_nest.ini'
-USER_FOLDER = os.path.join(os.path.expanduser('~'), ".gcal_nest")
+USER_FOLDER = os.path.join(os.path.expanduser('~'), ".config", "gcal_nest")
 SETTINGS_FOLDER = os.getenv('SETTINGS_FOLDER', USER_FOLDER)
+SETTINGS_PATH = os.path.join(SETTINGS_FOLDER, SETTINGS_FILENAME)
 FILE_SEARCH = [
     os.path.join("/etc/gcal_nest", SETTINGS_FILENAME),
-    os.path.join(SETTINGS_FOLDER, SETTINGS_FILENAME),
+    SETTINGS_PATH,
     os.path.abspath(os.path.join(os.curdir, SETTINGS_FILENAME)),
 ]
 
@@ -83,11 +84,7 @@ class Settings(object):
 
         config = ConfigParser()
 
-        self._user_path = os.path.join(
-            os.path.expanduser('~'),
-            '.gcal_nest',
-            SETTINGS_FILENAME)
-
+        self._user_path = SETTINGS_PATH
         self._loaded_paths = config.read(FILE_SEARCH)
 
         for section in config.sections():
