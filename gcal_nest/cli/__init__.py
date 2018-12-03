@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
 This script is used to interface with the gcal_nest package from the command
 line.
-'''
+"""
 # pylint:disable=W0212
 
 # Imports #####################################################################
@@ -25,18 +25,21 @@ from .set_ import set_
 from .service import service
 
 # Metadata ####################################################################
-__author__ = 'Timothy McFadden'
-__creationDate__ = '11-JUN-2017'
-__version__ = '1.0.0'
+__author__ = "Timothy McFadden"
+__creationDate__ = "11-JUN-2017"
+__version__ = "1.0.0"
 
 
-HELP = '''
+HELP = """
 gcal_nest v{0}
-'''.format(library_version)
+""".format(
+    library_version
+)
 
 
 class Ctx(object):
-    '''The context object'''
+    """The context object"""
+
     def __init__(self):
         self.logger = get_logger()
         self.project_settings = get_settings()
@@ -50,11 +53,13 @@ CTX = click.make_pass_decorator(Ctx, ensure=True)
 
 
 @click.group(help=HELP)
-@click.option('--quiet', '-q', is_flag=True, help='Only report errors')
-@click.option('--debug/--no-debug', '-d', is_flag=True, default=True, help='Debug use only')
+@click.option("--quiet", "-q", is_flag=True, help="Only report errors")
+@click.option(
+    "--debug/--no-debug", "-d", is_flag=True, default=True, help="Debug use only"
+)
 @CTX
 def cli(ctx, quiet, debug):
-    '''Run the gcal_nest command-line application'''
+    """Run the gcal_nest command-line application"""
     ctx.quiet = quiet
     ctx.debug = debug
     ctx.cache = get_cache(debug)

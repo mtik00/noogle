@@ -5,9 +5,9 @@
 #  Copyright (C) 2017 Broadcom Ltd.  All rights reserved.                     #
 #                                                                             #
 ###############################################################################
-'''
+"""
 This module holds the cli `init` commands
-'''
+"""
 
 # Imports #####################################################################
 import click
@@ -15,15 +15,15 @@ import click
 from ..helpers import print_log
 
 # Metadata ####################################################################
-__author__ = 'Timothy McFadden'
-__creationDate__ = '11-JUN-2017'
-__license__ = 'Proprietary'
+__author__ = "Timothy McFadden"
+__creationDate__ = "11-JUN-2017"
+__license__ = "Proprietary"
 
 
 # Globals #####################################################################
-@click.group(name='init')
+@click.group(name="init")
 def init():
-    '''Initialize app'''
+    """Initialize app"""
     ctx = click.get_current_context()
 
     # No reason to continue if we're in quiet mode
@@ -32,27 +32,28 @@ def init():
 
 
 @init.command()
-@click.confirmation_option(prompt='Are you sure you want to clear the settings?')
+@click.confirmation_option(prompt="Are you sure you want to clear the settings?")
 def settings():
-    '''
+    """
     Sets default settings
-    '''
+    """
     ctx = click.get_current_context().obj
 
-    print_log('Initializing user settings...', nl=False)
+    print_log("Initializing user settings...", nl=False)
     ctx.project_settings.make_user_settings()
-    print_log('...done')
-    print_log('...settings file at: %s' % ctx.project_settings._user_path)
+    print_log("...done")
+    print_log("...settings file at: %s" % ctx.project_settings._user_path)
+
 
 @init.command()
-@click.confirmation_option(prompt='Are you sure you want to clear the cache?')
+@click.confirmation_option(prompt="Are you sure you want to clear the cache?")
 def cache():
-    '''
+    """
     Clears the cache
-    '''
+    """
     ctx = click.get_current_context().obj
 
-    print_log('Initializing cache...', nl=False)
+    print_log("Initializing cache...", nl=False)
     ctx.cache.init()
-    print_log('...done')
-    print_log('...cache file at: %s' % ctx.cache.default_path)
+    print_log("...done")
+    print_log("...cache file at: %s" % ctx.cache.default_path)

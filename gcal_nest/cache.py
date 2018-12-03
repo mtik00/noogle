@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
 This module holds the cache for the gcal_nest application.
-'''
+"""
 
 # Imports #####################################################################
 import os
@@ -16,13 +16,13 @@ from .helpers import print_log
 from .compat import string_types
 
 # Metadata ####################################################################
-__author__ = 'Timothy McFadden'
-__creationDate__ = '05-JUN-2017'
+__author__ = "Timothy McFadden"
+__creationDate__ = "05-JUN-2017"
 
 
 # Globals #####################################################################
 CACHE = None
-DB_INIT = '''
+DB_INIT = """
 CREATE TABLE IF NOT EXISTS events (
     event_id text NOT NULL PRIMARY KEY,   -- direct from google calendar
     name text NOT NULL,
@@ -35,11 +35,11 @@ CREATE TABLE IF NOT EXISTS events (
     timezone text,
     description text
 );
-'''
+"""
 
 
 def get_cache(debug=False):
-    '''Return the application's Cache object.'''
+    """Return the application's Cache object."""
     global CACHE  # pylint:disable=W0603
     if not CACHE:
         CACHE = Cache(debug=debug)
@@ -48,24 +48,24 @@ def get_cache(debug=False):
 
 
 class Cache(object):
-    '''
+    """
     This object holds the application cache.
-    '''
+    """
 
-    insert_sql = '''
+    insert_sql = """
             INSERT INTO events(name,event_id,action,calendar_id,parent_event_id,
             state,scheduled_date,actioned_date,timezone,description)
             VALUES(?,?,?,?,?,?,?,?,?,?)
-    '''
+    """
 
     def __init__(self, path=None, debug=False):
         if not os.path.isdir(SETTINGS_FOLDER):
             os.makedirs(SETTINGS_FOLDER)
 
         if debug:
-            self.default_path = os.path.join(SETTINGS_FOLDER, 'gcal_nest-debug.db')
+            self.default_path = os.path.join(SETTINGS_FOLDER, "gcal_nest-debug.db")
         else:
-            self.default_path = os.path.join(SETTINGS_FOLDER, 'gcal_nest.db')
+            self.default_path = os.path.join(SETTINGS_FOLDER, "gcal_nest.db")
 
         self.path = path or self.default_path
         self.conn = sqlite3.connect(self.path)
@@ -83,35 +83,36 @@ class Cache(object):
         if self._columns:
             return self._columns
 
-        cursor = self.conn.execute('select * from events')
+        cursor = self.conn.execute("select * from events")
         self._columns = [description[0] for description in cursor.description]
         return self._columns
 
     def exists(self, event_id):
-        '''
+        """
         Checks the specified `event_id` and returns True if its in the cache.
-        '''
-        self.cursor.execute("SELECT count(*) FROM events WHERE event_id = ?", (event_id,))
+        """
+        self.cursor.execute(
+            "SELECT count(*) FROM events WHERE event_id = ?", (event_id,)
+        )
         data = self.cursor.fetchone()[0]
         return data != 0
 
     def waiting(self):
-        '''
+        """
         Return all events from the cache that are waiting to be completed.
-        '''
-        self.cursor.execute("SELECT * FROM events WHERE state = ?", (State.waiting.value,))
+        """
+        self.cursor.execute(
+            "SELECT * FROM events WHERE state = ?", (State.waiting.value,)
+        )
         data = self.cursor.fetchall()
-        events = [
-            Event(
-                db_dict=dict(list(zip(self.columns, x)))
-            ) for x in data]
+        events = [Event(db_dict=dict(list(zip(self.columns, x)))) for x in data]
 
         return sorted(events, key=lambda x: x.scheduled_date)
 
     def do_event(self, event, commit=True):
-        '''
+        """
         Mark the event as completed.
-        '''
+        """
         if type(event) in string_types:
             event_id = event
         else:
@@ -119,30 +120,28 @@ class Cache(object):
 
         self.cursor.execute(
             """UPDATE events SET state = ?, actioned_date = ? WHERE event_id = ? """,
-            (State.complete.value, arrow.now().timestamp, event_id)
+            (State.complete.value, arrow.now().timestamp, event_id),
         )
 
         if commit:
             self.conn.commit()
 
     def get_event(self, event_id):
-        '''
+        """
         Returns the specified event, if it exists.
-        '''
+        """
         self.cursor.execute("SELECT * FROM events WHERE event_id = ?", (event_id,))
         data = self.cursor.fetchone()
 
         if data:
-            return Event(
-                db_dict=dict(list(zip(self.columns, data)))
-            )
+            return Event(db_dict=dict(list(zip(self.columns, data))))
 
         return None
 
     def add(self, item, commit=True):
-        '''
+        """
         Add a single item to the cache.
-        '''
+        """
         if isinstance(item, Event):
             return self.add_event(item, commit)
 
@@ -152,23 +151,25 @@ class Cache(object):
             self.conn.commit()
 
     def add_event(self, event, commit=True):
-        '''
+        """
         Add a single event to the cache.
-        '''
+        """
         self.conn.execute(
             Cache.insert_sql,
-            tuple([
-                event.name,
-                event.event_id,
-                event.action.value,
-                event.calendar_id,
-                event.parent_event_id,
-                event.state.value,
-                event.scheduled_date.timestamp,
-                event.actioned_date.timestamp if event.actioned_date else None,
-                event.timezone,
-                event.description,
-            ])
+            tuple(
+                [
+                    event.name,
+                    event.event_id,
+                    event.action.value,
+                    event.calendar_id,
+                    event.parent_event_id,
+                    event.state.value,
+                    event.scheduled_date.timestamp,
+                    event.actioned_date.timestamp if event.actioned_date else None,
+                    event.timezone,
+                    event.description,
+                ]
+            ),
         )
 
         if commit:
@@ -181,26 +182,26 @@ class Cache(object):
                 self.add_event(event)
 
     def init(self):
-        '''
+        """
         Clear/create the cache.
-        '''
-        self.conn.execute('DROP TABLE IF EXISTS events;')
+        """
+        self.conn.execute("DROP TABLE IF EXISTS events;")
         self.conn.execute(DB_INIT)
         self.conn.commit()
 
     def events(self):
-        '''
+        """
         Iterate through all events in reversed order.
-        '''
-        for row in self.conn.execute('SELECT * FROM events ORDER BY scheduled_date DESC'):
-            yield Event(
-                db_dict=dict(list(zip(self.columns, row)))
-            )
+        """
+        for row in self.conn.execute(
+            "SELECT * FROM events ORDER BY scheduled_date DESC"
+        ):
+            yield Event(db_dict=dict(list(zip(self.columns, row))))
 
 
 def main():
     cache = Cache()
-    cache.cursor.execute('DROP TABLE IF EXISTS events;')
+    cache.cursor.execute("DROP TABLE IF EXISTS events;")
     cache.cursor.execute(DB_INIT)
 
     e = Event()
@@ -211,5 +212,5 @@ def main():
     cache.add_event(e)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

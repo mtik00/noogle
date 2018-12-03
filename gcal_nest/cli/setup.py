@@ -5,9 +5,9 @@
 #  Copyright (C) 2017 Broadcom Ltd.  All rights reserved.                     #
 #                                                                             #
 ###############################################################################
-'''
+"""
 This module holds the cli `setup` commands
-'''
+"""
 
 # Imports #####################################################################
 import sys
@@ -19,28 +19,29 @@ from ..nest import setup as nest_setup
 
 
 # Metadata ####################################################################
-__author__ = 'Timothy McFadden'
-__creationDate__ = '11-JUN-2017'
-__license__ = 'Proprietary'
+__author__ = "Timothy McFadden"
+__creationDate__ = "11-JUN-2017"
+__license__ = "Proprietary"
 
 
 # Globals #####################################################################
 @click.group()
 def setup():
-    '''Run the setup for Google calendar or Nest'''
+    """Run the setup for Google calendar or Nest"""
     pass
 
 
 @setup.command()
 @click.option(
-    '--noauth-local-webserver',
+    "--noauth-local-webserver",
     is_flag=True,
-    help="don't use a local webserver for authentication")
+    help="don't use a local webserver for authentication",
+)
 def gcal(noauth_local_webserver):
-    '''Set up Google calendar'''
+    """Set up Google calendar"""
     # We need to change sys.argv to align with the google setup.
     if noauth_local_webserver:
-        sys.argv = sys.argv[0] + '--noauth-local-webserver'
+        sys.argv = sys.argv[0] + "--noauth-local-webserver"
     else:
         sys.argv = [sys.argv[0]]
 
@@ -49,8 +50,8 @@ def gcal(noauth_local_webserver):
 
 @setup.command()
 def nest():
-    '''Set up Nest'''
+    """Set up Nest"""
     ctx = click.get_current_context().obj
-    ctx.logger.debug('calling `nest_setup`')
+    ctx.logger.debug("calling `nest_setup`")
     nest_setup(ctx)
-    ctx.logger.debug('...done')
+    ctx.logger.debug("...done")

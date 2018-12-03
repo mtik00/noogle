@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
 This module holds the single logging object for the project.
-'''
+"""
 
 # Imports #####################################################################
 import os
@@ -11,8 +11,8 @@ import logging
 # from .settings import settings
 
 # Metadata ####################################################################
-__author__ = 'Timothy McFadden'
-__creationDate__ = '08-JUN-2017'
+__author__ = "Timothy McFadden"
+__creationDate__ = "08-JUN-2017"
 
 
 # Globals #####################################################################
@@ -20,8 +20,11 @@ LOGGER = None
 
 
 def get_logger(
-        name=None, screen_level=logging.INFO, logfile_path=None,
-        logfile_level=logging.DEBUG, logfile_mode="wb"
+    name=None,
+    screen_level=logging.INFO,
+    logfile_path=None,
+    logfile_level=logging.DEBUG,
+    logfile_mode="wb",
 ):
     """Returns a logging object.
 

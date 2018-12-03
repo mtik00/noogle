@@ -22,14 +22,15 @@ class Action(enum.Enum):
 
 
 class Event(Base):
-    '''Describes a single event stored in cache.'''
-    __tablename__ = 'events'
+    """Describes a single event stored in cache."""
+
+    __tablename__ = "events"
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
     action = Column(Enum(Action), nullable=False)
     event_id = Column(Integer)
-    calendar_id = Column(String, default='primary')
+    calendar_id = Column(String, default="primary")
     parent_event_id = Column(Integer)
     state = Column(Enum(State), nullable=False, default=State.waiting)
     scheduled_date = Column(ArrowType)

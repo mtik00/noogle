@@ -5,9 +5,9 @@
 #  Copyright (C) 2017 Broadcom Ltd.  All rights reserved.                     #
 #                                                                             #
 ###############################################################################
-'''
+"""
 This module holds the cli `show` commands
-'''
+"""
 
 # Imports #####################################################################
 import click
@@ -18,15 +18,15 @@ from ..nest import get_napi_thermostat, get_nest_api
 from ..helpers import print_log
 
 # Metadata ####################################################################
-__author__ = 'Timothy McFadden'
-__creationDate__ = '11-JUN-2017'
-__license__ = 'Proprietary'
+__author__ = "Timothy McFadden"
+__creationDate__ = "11-JUN-2017"
+__license__ = "Proprietary"
 
 
 # Globals #####################################################################
 @click.group()
 def show():
-    '''Show information'''
+    """Show information"""
     ctx = click.get_current_context()
 
     # No reason to continue if we're in quiet mode
@@ -35,37 +35,37 @@ def show():
 
 
 @show.command()
-@click.option(
-    '--max-events', default=10, help='maximum number of events to show')
+@click.option("--max-events", default=10, help="maximum number of events to show")
 def events(max_events):
-    '''Display the next events from Google calendar'''
+    """Display the next events from Google calendar"""
     ctx = click.get_current_context().obj
 
-    q = 'nest'
+    q = "nest"
     if ctx.debug:
-        q = 'nestd'
+        q = "nestd"
 
-    lookback = ctx.project_settings.get('calendar.lookback') or 0
+    lookback = ctx.project_settings.get("calendar.lookback") or 0
 
-    since = arrow.now().replace(days=-1 * lookback, hour=0, minute=0, second=0, microsecond=0)
+    since = arrow.now().replace(
+        days=-1 * lookback, hour=0, minute=0, second=0, microsecond=0
+    )
 
-    print_log('Showing events since %s' % since.strftime('%A, %d %B'))
+    print_log("Showing events since %s" % since.strftime("%A, %d %B"))
     nest_events = get_next_events(max_results=max_events, q_filter=q, since=since)
 
     for event in nest_events:
         print_log(
             "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.format('YYYY-MM-DD h:mmA'),
-                event.state,
-                event.name)
+                event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name
+            )
         )
 
 
 @show.command()
 def cache():
-    '''
+    """
     Shows the cached events
-    '''
+    """
     ctx = click.get_current_context().obj
 
     # For the pager to work, we need to create one big string.
@@ -73,9 +73,8 @@ def cache():
     for event in ctx.cache.events():
         str_events.append(
             "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.format('YYYY-MM-DD h:mmA'),
-                event.state,
-                event.name)
+                event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name
+            )
         )
 
     click.echo_via_pager("\n".join(str_events))
@@ -83,70 +82,67 @@ def cache():
 
 @show.command()
 def thermostat():
-    '''Show the current thermostat info'''
+    """Show the current thermostat info"""
 
     ctx = click.get_current_context().obj
     thermostat = get_napi_thermostat(ctx)
 
-    print_log(
-        '%s : %s' % (
-            thermostat.structure.name,
-            thermostat.name)
+    print_log("%s : %s" % (thermostat.structure.name, thermostat.name))
+
+    setpoint = "%s%s (%s)" % (
+        thermostat.target,
+        thermostat.temperature_scale,
+        thermostat.mode,
     )
-
-    setpoint = "%s%s (%s)" % (thermostat.target, thermostat.temperature_scale, thermostat.mode)
-    if thermostat.mode.lower() == 'eco':
-        setpoint = "%s%s (eco)" % (thermostat.eco_temperature.low, thermostat.temperature_scale)
-    print_log('...current setpoint: %s' % setpoint)
-
-    print_log(
-        '...current temperature: %s%s' % (
-            thermostat.temperature,
-            thermostat.temperature_scale
+    if thermostat.mode.lower() == "eco":
+        setpoint = "%s%s (eco)" % (
+            thermostat.eco_temperature.low,
+            thermostat.temperature_scale,
         )
-    )
+    print_log("...current setpoint: %s" % setpoint)
 
     print_log(
-        '...current humidity: %s%%' % thermostat.humidity
+        "...current temperature: %s%s"
+        % (thermostat.temperature, thermostat.temperature_scale)
     )
 
-    print_log(
-        '...state: %s' % thermostat.hvac_state
-    )
+    print_log("...current humidity: %s%%" % thermostat.humidity)
+
+    print_log("...state: %s" % thermostat.hvac_state)
 
     print_log(
-        '...eco temperatures: low={low}{scale}, high={high}{scale}'.format(
+        "...eco temperatures: low={low}{scale}, high={high}{scale}".format(
             low=thermostat.eco_temperature.low,
             scale=thermostat.temperature_scale,
-            high=thermostat.eco_temperature.high
+            high=thermostat.eco_temperature.high,
         )
     )
 
 
 @show.command()
 def structures():
-    '''Show the structure information'''
+    """Show the structure information"""
     ctx = click.get_current_context().obj
     napi = get_nest_api(ctx)
 
     for structure in napi.structures:
-        print('Structure %s' % structure.name)
-        print('    Away: %s' % structure.away)
-        print('    Devices:')
+        print("Structure %s" % structure.name)
+        print("    Away: %s" % structure.away)
+        print("    Devices:")
 
         for device in structure.thermostats:
-            print('        Device: %s' % device.name)
-            print('            Temp: %0.1f' % device.temperature)
+            print("        Device: %s" % device.name)
+            print("            Temp: %0.1f" % device.temperature)
 
 
 @show.command()
 def away():
-    '''Show the away state for the controlled thermostat'''
+    """Show the away state for the controlled thermostat"""
     ctx = click.get_current_context().obj
     napi = get_nest_api(ctx)
 
-    structure_name = ctx.project_settings.get('nest.structure')
+    structure_name = ctx.project_settings.get("nest.structure")
     structure = next((x for x in napi.structures if x.name == structure_name))
 
-    print('Structure: %s' % structure.name)
-    print('     Away: %s' % structure.away)
+    print("Structure: %s" % structure.name)
+    print("     Away: %s" % structure.away)
