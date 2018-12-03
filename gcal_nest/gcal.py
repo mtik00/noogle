@@ -18,7 +18,7 @@ from oauth2client import tools
 from oauth2client.file import Storage
 from googleapiclient.errors import HttpError
 
-from .settings import USER_FOLDER, get_settings
+from .settings import SETTINGS_FOLDER, get_settings
 from .event import Event
 
 # Metadata ####################################################################
@@ -28,7 +28,7 @@ __creationDate__ = '08-JUN-2017'
 
 # Globals #####################################################################
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-CLIENT_SECRET_FILE = os.path.join(USER_FOLDER, 'google-client-secret.json')
+CLIENT_SECRET_FILE = os.path.join(SETTINGS_FOLDER, 'google-client-secret.json')
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 
@@ -52,10 +52,10 @@ def get_credentials(noauth_local_webserver=False):
         print('Dont forget to rename the file!')
         sys.exit(1)
 
-    if not os.path.exists(USER_FOLDER):
-        os.makedirs(USER_FOLDER)
+    if not os.path.exists(SETTINGS_FOLDER):
+        os.makedirs(SETTINGS_FOLDER)
     credential_path = os.path.join(
-        USER_FOLDER, 'google-calendar.json')
+        SETTINGS_FOLDER, 'google-calendar.json')
 
     if noauth_local_webserver:
         flags = argparse.ArgumentParser(
