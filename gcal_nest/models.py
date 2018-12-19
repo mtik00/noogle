@@ -1,7 +1,10 @@
 import enum
 from sqlalchemy import Integer, String, Column, Enum
+from sqlalchemy.sql import exists
 from sqlalchemy_utils import ArrowType
-from .db import Base
+from .db import Base, session
+import arrow
+from .settings import get_settings
 
 
 class State(enum.Enum):
@@ -26,14 +29,66 @@ class Event(Base):
 
     __tablename__ = "events"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    event_id = Column(String, primary_key=True)
+    timezone = Column(String, nullable=True)
+    name = Column(String, nullable=True)
     action = Column(Enum(Action), nullable=False)
-    event_id = Column(Integer)
     calendar_id = Column(String, default="primary")
-    parent_event_id = Column(Integer)
+    parent_event_id = Column(Integer, nullable=True)
     state = Column(Enum(State), nullable=False, default=State.waiting)
-    scheduled_date = Column(ArrowType)
-    actioned_date = Column(ArrowType)
-    timezone = Column(String)
+    scheduled_date = Column(ArrowType, nullable=True)
+    actioned_date = Column(ArrowType, nullable=True)
+    timezone = Column(String, nullable=True)
     description = Column(String, nullable=True)
+
+    @classmethod
+    def waiting(cls):
+        """Return all waiting events"""
+        return session.query(Event).filter(Event.state == State.waiting).all()
+
+    @classmethod
+    def exists(cls, event_id):
+        """Returns True if the event_id exists, False otherwise"""
+        return session.query(exists().where(Event.event_id == event_id)).scalar()
+
+    @classmethod
+    def create_from_gcal(cls, gcal_event, timezone=None):
+        default_start_time = get_settings().get("calendar.default-start-time")
+        e = Event(
+            name = gcal_event["summary"],
+            event_id = gcal_event["id"],
+            state = State.waiting,
+        )
+
+        if "date" in gcal_event["start"]:
+            e.scheduled_date = arrow.get(
+                gcal_event["start"]["date"] + " " + default_start_time + " " + timezone,
+                "YYYY-MM-DD H:mm ZZZ",
+            )
+        else:
+            # NOTE: 'dateTime' includes the timezone
+            e.scheduled_date = arrow.get(gcal_event["start"].get("dateTime"))
+        e.actioned_date = None
+        e.timezone = timezone
+
+        parts = e.name.split(":")
+        if len(parts) == 2:
+            e.action = Action[parts[1]]
+        elif len(parts) == 3:
+            e.action = Action[parts[1]]
+            e.description = parts[2]
+        else:
+            print(f'WARNING: Cannot parse event name: "{self.name}"')
+
+        session.add(e)
+        session.commit()
+
+    def mark_event_missing(self):
+        self.state = State.removed
+        session.add(self)
+        session.commit()
+
+    def mark_event_done(self):
+        self.state = State.complete
+        session.add(self)
+        session.commit()

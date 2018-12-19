@@ -7,11 +7,12 @@ This module has the class used to control the Nest thermostat.
 # Imports #####################################################################
 from __future__ import print_function, absolute_import
 import os
-
+import time
 import nest
 
 from .compat import prompt
 from .settings import get_settings, USER_FOLDER
+from .models import Action
 
 
 # Metadata ####################################################################
@@ -160,6 +161,47 @@ def do_home(ctx):
     if structure.thermostats[0].mode != "heat":
         structure.thermostats[0].mode = "heat"
         print('...changed mode to "heat"')
+
+
+def verify(ctx, event):
+    """
+    Verify the event actually occurred.
+    """
+    errors = []
+    napi = get_nest_api(ctx)
+    structure = get_napi_structure(ctx, napi)
+
+    if event.action == Action.home:
+        away = "home"
+        mode = "heat"
+    else:
+        away = "away"
+        mode = "eco"
+
+    if structure.away != away:
+        errors.append(f'Structure is not marked as {away}!')
+
+    if structure.thermostats[0].mode != mode:
+        errors.append(f'Thermostat mode is not set to {mode}!')
+
+    if errors:
+        message = '\n'.join(errors)
+        raise Exception(message)
+
+
+def do_event(ctx, event):
+    action_map = {Action.away.value: do_away, Action.home.value: do_home}
+
+    func = action_map.get(event.action.value, None)
+    if func:
+        func(ctx)
+
+        print('...waiting 30s before verification')
+        time.sleep(30)
+
+        verify(ctx, event)
+    else:
+        raise Exception('Unkown event action: {!r}'.format(event.action))
 
 
 class NestControl(object):

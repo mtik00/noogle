@@ -16,6 +16,7 @@ import arrow
 from ..gcal import get_next_events
 from ..nest import get_napi_thermostat, get_nest_api
 from ..helpers import print_log
+from ..models import Event
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -70,7 +71,7 @@ def cache():
 
     # For the pager to work, we need to create one big string.
     str_events = []
-    for event in ctx.cache.events():
+    for event in ctx.session.query(Event).all():
         str_events.append(
             "{:<19s}({:^9}) {}".format(
                 event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name

@@ -1,12 +1,13 @@
 # TODO
 
-[ ] mailgun setup
-[ ] sqlalchemy?
 [ ] deployment
 [ ] `circusd` error reporting through `mailgun`
 [ ] documentation
 [ ] debug mode
 [ ] env var setup
+[ ] multiple devices/structures?
+[ ] rename `device` to `thermostat` in settings
+[ ] ditch 3rd party `nest` module (we don't need it)
 
 # Introduction
 This project is used to control your Nest thermostat through your Google calendar using events.
@@ -94,3 +95,13 @@ These two scripts can be run using `circusd` like so:
 You can control the daemon through the `circusctl` application.  Read more about it here:  https://circus.readthedocs.io/en/latest/
 
 NOTE: For debug purposes, you may want to run `circusd circus.ini` (remove the `--daemon` option to run `circusd` in the foreground)
+
+# Theory
+Here's how I think this should all work.  The bulk of the logic should be in the calendar service, since we need to figure out upcoming events, deleted events, etc.  The nest service only needs to the check the DB for something to do at that exact moment.
+
+*   The calendar service should check for events every hour
+*   If events are found that don't exist already, add them to the DB
+*   If we have *waiting* events in the DB that aren't found, mark them as missing
+
+*   The nest service should check for events in the DB every 5 minutes
+*   If it's time for an event, do it, mark the event done, and send an email

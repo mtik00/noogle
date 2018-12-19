@@ -19,7 +19,7 @@ from oauth2client.file import Storage
 from googleapiclient.errors import HttpError
 
 from .settings import SETTINGS_FOLDER, get_settings
-from .event import Event
+# from .event import Event
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -139,6 +139,4 @@ def get_next_events(max_results=10, q_filter="nest", since=None):
 
         raise
 
-    temp_events = events_result.get("items", [])
-    events = [Event(gcal_event=x, timezone=timezone) for x in temp_events]
-    return events
+    return events_result.get("items", [])

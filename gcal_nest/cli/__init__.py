@@ -14,7 +14,8 @@ import click
 from .. import __version__ as library_version
 from ..logger import get_logger
 from ..settings import get_settings
-from ..cache import get_cache
+from ..db import session
+from ..models import Event
 
 from .show import show
 from .init import init
@@ -27,7 +28,7 @@ from .service import service
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
 __creationDate__ = "11-JUN-2017"
-__version__ = "1.0.0"
+__version__ = "0.1.0a"
 
 
 HELP = """
@@ -43,7 +44,7 @@ class Ctx(object):
     def __init__(self):
         self.logger = get_logger()
         self.project_settings = get_settings()
-        self.cache = None
+        self.session = None
         self.quiet = False
         self.napi = None
         self.debug = False
@@ -55,14 +56,14 @@ CTX = click.make_pass_decorator(Ctx, ensure=True)
 @click.group(help=HELP)
 @click.option("--quiet", "-q", is_flag=True, help="Only report errors")
 @click.option(
-    "--debug/--no-debug", "-d", is_flag=True, default=True, help="Debug use only"
+    "--debug/--no-debug", "-d", is_flag=True, default=False, help="Debug use only"
 )
 @CTX
 def cli(ctx, quiet, debug):
     """Run the gcal_nest command-line application"""
     ctx.quiet = quiet
     ctx.debug = debug
-    ctx.cache = get_cache(debug)
+    ctx.session = session
 
 
 cli.add_command(show)

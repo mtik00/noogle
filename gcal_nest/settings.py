@@ -9,6 +9,7 @@ from __future__ import print_function
 import os
 import re
 import pkg_resources
+import json
 
 try:
     from configparser import ConfigParser
@@ -34,7 +35,7 @@ FILE_SEARCH = [
 ]
 
 # These settings will be removed from `as_string`
-SECRET_SETTINGS = ["nest.product-id", "nest.product-secret"]
+SECRET_SETTINGS = ["nest.product-id", "nest.product-secret", "nest.access-token"]
 
 
 def get_settings():
@@ -66,6 +67,7 @@ class Settings(object):
             "maximum-hold-days": 10,
             "product-id": None,
             "product-secret": None,
+            "access-token": None,
         },
         "calendar": {"name": "primary", "default-start-time": "9:00", "lookback": 2},
     }
@@ -87,6 +89,11 @@ class Settings(object):
             for key, value in config.items(section):
                 if value is not None:
                     self.settings[section][key] = value
+
+        token_file = os.path.join(SETTINGS_FOLDER, 'nest-token.json')
+        with open(token_file) as fh:
+            data = json.load(fh)
+        self.settings["nest"]["access-token"] = data['access_token']
 
         self._validate()
 

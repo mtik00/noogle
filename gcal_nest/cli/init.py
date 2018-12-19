@@ -13,6 +13,8 @@ This module holds the cli `init` commands
 import click
 
 from ..helpers import print_log
+from ..db import init as init_db
+from ..settings import get_settings
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -30,6 +32,10 @@ def init():
     if ctx.obj.quiet:
         ctx.exit()
 
+@init.command(name="db")
+def init_database():
+    """Initialize the database."""
+    init_db()
 
 @init.command()
 @click.confirmation_option(prompt="Are you sure you want to clear the settings?")
