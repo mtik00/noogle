@@ -132,12 +132,12 @@ class Settings(object):
                 ).format(start)
             )
 
-    def get(self, item):
+    def get(self, item, default=None):
         """
         Get a setting in the form of "section.key" (e.g. "nest.device").
         """
         section, key = item.split(".", 1)
-        val = self.settings.get(section, {}).get(key, None)
+        val = self.settings.get(section, {}).get(key, default)
 
         if item in self.conversions:
             return self.conversions[item](val)

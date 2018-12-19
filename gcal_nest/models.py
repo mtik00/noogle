@@ -30,7 +30,6 @@ class Event(Base):
     __tablename__ = "events"
 
     event_id = Column(String, primary_key=True)
-    timezone = Column(String, nullable=True)
     name = Column(String, nullable=True)
     action = Column(Enum(Action), nullable=False)
     calendar_id = Column(String, default="primary")
@@ -38,7 +37,6 @@ class Event(Base):
     state = Column(Enum(State), nullable=False, default=State.waiting)
     scheduled_date = Column(ArrowType, nullable=True)
     actioned_date = Column(ArrowType, nullable=True)
-    timezone = Column(String, nullable=True)
     description = Column(String, nullable=True)
 
     @classmethod
@@ -52,7 +50,7 @@ class Event(Base):
         return session.query(exists().where(Event.event_id == event_id)).scalar()
 
     @classmethod
-    def create_from_gcal(cls, gcal_event, timezone=None):
+    def create_from_gcal(cls, gcal_event):
         default_start_time = get_settings().get("calendar.default-start-time")
         e = Event(
             name=gcal_event["summary"], event_id=gcal_event["id"], state=State.waiting
@@ -60,14 +58,13 @@ class Event(Base):
 
         if "date" in gcal_event["start"]:
             e.scheduled_date = arrow.get(
-                gcal_event["start"]["date"] + " " + default_start_time + " " + timezone,
+                gcal_event["start"]["date"] + " " + default_start_time + " " + get_settings().get('calendar.timezone', 'MST'),
                 "YYYY-MM-DD H:mm ZZZ",
             )
         else:
             # NOTE: 'dateTime' includes the timezone
             e.scheduled_date = arrow.get(gcal_event["start"].get("dateTime"))
         e.actioned_date = None
-        e.timezone = timezone
 
         parts = e.name.split(":")
         if len(parts) == 2:
