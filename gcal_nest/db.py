@@ -17,5 +17,6 @@ session = Session()
 
 def init():
     from .models import Event
+
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)

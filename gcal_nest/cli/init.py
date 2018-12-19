@@ -32,10 +32,12 @@ def init():
     if ctx.obj.quiet:
         ctx.exit()
 
+
 @init.command(name="db")
 def init_database():
     """Initialize the database."""
     init_db()
+
 
 @init.command()
 @click.confirmation_option(prompt="Are you sure you want to clear the settings?")

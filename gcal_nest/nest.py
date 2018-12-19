@@ -179,13 +179,13 @@ def verify(ctx, event):
         mode = "eco"
 
     if structure.away != away:
-        errors.append(f'Structure is not marked as {away}!')
+        errors.append(f"Structure is not marked as {away}!")
 
     if structure.thermostats[0].mode != mode:
-        errors.append(f'Thermostat mode is not set to {mode}!')
+        errors.append(f"Thermostat mode is not set to {mode}!")
 
     if errors:
-        message = '\n'.join(errors)
+        message = "\n".join(errors)
         raise Exception(message)
 
 
@@ -196,12 +196,12 @@ def do_event(ctx, event):
     if func:
         func(ctx)
 
-        print('...waiting 30s before verification')
+        print("...waiting 30s before verification")
         time.sleep(30)
 
         verify(ctx, event)
     else:
-        raise Exception('Unkown event action: {!r}'.format(event.action))
+        raise Exception("Unkown event action: {!r}".format(event.action))
 
 
 class NestControl(object):

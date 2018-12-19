@@ -55,9 +55,7 @@ class Event(Base):
     def create_from_gcal(cls, gcal_event, timezone=None):
         default_start_time = get_settings().get("calendar.default-start-time")
         e = Event(
-            name = gcal_event["summary"],
-            event_id = gcal_event["id"],
-            state = State.waiting,
+            name=gcal_event["summary"], event_id=gcal_event["id"], state=State.waiting
         )
 
         if "date" in gcal_event["start"]:

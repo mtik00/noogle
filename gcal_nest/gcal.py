@@ -19,6 +19,7 @@ from oauth2client.file import Storage
 from googleapiclient.errors import HttpError
 
 from .settings import SETTINGS_FOLDER, get_settings
+
 # from .event import Event
 
 # Metadata ####################################################################
