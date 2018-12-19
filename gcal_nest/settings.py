@@ -69,7 +69,12 @@ class Settings(object):
             "product-secret": None,
             "access-token": None,
         },
-        "calendar": {"name": "primary", "default-home-time": "9:00", "default-end-time": "19:00", "lookback": 2},
+        "calendar": {
+            "name": "primary",
+            "default-home-time": "9:00",
+            "default-away-time": "19:00",
+            "lookback": 2,
+        },
     }
 
     def __init__(self):
