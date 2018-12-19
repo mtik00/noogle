@@ -51,19 +51,10 @@ class Event(Base):
 
     @classmethod
     def create_from_gcal(cls, gcal_event):
-        default_start_time = get_settings().get("calendar.default-start-time")
         e = Event(
             name=gcal_event["summary"], event_id=gcal_event["id"], state=State.waiting
         )
 
-        if "date" in gcal_event["start"]:
-            e.scheduled_date = arrow.get(
-                gcal_event["start"]["date"] + " " + default_start_time + " " + get_settings().get('calendar.timezone', 'MST'),
-                "YYYY-MM-DD H:mm ZZZ",
-            )
-        else:
-            # NOTE: 'dateTime' includes the timezone
-            e.scheduled_date = arrow.get(gcal_event["start"].get("dateTime"))
         e.actioned_date = None
 
         parts = e.name.split(":")
@@ -74,6 +65,17 @@ class Event(Base):
             e.description = parts[2]
         else:
             print(f'WARNING: Cannot parse event name: "{self.name}"')
+
+        if "date" in gcal_event["start"]:
+            # The user has an "all day" event in gcal.
+            default_time = get_settings().get("calendar.default-start-time") if e.action.value == Action.home else get_settings().get("calendar.default-end-time")
+            e.scheduled_date = arrow.get(
+                gcal_event["start"]["date"] + " " + default_time + " " + get_settings().get('calendar.timezone', 'MST'),
+                "YYYY-MM-DD H:mm ZZZ",
+            )
+        else:
+            # NOTE: 'dateTime' includes the timezone
+            e.scheduled_date = arrow.get(gcal_event["start"].get("dateTime"))
 
         session.add(e)
         session.commit()
