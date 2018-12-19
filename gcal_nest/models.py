@@ -68,7 +68,7 @@ class Event(Base):
 
         if "date" in gcal_event["start"]:
             # The user has an "all day" event in gcal.
-            default_time = get_settings().get("calendar.default-start-time") if e.action.value == Action.home else get_settings().get("calendar.default-end-time")
+            default_time = get_settings().get("calendar.default-home-time") if e.action.value == Action.home else get_settings().get("calendar.default-end-time")
             e.scheduled_date = arrow.get(
                 gcal_event["start"]["date"] + " " + default_time + " " + get_settings().get('calendar.timezone', 'MST'),
                 "YYYY-MM-DD H:mm ZZZ",

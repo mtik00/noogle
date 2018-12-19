@@ -69,7 +69,7 @@ class Settings(object):
             "product-secret": None,
             "access-token": None,
         },
-        "calendar": {"name": "primary", "default-start-time": "9:00", "default-end-time": "19:00", "lookback": 2},
+        "calendar": {"name": "primary", "default-home-time": "9:00", "default-end-time": "19:00", "lookback": 2},
     }
 
     def __init__(self):
@@ -124,11 +124,11 @@ class Settings(object):
         """
         Validates the settings to ensure they're correct.
         """
-        start = self.settings["calendar"]["default-start-time"]
+        start = self.settings["calendar"]["default-home-time"]
         if not re.match(r"^\d+:\d{2}$", start):
             raise ValueError(
                 (
-                    "calendar.default-start-time ({0}) not " "in correct format: H:mm"
+                    "calendar.default-home-time ({0}) not " "in correct format: H:mm"
                 ).format(start)
             )
 
@@ -184,8 +184,8 @@ class Settings(object):
             if self.settings["calendar"]["name"] is None
             else self.settings["calendar"]["name"],
             default_start_time=""
-            if self.settings["calendar"]["default-start-time"] is None
-            else self.settings["calendar"]["default-start-time"],
+            if self.settings["calendar"]["default-home-time"] is None
+            else self.settings["calendar"]["default-home-time"],
             lookback=""
             if self.settings["calendar"]["lookback"] is None
             else self.settings["calendar"]["lookback"],
