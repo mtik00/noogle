@@ -95,11 +95,6 @@ class Settings(object):
                 if value is not None:
                     self.settings[section][key] = value
 
-        token_file = os.path.join(SETTINGS_FOLDER, "nest-token.json")
-        with open(token_file) as fh:
-            data = json.load(fh)
-        self.settings["nest"]["access-token"] = data["access_token"]
-
         self._validate()
 
     def _to_int(self, value, base=10):
