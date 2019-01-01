@@ -15,7 +15,7 @@ import sys
 import click
 
 from ..gcal import setup as gcal_setup
-from ..nest import setup as nest_setup
+from ..nest import NestAPI
 
 
 # Metadata ####################################################################
@@ -52,6 +52,6 @@ def gcal(noauth_local_webserver):
 def nest():
     """Set up Nest"""
     ctx = click.get_current_context().obj
-    ctx.logger.debug("calling `nest_setup`")
-    nest_setup(ctx)
+    ctx.logger.debug("calling `NestApi.show()`")
+    NestAPI().show()
     ctx.logger.debug("...done")

@@ -16,7 +16,7 @@ import inflect
 from sqlalchemy import and_
 
 from ..gcal import get_next_events
-from ..nest import do_event
+from ..nest import NestAPI
 from ..helpers import format_future_time, print_log
 from ..mailgun import send_message
 from ..models import Event, State
@@ -104,6 +104,7 @@ def nest(poll=5):
     ctx = click.get_current_context().obj
     poll *= 60
     text_lines = []
+    api = None
 
     while True:
         events = Event.waiting()
@@ -119,13 +120,14 @@ def nest(poll=5):
 
         if events:
             print_log("NEST: %d events waiting..." % len(events), nl=False)
+            api = NestAPI()
 
         for event in events:
             text_lines.append(f"NEST:...doing {event}")
             print_log(f"NEST:...doing {event}")
 
             try:
-                do_event(ctx, event)
+                api.do_event(event)
                 event.mark_event_done(event)
             except Exception as e:
                 text_lines.append(str(e))

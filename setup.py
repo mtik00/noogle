@@ -20,7 +20,6 @@ if __name__ == '__main__':
             "https://github.com/mtik00/gcal_nest/releases/download/v0.0.0/"
             "gcal_nest-0.0.0.tar.gz"),
         install_requires=[
-            "python-nest>=3.0",
             "google-api-python-client",
             "setuptools",
             "arrow",

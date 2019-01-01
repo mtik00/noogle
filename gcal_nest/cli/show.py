@@ -14,7 +14,7 @@ import click
 import arrow
 
 from ..gcal import get_next_events
-from ..nest import get_napi_thermostat, get_nest_api
+from ..nest import NestAPI
 from ..helpers import print_log
 from ..models import Event
 
@@ -82,68 +82,20 @@ def cache():
 
 
 @show.command()
-def thermostat():
-    """Show the current thermostat info"""
-
-    ctx = click.get_current_context().obj
-    thermostat = get_napi_thermostat(ctx)
-
-    print_log("%s : %s" % (thermostat.structure.name, thermostat.name))
-
-    setpoint = "%s%s (%s)" % (
-        thermostat.target,
-        thermostat.temperature_scale,
-        thermostat.mode,
-    )
-    if thermostat.mode.lower() == "eco":
-        setpoint = "%s%s (eco)" % (
-            thermostat.eco_temperature.low,
-            thermostat.temperature_scale,
-        )
-    print_log("...current setpoint: %s" % setpoint)
-
-    print_log(
-        "...current temperature: %s%s"
-        % (thermostat.temperature, thermostat.temperature_scale)
-    )
-
-    print_log("...current humidity: %s%%" % thermostat.humidity)
-
-    print_log("...state: %s" % thermostat.hvac_state)
-
-    print_log(
-        "...eco temperatures: low={low}{scale}, high={high}{scale}".format(
-            low=thermostat.eco_temperature.low,
-            scale=thermostat.temperature_scale,
-            high=thermostat.eco_temperature.high,
-        )
-    )
-
-
-@show.command()
 def structures():
     """Show the structure information"""
-    ctx = click.get_current_context().obj
-    napi = get_nest_api(ctx)
-
-    for structure in napi.structures:
-        print("Structure %s" % structure.name)
-        print("    Away: %s" % structure.away)
-        print("    Devices:")
-
-        for device in structure.thermostats:
-            print("        Device: %s" % device.name)
-            print("            Temp: %0.1f" % device.temperature)
+    NestAPI().show()
 
 
 @show.command()
 def away():
     """Show the away state for the controlled thermostat"""
     ctx = click.get_current_context().obj
-    napi = get_nest_api(ctx)
+    napi = NestAPI()
 
     structure_name = ctx.project_settings.get("nest.structure")
     structure = next((x for x in napi.structures if x.name == structure_name))
+
 
     print("Structure: %s" % structure.name)
     print("     Away: %s" % structure.away)

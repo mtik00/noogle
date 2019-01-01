@@ -9,8 +9,9 @@ import click
 import arrow
 
 from ..gcal import get_next_events
-from ..nest import get_napi_structure, get_nest_api
+from ..nest import NestAPI
 from ..helpers import print_log
+from ..models import Action
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -31,37 +32,15 @@ def set_():
 
 @set_.command()
 def home():
-    """Sets the thermostate to `home`"""
+    """Sets the structure to `home` and thermostat to `heat`"""
     ctx = click.get_current_context().obj
-    napi = get_nest_api(ctx)
-    structure = get_napi_structure(ctx, napi)
-
-    print("Structure: %s" % structure.name)
-
-    if structure.away != "home":
-        structure.away = "home"
-    else:
-        print('...already in "home" mode')
-
-    if structure.thermostats[0].mode != "heat":
-        structure.thermostats[0].mode = "heat"
-        print('...changed mode to "heat"')
+    napi = NestAPI()
+    napi.do_action(Action.home)
 
 
 @set_.command()
 def away():
-    """Sets the thermostate to `away`"""
+    """Sets the structure to `away` and thermostat to `eco`"""
     ctx = click.get_current_context().obj
-    napi = get_nest_api(ctx)
-    structure = get_napi_structure(ctx, napi)
-
-    print("Structure: %s" % structure.name)
-
-    if structure.away != "away":
-        structure.away = "away"
-    else:
-        print('...already in "away" mode')
-
-    if structure.thermostats[0].mode != "eco":
-        structure.thermostats[0].mode = "eco"
-        print('...changed mode to "eco"')
+    napi = NestAPI()
+    napi.do_action(Action.away)
