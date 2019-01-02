@@ -189,6 +189,9 @@ class Settings(object):
             lookback=""
             if self.settings["calendar"]["lookback"] is None
             else self.settings["calendar"]["lookback"],
+            timezone=""
+            if self.settings["calendar"]["timezone"] is None
+            else self.settings["calendar"]["timezone"],
         )
 
     def as_string(self, mask=True):
