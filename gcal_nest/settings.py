@@ -74,6 +74,7 @@ class Settings(object):
             "default-home-time": "9:00",
             "default-away-time": "19:00",
             "lookback": 2,
+            "timezone": "MST",
         },
     }
 
