@@ -7,7 +7,6 @@
 [ ] env var setup
 [ ] multiple devices/structures?
 [ ] rename `device` to `thermostat` in settings
-[ ] ditch 3rd party `nest` module (we don't need it)
 [ ] all email subjects are "New event scheduled"; not always True
 
 # Introduction
@@ -17,7 +16,6 @@ This project is used to control your Nest thermostat through your Google calenda
 
 We depend on these things to communicate with Google and Nest APIs:
 
-*   [python-nest](https://pypi.python.org/pypi/python-nest)
 *   [google-api-python-client](https://developers.google.com/google-apps/calendar/quickstart/python)
 
 See `requirements.txt` for a complete list of requirements.
@@ -60,7 +58,6 @@ in `env/env.bat` (or `env/env.sh` on Linux).
 1.  Once done, add the `OAuth` parameters to your environment setup file.  For example, add the following to `env/env.bat`:  
     `set NEST_PRODUCT_ID="ABCDEFG"`  
     `set NEST_PRODUCT_SECRET="ABCDEFG"`  
-    Alternatively, you may insert these into `~/.gcal_nest/gcal_nest_settings.ini`
 1.  Run the `gcal_nest` setup for Nest: `gcal_nest setup nest`
 1.  If presented with a URL:
     *   Go to the URL
