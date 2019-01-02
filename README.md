@@ -20,18 +20,24 @@ We depend on these things to communicate with Google and Nest APIs:
 
 See `requirements.txt` for a complete list of requirements.
 
+# Installation
+
+You can install `gcal_nest` like any other Python package.
+
+1.  Extract the tarball/zip
+2.  Run `python3.7 setup.py`
+
 # Configuration
 
 This application makes use of configuration files to store your specific
 settings.  You should probably create your own configuration file:
 
-    python -mgcal_nest --make-user-settings
+    gcal_nest settings make
 
-This will create a file located at `~/.gcal_nest/gcal_nest_settings.ini`.  To change the location of the file, you must set the `SETTINGS_FOLDER` environment variable.
+This will create a file located at `~/.config/gcal_nest/gcal_nest.ini`.  To change the location of the file, you must set the `SETTINGS_FOLDER` environment variable before making the settings.
 
 This folder will also hold the OAuth tokens for both Google and Nest.  You may
 wish to change the access bits accordingly.
-
 
 # Setup
 
@@ -46,7 +52,7 @@ in `env/env.bat` (or `env/env.sh` on Linux).
 
 1.  Create an application using [Google API](https://console.developers.google.com/flows/enableapi?apiid=calendar&pli=1)
 1.  Download the credentials to `~/.gcal_nest/google_client_secret.json`
-1.  Run the `gcal_nest` setup for Google: `gcal_nest setup gcal`
+1.  Run the `gcal_nest` setup for Google: `gcal_nest setup gcal --noauth-local-webserver`
 1.  Follow the prompts to allow this computer to access your contacts.
 1.  Run the script again to ensure you have the credentials stored (you should not
     be prompted again).
