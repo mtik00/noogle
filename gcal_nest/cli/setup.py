@@ -33,19 +33,19 @@ def setup():
 
 @setup.command()
 @click.option(
-    "--noauth-local-webserver",
+    "--auth-local-webserver",
     is_flag=True,
-    help="don't use a local webserver for authentication",
+    help="use a local webserver for authentication; otherwise just show a link",
 )
-def gcal(noauth_local_webserver):
+def gcal(auth_local_webserver):
     """Set up Google calendar"""
     # We need to change sys.argv to align with the google setup.
-    if noauth_local_webserver:
-        sys.argv = sys.argv[0] + "--noauth-local-webserver"
-    else:
+    if auth_local_webserver:
         sys.argv = [sys.argv[0]]
+    else:
+        sys.argv = sys.argv[0] + "--noauth-local-webserver"
 
-    gcal_setup(noauth_local_webserver)
+    gcal_setup(auth_local_webserver)
 
 
 @setup.command()

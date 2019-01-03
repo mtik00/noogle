@@ -74,10 +74,11 @@ def get_credentials(noauth_local_webserver=False):
     return credentials
 
 
-def setup(noauth_local_webserver=False):
+def setup(auth_local_webserver=False):
     """
     Set up your credentials for access to google calendar.
     """
+    noauth_local_webserver = not auth_local_webserver
     get_credentials(noauth_local_webserver=noauth_local_webserver)
     events = get_next_events()
     if not events:
