@@ -24,6 +24,8 @@ if __name__ == '__main__':
             "setuptools",
             "arrow",
             "click",
+            "sqlalchemy-utils",
+            "sqlalchemy",
         ],
         packages=find_packages(exclude=('fabfile',)),
         zip_safe=True,
