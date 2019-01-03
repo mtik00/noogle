@@ -20,6 +20,8 @@ We depend on these things to communicate with Google and Nest APIs:
 
 See `requirements.txt` for a complete list of requirements.
 
+This service only runs on Python3.7.
+
 # Installation
 
 You can install `gcal_nest` like any other Python package.
