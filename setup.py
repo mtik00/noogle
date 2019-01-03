@@ -52,6 +52,6 @@ if __name__ == '__main__':
         long_description=open(os.path.join(THIS_DIR, "README.md")).read(),
 
         entry_points={
-            'console_scripts': ['gcal_nest=gcal_nest.cli:cli'],
+            'console_scripts': ['gcal-nest=gcal_nest.cli:cli'],
         }
     )
