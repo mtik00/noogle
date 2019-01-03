@@ -1,0 +1,22 @@
+---
+
+app_log_dir: /var/log/gcal_nest
+
+# circusd ini #################################################################
+
+# Running circusd
+uid: <some user name> # e.g. myusername
+gid: nginx
+chdir: /home/<username>/gcal_nest
+number_of_processes: 1
+
+# Application logging
+logger: file:/var/log/gcal_nest/gcal_nest.log
+###############################################################################
+
+# systemd service #############################################################
+venv_dir: /home/<username>/gcal_nest/.direnv
+service_name: gcal_nest.service
+# The service file (gcal_nest.service) will get copied here
+service_path: /etc/systemd/system
+###############################################################################
