@@ -27,6 +27,15 @@ if [[ ! -e instance/env.sh ]]; then
     chmod +x instance/env.sh
 fi
 
+# Check the circus config######################################################
+if [[ (! -e instance/circus.ini) || (-n `diff _build/circus.ini instance/circus.ini`) ]]; then
+    echo "changes detected in 'instance/circus.ini'"
+    cp -f _build/circus.ini instance
+else
+    echo "no changes detected in circus.ini"
+fi
+###############################################################################
+
 # Check the service ###########################################################
 if [[ ! -e {{service_path}}/{{service_name}} ]]; then
     echo "creating the service"
@@ -40,7 +49,7 @@ elif [[ -n `diff _build/gcal-nest-systemd.service {{service_path}}/{{service_nam
 
     echo "deploying the service"
     cp _build/gcal-nest-systemd.service {{service_path}}/{{service_name}}
-    chmod 755 {{service_path}}/{{service_name}}
+    chmod {{service_chmod}} {{service_path}}/{{service_name}}
     systemctl daemon-reload
 else
     echo "no change detected in {{service_path}}/{{service_name}}"

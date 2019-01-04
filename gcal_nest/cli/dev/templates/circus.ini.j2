@@ -1,0 +1,21 @@
+[circus]
+check_delay = 5
+umask = 002
+
+[watcher:nest]
+virtualenv = {{venv_dir}}
+copy_env = 1
+cmd = gcal_nest
+args = service nest --poll {{nest_poll}}
+stdout_stream.class = FancyStdoutStream
+stdout_stream.color = green
+stdout_stream.time_format = %%Y/%%m/%%d | %%H:%%M:%%S
+
+[watcher:gcal]
+virtualenv = {{venv_dir}}
+copy_env = 1
+cmd = gcal_nest
+args = service gcal --poll {{calendar_poll}}
+stdout_stream.class = FancyStdoutStream
+stdout_stream.color = yellow
+stdout_stream.time_format = %%Y/%%m/%%d | %%H:%%M:%%S
