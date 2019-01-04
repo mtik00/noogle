@@ -6,15 +6,7 @@ instance_dirname: instance
 
 # logging #####################################################################
 app_log_dir: /var/log/noogle
-chown_log_dir: 755
-###############################################################################
-
-# circusd ini #################################################################
-
-# Running circusd
-chdir: /home/<username>/noogle
-
-# Application logging
+chown_log_dir: <username>:<groupname>
 logfile: file:/var/log/noogle/app.log
 ###############################################################################
 
@@ -27,6 +19,8 @@ service_chmod: 755
 ###############################################################################
 
 # Application Setup ###########################################################
-calendar_poll: 30
-nest_poll: 10
+calendar_poll: 30  # Minutes between GCal reads
+nest_poll: 10  # Minutes between Nest event checks
+rotate_log_size: 10485760  # 10 MB
+rotate_log_count: 5  # Keep 5 rotated log files
 ###############################################################################

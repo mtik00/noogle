@@ -18,6 +18,9 @@ __creationDate__ = "08-JUN-2017"
 # Globals #####################################################################
 LOGGER = None
 
+# Fix verbose error in google api
+logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.ERROR)
+
 
 def get_logger(
     name=None,

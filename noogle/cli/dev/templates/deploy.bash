@@ -5,7 +5,10 @@ today=`date +%Y-%m-%d-%H:%M:%S`
 if [[ ! -d {app_log_dir} ]]; then
     echo "creating log dir"
     mkdir -p {app_log_dir}
-    chown {chown_log_dir} {app_log_dir}/
+    touch {app_log_dir}/noogle.log
+    touch {app_log_dir}/gcal.log
+    touch {app_log_dir}/nest.log
+    chown -R {chown_log_dir} {app_log_dir}/
 else
     chown -R {chown_log_dir} {app_log_dir}
 fi
