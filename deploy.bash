@@ -4,6 +4,7 @@
 
 # Make sure we bring in any changes to python #################################
 pip install -e .[dev]
+pip install -r requirements.txt
 ###############################################################################
 
 # build the config files
@@ -12,4 +13,4 @@ noogle dev build
 # TODO: Upgrade the database?
 
 # bootstrap the built deploy file
-# sudo bash _build/deploy.bash
+sudo bash _build/deploy.bash
