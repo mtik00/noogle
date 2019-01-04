@@ -22,7 +22,6 @@ def build():
         click.echo('...we think your instance folder is here: ' + instance_dir)
         raise click.Abort()
 
-    return
     options = ruamel.yaml.safe_load(open(site_config_file).read())
 
     if not os.path.isdir(outdir):
@@ -33,12 +32,12 @@ def build():
         undefined=StrictUndefined)
 
     ###########################################################################
-    click.echo('Creating `_build/gcal-nest-systemd.service')
-    template = env.get_template('gcal-nest-systemd.service.j2')
-    content = template.render(**options)
-    with open(os.path.join(outdir, 'gcal-nest-systemd.service'), 'wb') as fh:
-        fh.write(content)
-    click.echo('...done')
+    # click.echo('Creating `_build/gcal-nest-systemd.service')
+    # template = env.get_template('gcal-nest-systemd.service.j2')
+    # content = template.render(**options)
+    # with open(os.path.join(outdir, 'gcal-nest-systemd.service'), 'wb') as fh:
+    #     fh.write(content)
+    # click.echo('...done')
     ###########################################################################
 
     ###########################################################################
@@ -46,6 +45,6 @@ def build():
     template = env.get_template('deploy.bash.j2')
     content = template.render(**options)
     with open(os.path.join(outdir, 'deploy.bash'), 'wb') as fh:
-        fh.write(content)
+        fh.write(content.encode('utf-8'))
     click.echo('...done')
     ###########################################################################

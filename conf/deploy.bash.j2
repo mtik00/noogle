@@ -5,7 +5,9 @@ today=`date +%Y-%m-%d-%H:%M:%S`
 if [[ ! -d {{app_log_dir}} ]]; then
     echo "creating log dir"
     mkdir -p {{app_log_dir}}
-    chown {{chown_socket}} {{app_log_dir}}/
+    chown {{chown_log_dir}} {{app_log_dir}}/
+else
+    chown -R {{chown_log_dir}} {{app_log_dir}}
 fi
 ###############################################################################
 
@@ -15,7 +17,13 @@ fi
 
 if [[ ! -e instance/env.sh ]]; then
     echo "creating instance env vars file"
-    echo export SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1) > instance/env.sh
+    echo "export NEST_PRODUCT_ID=" > instance/env.sh
+    echo "export NEST_PRODUCT_SECRET=" > instance/env.sh
+    echo "export MAILGUN_API_KEY=" > instance/env.sh
+    echo "export MAILGUN_DOMAIN_NAME=" > instance/env.sh
+    echo "export MAILGUN_FROM=" > instance/env.sh
+    echo "export MAILGUN_TO=" > instance/env.sh
+    echo "eval \"$(_GCAL_NEST_COMPLETE=source gcal-nest)\"" > instance/env.sh
     chmod +x instance/env.sh
 fi
 

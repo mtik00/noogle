@@ -1,6 +1,7 @@
 ---
 
 app_log_dir: /var/log/gcal_nest
+chown_log_dir: 755
 
 # circusd ini #################################################################
 
