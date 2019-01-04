@@ -8,6 +8,7 @@
 [ ] multiple devices/structures?
 [ ] rename `device` to `thermostat` in settings
 [ ] all email subjects are "New event scheduled"; not always True
+[ ] rename to `noogle` ;)
 
 # Introduction
 This project is used to control your Nest thermostat through your Google calendar using events.
