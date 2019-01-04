@@ -11,26 +11,28 @@ else
 fi
 ###############################################################################
 
-if [[ ! -d instance ]]; then
-    mkdir instance
+if [[ ! -d {{instance_dirname}} ]]; then
+    mkdir {{instance_dirname}}
 fi
 
-if [[ ! -e instance/env.sh ]]; then
-    echo "creating instance env vars file"
-    echo "export NEST_PRODUCT_ID=" > instance/env.sh
-    echo "export NEST_PRODUCT_SECRET=" > instance/env.sh
-    echo "export MAILGUN_API_KEY=" > instance/env.sh
-    echo "export MAILGUN_DOMAIN_NAME=" > instance/env.sh
-    echo "export MAILGUN_FROM=" > instance/env.sh
-    echo "export MAILGUN_TO=" > instance/env.sh
-    echo "eval \"$(_GCAL_NEST_COMPLETE=source gcal-nest)\"" > instance/env.sh
-    chmod +x instance/env.sh
+if [[ ! -e {{instance_dirname}}/env.sh ]]; then
+    echo "creating {{instance_dirname}} env vars file"
+    echo "export NEST_PRODUCT_ID=" > {{instance_dirname}}/env.sh
+    echo "export NEST_PRODUCT_SECRET=" > {{instance_dirname}}/env.sh
+    echo "export MAILGUN_API_KEY=" > {{instance_dirname}}/env.sh
+    echo "export MAILGUN_DOMAIN_NAME=" > {{instance_dirname}}/env.sh
+    echo "export MAILGUN_FROM=" > {{instance_dirname}}/env.sh
+    echo "export MAILGUN_TO=" > {{instance_dirname}}/env.sh
+    echo "eval \"$(_GCAL_NEST_COMPLETE=source gcal-nest)\"" > {{instance_dirname}}/env.sh
+    chmod +x {{instance_dirname}}/env.sh
+
+    echo "WARNING: '{{instance_dirname}}/env.sh' needs to be modified!"
 fi
 
 # Check the circus config######################################################
-if [[ (! -e instance/circus.ini) || (-n `diff _build/circus.ini instance/circus.ini`) ]]; then
-    echo "changes detected in 'instance/circus.ini'"
-    cp -f _build/circus.ini instance
+if [[ (! -e {{instance_dirname}}/circus.ini) || (-n `diff _build/circus.ini {{instance_dirname}}/circus.ini`) ]]; then
+    echo "changes detected in '{{instance_dirname}}/circus.ini'"
+    cp -f _build/circus.ini {{instance_dirname}}
 else
     echo "no changes detected in circus.ini"
 fi
