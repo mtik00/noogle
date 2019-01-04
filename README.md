@@ -6,7 +6,6 @@
 [ ] debug mode
 [ ] env var setup
 [ ] multiple devices/structures?
-[ ] rename `device` to `thermostat` in settings
 [ ] all email subjects are "New event scheduled"; not always True
 [ ] rename to `noogle` ;)
 

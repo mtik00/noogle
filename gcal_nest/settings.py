@@ -62,7 +62,7 @@ class Settings(object):
         "general": {"use-logfile": True},
         "nest": {
             "structure": None,
-            "device": None,
+            "thermostat": None,
             "eco-temperature": 50,
             "maximum-hold-days": 10,
             "product-id": None,
@@ -135,7 +135,7 @@ class Settings(object):
 
     def get(self, item, default=None):
         """
-        Get a setting in the form of "section.key" (e.g. "nest.device").
+        Get a setting in the form of "section.key" (e.g. "nest.thermostat").
         """
         section, key = item.split(".", 1)
         val = self.settings.get(section, {}).get(key, default)
@@ -147,7 +147,7 @@ class Settings(object):
 
     def set(self, item, value):
         """
-        Set a setting in the form of `"section.key" = value` (e.g. "nest.device", 'Test').
+        Set a setting in the form of `"section.key" = value` (e.g. "nest.thermostat", 'Test').
         """
         section, key = item.split(".", 1)
         self.settings[section][key] = value
@@ -169,9 +169,9 @@ class Settings(object):
             use_logfile=""
             if self.settings["general"]["use-logfile"] is None
             else self.settings["general"]["use-logfile"],
-            nest_device=""
-            if self.settings["nest"]["device"] is None
-            else self.settings["nest"]["device"],
+            nest_thermostat=""
+            if self.settings["nest"]["thermostat"] is None
+            else self.settings["nest"]["thermostat"],
             nest_structure=""
             if self.settings["nest"]["structure"] is None
             else self.settings["nest"]["structure"],
