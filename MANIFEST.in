@@ -1,0 +1,2 @@
+recursive-include noogle *.*
+global-exclude *.py[cod]

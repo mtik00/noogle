@@ -1,0 +1,26 @@
+---
+
+# This is the folder that has the application setup.  It should not be checked
+# in to source control.
+instance_dirname: instance
+
+# logging #####################################################################
+app_log_dir: /var/log/noogle
+chown_log_dir: <username>:<groupname>
+logfile: file:/var/log/noogle/app.log
+###############################################################################
+
+# systemd service #############################################################
+venv_dir: /home/<username>/noogle/.direnv
+service_name: noogle.service
+# The service file (noogle.service) will get copied here
+service_path: /etc/systemd/system
+service_chmod: 755
+###############################################################################
+
+# Application Setup ###########################################################
+calendar_poll: 30  # Minutes between GCal reads
+nest_poll: 10  # Minutes between Nest event checks
+rotate_log_size: 10485760  # 10 MB
+rotate_log_count: 5  # Keep 5 rotated log files
+###############################################################################

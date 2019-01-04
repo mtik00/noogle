@@ -1,4 +1,7 @@
-.direnv
+/.vscode
+/.direnv
+/junk.py
+/_build
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
