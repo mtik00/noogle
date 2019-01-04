@@ -12,6 +12,8 @@ service_name: noogle.service
 # The service file (noogle.service) will get copied here
 service_path: /etc/systemd/system
 service_chmod: 755
+service_user: <username>
+service_group: <username>
 ###############################################################################
 
 # Application Setup ###########################################################
