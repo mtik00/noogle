@@ -2,7 +2,7 @@
 #       also set permissions: `sudo chmod {service_chmod} /etc/systemd/system/{service_name}`
 
 [Unit]
-Description=circusd config to control gcal-nest
+Description=circusd config to control noogle
 After=syslog.target network.target nss-lookup.target
 
 [Service]

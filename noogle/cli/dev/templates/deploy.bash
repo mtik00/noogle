@@ -23,7 +23,7 @@ if [[ ! -e {instance_dirname}/env.sh ]]; then
     echo "export MAILGUN_DOMAIN_NAME=" > {instance_dirname}/env.sh
     echo "export MAILGUN_FROM=" > {instance_dirname}/env.sh
     echo "export MAILGUN_TO=" > {instance_dirname}/env.sh
-    echo "eval \"$(_GCAL_NEST_COMPLETE=source gcal-nest)\"" > {instance_dirname}/env.sh
+    echo "eval \"$(_NOOGLE_COMPLETE=source noogle)\"" > {instance_dirname}/env.sh
     chmod +x {instance_dirname}/env.sh
 
     echo "WARNING: '{instance_dirname}/env.sh' needs to be modified!"
@@ -41,16 +41,16 @@ fi
 # Check the service ###########################################################
 if [[ ! -e {service_path}/{service_name} ]]; then
     echo "creating the service"
-    cp _build/gcal-nest-systemd.service {service_path}/{service_name}
+    cp _build/noogle-systemd.service {service_path}/{service_name}
     chmod 755 {service_path}/{service_name}
     systemctl daemon-reload
     systemctl enable {service_name}
-elif [[ -n `diff _build/gcal-nest-systemd.service {service_path}/{service_name}` ]]; then
+elif [[ -n `diff _build/noogle-systemd.service {service_path}/{service_name}` ]]; then
     echo "backing up existing service file"
     mv {service_path}/{service_name} {service_path}/{service_name}.$today
 
     echo "deploying the service"
-    cp _build/gcal-nest-systemd.service {service_path}/{service_name}
+    cp _build/noogle-systemd.service {service_path}/{service_name}
     chmod {service_chmod} {service_path}/{service_name}
     systemctl daemon-reload
 else

@@ -102,7 +102,7 @@ def setup():
 
     text = re.sub('version="0.0.0",', 'version="%s",' % lib_ver, text)
     text = re.sub('download/v0.0.0/"', 'download/v%s/"' % lib_ver, text)
-    text = re.sub('gcal_nest-0.0.0.tar.gz', 'gcal_nest-%s.tar.gz' % lib_ver, text)
+    text = re.sub('noogle-0.0.0.tar.gz', 'noogle-%s.tar.gz' % lib_ver, text)
 
     # readme = os.path.join(BASE_DIR, 'README.md')
     # output = pypandoc.convert_file(readme, 'rst')

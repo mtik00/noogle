@@ -24,7 +24,7 @@ This service only runs on Python3.7.
 
 # Installation
 
-You can install `gcal_nest` like any other Python package.
+You can install `noogle` like any other Python package.
 
 1.  Extract the tarball/zip
 2.  Run `python3.7 setup.py`
@@ -34,9 +34,9 @@ You can install `gcal_nest` like any other Python package.
 This application makes use of configuration files to store your specific
 settings.  You should probably create your own configuration file:
 
-    gcal_nest settings make
+    noogle settings make
 
-This will create a file located at `~/.config/gcal_nest/gcal_nest.ini`.  To change the location of the file, you must set the `SETTINGS_FOLDER` environment variable before making the settings.
+This will create a file located at `~/.config/noogle/noogle.ini`.  To change the location of the file, you must set the `SETTINGS_FOLDER` environment variable before making the settings.
 
 This folder will also hold the OAuth tokens for both Google and Nest.  You may
 wish to change the access bits accordingly.
@@ -47,14 +47,14 @@ In this example, we're going to be storing some credentials and application setu
 in `instance/env.bat` (or `instance/env.sh` on Linux).
 
 **NOTE** I highly recommend using a virtual environment for this!
-1.  Install `gcal_nest` and its requirements
+1.  Install `noogle` and its requirements
 1.  Create your application ([configuration file](#Configuration)).
 
 ## Google OAuth 2.0 Setup
 
 1.  Create an application using [Google API](https://console.developers.google.com/flows/enableapi?apiid=calendar&pli=1)
-1.  Download the credentials to `~/.gcal_nest/google_client_secret.json`
-1.  Run the `gcal_nest` setup for Google: `gcal_nest setup gcal`
+1.  Download the credentials to `~/.noogle/google_client_secret.json`
+1.  Run the `noogle` setup for Google: `noogle setup gcal`
 1.  Follow the prompts to allow this computer to access your contacts.
 1.  Run the script again to ensure you have the credentials stored (you should not
     be prompted again).
@@ -66,19 +66,19 @@ in `instance/env.bat` (or `instance/env.sh` on Linux).
 1.  Once done, add the `OAuth` parameters to your environment setup file.  For example, add the following to `instance/env.bat`:  
     `set NEST_PRODUCT_ID=ABCDEFG`  
     `set NEST_PRODUCT_SECRET=ABCDEFG`  
-1.  Run the `gcal_nest` setup for Nest: `gcal_nest setup nest`
+1.  Run the `noogle` setup for Nest: `noogle setup nest`
 1.  If presented with a URL:
     *   Go to the URL
     *   Click the `Accept` button
     *   Copy the *pincode*
     *   Enter the *pincode* in to the prompt
-1.  Run the `gcal_nest show structure` to ensure you have the credentials stored (you should not
+1.  Run the `noogle show structure` to ensure you have the credentials stored (you should not
     be prompted again).
 
-**NOTE**: If you change the permissions through the Nest API, you must delete `~/.gcal_nest/google_client_secret.json` and re-run `gcal_nest setup nest`.
+**NOTE**: If you change the permissions through the Nest API, you must delete `~/.noogle/google_client_secret.json` and re-run `noogle setup nest`.
 
 # DSL
-`gcal_nest` depends on events in your calendar with specific text.  All events should be in the form of:
+`noogle` depends on events in your calendar with specific text.  All events should be in the form of:
 
     nest:<command>:<description>
 

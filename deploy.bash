@@ -7,7 +7,7 @@ pip install -e .[dev]
 ###############################################################################
 
 # build the config files
-gcal-nest dev build
+noogle dev build
 
 # TODO: Upgrade the database?
 

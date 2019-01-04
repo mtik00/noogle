@@ -1,6 +1,5 @@
 import os
 import click
-from jinja2 import Environment, StrictUndefined, FileSystemLoader
 import ruamel.yaml
 
 
@@ -35,10 +34,10 @@ def build():
         os.makedirs(outdir)
 
     ###########################################################################
-    click.echo('Creating `_build/gcal-nest-systemd.service')
-    template = get_template('gcal-nest-systemd.service')
+    click.echo('Creating `_build/noogle-systemd.service')
+    template = get_template('noogle-systemd.service')
     content = template.format(**options)
-    with open(os.path.join(outdir, 'gcal-nest-systemd.service'), 'wb') as fh:
+    with open(os.path.join(outdir, 'noogle-systemd.service'), 'wb') as fh:
         fh.write(content.encode('utf-8'))
     click.echo('...done')
     ###########################################################################

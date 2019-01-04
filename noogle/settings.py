@@ -24,12 +24,12 @@ __creationDate__ = "05-JUN-2017"
 # Globals #####################################################################
 
 _SETTINGS = None
-SETTINGS_FILENAME = "gcal_nest.ini"
-USER_FOLDER = os.path.join(os.path.expanduser("~"), ".config", "gcal_nest")
+SETTINGS_FILENAME = "noogle.ini"
+USER_FOLDER = os.path.join(os.path.expanduser("~"), ".config", "noogle")
 SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", USER_FOLDER)
 SETTINGS_PATH = os.path.join(SETTINGS_FOLDER, SETTINGS_FILENAME)
 FILE_SEARCH = [
-    os.path.join("/etc/gcal_nest", SETTINGS_FILENAME),
+    os.path.join("/etc/noogle", SETTINGS_FILENAME),
     SETTINGS_PATH,
     os.path.abspath(os.path.join(os.curdir, SETTINGS_FILENAME)),
 ]
@@ -158,7 +158,7 @@ class Settings(object):
         create a user-config file.
         """
         default_settings_file = pkg_resources.resource_filename(
-            "gcal_nest", "conf/conf-format.ini"
+            "noogle", "conf/conf-format.ini"
         )
 
         text = open(default_settings_file).read()

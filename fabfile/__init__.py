@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 '''
-gcal_nest management script
+noogle management script
 '''
 
 # Imports #####################################################################

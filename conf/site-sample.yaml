@@ -5,23 +5,23 @@
 instance_dirname: instance
 
 # logging #####################################################################
-app_log_dir: /var/log/gcal_nest
+app_log_dir: /var/log/noogle
 chown_log_dir: 755
 ###############################################################################
 
 # circusd ini #################################################################
 
 # Running circusd
-chdir: /home/<username>/gcal_nest
+chdir: /home/<username>/noogle
 
 # Application logging
-logfile: file:/var/log/gcal_nest/app.log
+logfile: file:/var/log/noogle/app.log
 ###############################################################################
 
 # systemd service #############################################################
-venv_dir: /home/<username>/gcal_nest/.direnv
-service_name: gcal-nest.service
-# The service file (gcal_nest.service) will get copied here
+venv_dir: /home/<username>/noogle/.direnv
+service_name: noogle.service
+# The service file (noogle.service) will get copied here
 service_path: /etc/systemd/system
 service_chmod: 755
 ###############################################################################

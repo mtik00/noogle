@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This script is used to interface with the gcal_nest package from the command
+This script is used to interface with the noogle package from the command
 line.
 """
 # pylint:disable=W0212
@@ -33,7 +33,7 @@ __version__ = "0.1.0a"
 
 
 HELP = """
-gcal_nest v{0}
+noogle v{0}
 """.format(
     library_version
 )
@@ -61,7 +61,7 @@ CTX = click.make_pass_decorator(Ctx, ensure=True)
 )
 @CTX
 def cli(ctx, quiet, debug):
-    """Run the gcal_nest command-line application"""
+    """Run the noogle command-line application"""
     ctx.quiet = quiet
     ctx.debug = debug
     ctx.session = session

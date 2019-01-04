@@ -1,2 +1,2 @@
-recursive-include gcal_nest *.*
+recursive-include noogle *.*
 global-exclude *.py[cod]

@@ -10,15 +10,15 @@ THIS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 if __name__ == "__main__":
     setup(
-        name="gcal_nest",
+        name="noogle",
         version="0.0.0",
         description="Google Calendar <--> Nest controller",
         author="Timothy McFadden",
         author_email="tim@timandjamie.com",
-        url="https://github.com/mtik00/gcal_nest",
+        url="https://github.com/mtik00/noogle",
         download_url=(
-            "https://github.com/mtik00/gcal_nest/releases/download/v0.0.0/"
-            "gcal_nest-0.0.0.tar.gz"
+            "https://github.com/mtik00/noogle/releases/download/v0.0.0/"
+            "noogle-0.0.0.tar.gz"
         ),
         install_requires=[
             "google-api-python-client",
@@ -27,6 +27,7 @@ if __name__ == "__main__":
             "click",
             "sqlalchemy-utils",
             "sqlalchemy",
+            "oauth2client",
         ],
         extras_require={"dev": ["ruamel.yaml"]},
         packages=find_packages(exclude=("fabfile",)),
@@ -50,5 +51,5 @@ if __name__ == "__main__":
             "Topic :: Internet",
         ],
         long_description=open(os.path.join(THIS_DIR, "README.md")).read(),
-        entry_points={"console_scripts": ["gcal-nest=gcal_nest.cli:cli"]},
+        entry_points={"console_scripts": ["noogle=noogle.cli:cli"]},
     )
