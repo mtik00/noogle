@@ -1,0 +1,16 @@
+# NOTE: Copy this file to /etc/systemd/system/{service_name} during deployment
+#       also set permissions: `sudo chmod {service_chmod} /etc/systemd/system/{service_name}`
+
+[Unit]
+Description=circusd config to control gcal-nest
+After=syslog.target network.target nss-lookup.target
+
+[Service]
+Type=simple
+ExecReload={venv_dir}/bin/circusctl reload
+ExecStart={venv_dir}/bin/circusd
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -4,6 +4,14 @@ from jinja2 import Environment, StrictUndefined, FileSystemLoader
 import ruamel.yaml
 
 
+def get_template(name):
+    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
+    with open(os.path.join(template_dir, name)) as fh:
+        text = fh.read()
+
+    return text
+
+
 @click.command()
 def build():
     """
@@ -12,7 +20,6 @@ def build():
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
     instance_dir = os.path.abspath(os.path.join(base_dir, 'instance'))
     outdir = os.path.join(base_dir, '_build')
-    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
 
     site_config_file = os.path.join(instance_dir, 'site.yaml')
     if not os.path.exists(site_config_file):
@@ -27,14 +34,10 @@ def build():
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
 
-    env = Environment(
-        loader=FileSystemLoader(template_dir),
-        undefined=StrictUndefined)
-
     ###########################################################################
     click.echo('Creating `_build/gcal-nest-systemd.service')
-    template = env.get_template('gcal-nest-systemd.service.j2')
-    content = template.render(**options)
+    template = get_template('gcal-nest-systemd.service')
+    content = template.format(**options)
     with open(os.path.join(outdir, 'gcal-nest-systemd.service'), 'wb') as fh:
         fh.write(content.encode('utf-8'))
     click.echo('...done')
@@ -42,8 +45,8 @@ def build():
 
     ###########################################################################
     click.echo('Creating `_build/deploy.bash')
-    template = env.get_template('deploy.bash.j2')
-    content = template.render(**options)
+    template = get_template('deploy.bash')
+    content = template.format(**options)
     with open(os.path.join(outdir, 'deploy.bash'), 'wb') as fh:
         fh.write(content.encode('utf-8'))
     click.echo('...done')
@@ -51,8 +54,8 @@ def build():
 
     ###########################################################################
     click.echo('Creating `_build/circus.ini')
-    template = env.get_template('circus.ini.j2')
-    content = template.render(**options)
+    template = get_template('circus.ini')
+    content = template.format(**options)
     with open(os.path.join(outdir, 'circus.ini'), 'wb') as fh:
         fh.write(content.encode('utf-8'))
     click.echo('...done')

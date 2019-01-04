@@ -28,7 +28,7 @@ if __name__ == "__main__":
             "sqlalchemy-utils",
             "sqlalchemy",
         ],
-        extras_require={"dev": ["jinja2", "ruamel.yaml"]},
+        extras_require={"dev": ["ruamel.yaml"]},
         packages=find_packages(exclude=("fabfile",)),
         zip_safe=True,
         include_package_data=True,
