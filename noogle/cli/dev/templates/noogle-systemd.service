@@ -8,6 +8,7 @@ After=syslog.target network.target nss-lookup.target
 [Service]
 Type=simple
 ExecReload={venv_dir}/bin/circusctl reload
+ExecStartPre=source {env_sh}
 ExecStart={venv_dir}/bin/circusd {circus_ini}
 Restart=always
 RestartSec=5

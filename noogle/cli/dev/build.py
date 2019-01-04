@@ -33,6 +33,7 @@ def build():
     options = ruamel.yaml.safe_load(open(site_config_file).read())
     options["circus_ini"] = os.path.join(instance_dir, 'circus.ini')
     options['instance_dirname'] = instance_dirname
+    options['env_sh'] = os.path.join(instance_dir, 'env.sh')
 
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
