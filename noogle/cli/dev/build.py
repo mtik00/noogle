@@ -1,6 +1,7 @@
 import os
 import click
 import ruamel.yaml
+import glob
 
 
 def get_template(name):
@@ -32,6 +33,10 @@ def build():
 
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
+    else:
+        files = glob.glob(f"{outdir}/*")
+        for f in files:
+            os.unlink(f)
 
     ###########################################################################
     click.echo('Creating `_build/noogle-systemd.service')
