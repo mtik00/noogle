@@ -1,9 +1,5 @@
 ---
 
-# This is the folder that has the application setup.  It should not be checked
-# in to source control.
-instance_dirname: instance
-
 # logging #####################################################################
 app_log_dir: /var/log/noogle
 chown_log_dir: <username>:<groupname>

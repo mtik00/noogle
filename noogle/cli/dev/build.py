@@ -17,8 +17,9 @@ def build():
     """
     Build the utility
     """
+    instance_dirname = 'instance'
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-    instance_dir = os.path.abspath(os.path.join(base_dir, 'instance'))
+    instance_dir = os.path.abspath(os.path.join(base_dir, instance_dirname))
     outdir = os.path.join(base_dir, '_build')
 
     site_config_file = os.path.join(instance_dir, 'site.yaml')
@@ -30,6 +31,8 @@ def build():
         raise click.Abort()
 
     options = ruamel.yaml.safe_load(open(site_config_file).read())
+    options["circus_ini"] = os.path.join(instance_dir, 'circus.ini')
+    options['instance_dirname'] = instance_dirname
 
     if not os.path.isdir(outdir):
         os.makedirs(outdir)

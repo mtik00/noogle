@@ -103,6 +103,10 @@ You can control the daemon through the `circusctl` application.  Read more about
 
 NOTE: For debug purposes, you may want to run `circusd circus.ini` (remove the `--daemon` option to run `circusd` in the foreground)
 
+# Environment Setup
+## Fabric
+## Dirvnev
+
 # Theory
 Here's how I think this should all work.  The bulk of the logic should be in the calendar service, since we need to figure out upcoming events, deleted events, etc.  The nest service only needs to the check the DB for something to do at that exact moment.
 
