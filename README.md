@@ -7,16 +7,17 @@
 [ ] env var setup
 [ ] multiple devices/structures?
 [ ] all email subjects are "New event scheduled"; not always True
-[ ] rename to `noogle` ;)
+[ ] better delineate between `instance` and `~/.config/noogle` folder
+[ ] db migrations?
 
 # Introduction
-This project is used to control your Nest thermostat through your Google calendar using events.
+Noogle is a Python3.7 project used to control your Nest thermostat through your Google calendar using events.
 
 # Requirements
 
-We depend on these things to communicate with Google and Nest APIs:
-
-*   [google-api-python-client](https://developers.google.com/google-apps/calendar/quickstart/python)
+*   Python3.7
+*   Nest Developer Account (free)
+*   Google Developer API Access (free)
 
 See `requirements.txt` for a complete list of requirements.
 
