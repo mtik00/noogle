@@ -126,7 +126,7 @@ def nest(poll=5):
             print_log(f"NEST:...doing {event}")
 
             try:
-                api.do_action(event)
+                api.do_action(event.action)
                 event.mark_event_done(event)
             except Exception as e:
                 text_lines.append(str(e))
