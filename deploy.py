@@ -29,8 +29,8 @@ if __name__ == "__main__":
     ]
 
     with c.cd(NOOGLE_APP_HOME_FOLDER):
-        c.run("git reset --hard HEAD")
-        c.run("git pull")
+        c.run("git fetch")
+        c.run("git reset --hard origin/master")
 
         if VENV_ACTIVATE:
             with c.prefix(VENV_ACTIVATE):
