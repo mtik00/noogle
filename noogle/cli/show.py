@@ -52,12 +52,12 @@ def events(max_events):
     )
 
     print_log("Showing events since %s" % since.strftime("%A, %d %B"))
-    nest_events = get_next_events(max_results=max_events, q_filter=q, since=since)
 
-    for event in nest_events:
+    for event in ctx.session.query(Event).filter(Event.scheduled_date >= since):
         print_log(
             "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name
+                event.scheduled_date.format("YYYY-MM-DD h:mmA"),
+                event.state, event.name
             )
         )
 
@@ -74,7 +74,8 @@ def cache():
     for event in ctx.session.query(Event).all():
         str_events.append(
             "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name
+                event.scheduled_date.format("YYYY-MM-DD h:mmA"),
+                event.state, event.name
             )
         )
 
