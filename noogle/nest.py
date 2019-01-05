@@ -257,6 +257,7 @@ class NestAPI:
 
         for structure in self.structures:
             print(structure.name)
+            print(f"    ID: {structure.structure_id}")
             print(f"    Away: {structure.away}")
             print("    Thermostats:")
             for t in [
@@ -268,6 +269,7 @@ class NestAPI:
                     setpoint = f"{t.target_temperature_low_f} F"
 
                 print(f"        Device: {t.name}")
+                print(f"            ID: {t.device_id}")
                 print(f"            Setpoint: {setpoint}")
 
     def set_away(self, structure, away="away", force=False):

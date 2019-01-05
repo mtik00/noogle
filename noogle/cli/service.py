@@ -14,6 +14,7 @@ import click
 import arrow
 import inflect
 from sqlalchemy import and_
+from pprint import pformat
 
 from ..gcal import get_next_events
 from ..nest import NestAPI
@@ -49,15 +50,13 @@ def gcal(poll):
 
         for event in gcal_events:
             if not Event.exists(event["id"]):
-                message = f"GCAL: caching new event: {event}"
+                message = f"GCAL: caching new event:\n" + pformat(event)
                 print_log(message)
                 text_lines.append(message)
                 Event.create_from_gcal(event)
 
         # Any event that's not completed and not found in our list should be
         # set to 'removed'.
-        gcal_ids = [x["id"] for x in gcal_events]
-        waiting_events = Event.waiting()
         removed_events = (
             session.query(Event)
             .filter(
@@ -77,7 +76,7 @@ def gcal(poll):
             )
 
         for event in removed_events:
-            message = f"GCAL: marking missing event: {event}"
+            message = f"GCAL: marking missing event:\n" + pformat(repr(event))
             text_lines.append(message)
             print_log(message)
             event.mark_event_missing()

@@ -39,6 +39,12 @@ class Event(Base):
     actioned_date = Column(ArrowType, nullable=True)
     description = Column(String, nullable=True)
 
+    def __str__(self):
+        return str(self)
+
+    def __repr__(self):
+        return self.__dict__
+
     @classmethod
     def waiting(cls):
         """Return all waiting events"""
