@@ -40,7 +40,7 @@ class Event(Base):
     description = Column(String, nullable=True)
 
     def __str__(self):
-        return str(self)
+        return f"<Event {self.action}/{self.state}/{self.scheduled_date}"
 
     def __repr__(self):
         return self.__dict__
