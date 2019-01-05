@@ -25,6 +25,7 @@ from .main import go
 from .set_ import set_
 from .service import service
 from .dev import dev
+from .logs import logs
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -75,3 +76,4 @@ cli.add_command(go)
 cli.add_command(set_)
 cli.add_command(service)
 cli.add_command(dev)
+cli.add_command(logs)

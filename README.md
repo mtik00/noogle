@@ -1,6 +1,5 @@
 # TODO
 
-[ ] deployment
 [ ] `circusd` error reporting through `mailgun`
 [ ] documentation
 [ ] debug mode
@@ -9,6 +8,7 @@
 [ ] all email subjects are "New event scheduled"; not always True
 [ ] better delineate between `instance` and `~/.config/noogle` folder
 [ ] db migrations?
+[ ] move app config to yaml (already using it during build anyway)
 
 # Introduction
 Noogle is a Python3.7 project used to control your Nest thermostat through your Google calendar using events.

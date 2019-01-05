@@ -10,6 +10,7 @@ import os
 import re
 import pkg_resources
 import json
+import ruamel.yaml
 
 try:
     from configparser import ConfigParser
@@ -25,6 +26,10 @@ __creationDate__ = "05-JUN-2017"
 
 _SETTINGS = None
 SETTINGS_FILENAME = "noogle.ini"
+THIS_DIR = os.path.abspath(os.path.dirname(__file__))
+INSTANCE_FOLDER = os.path.join(THIS_DIR, "..", "instance")
+SITE_YAML = os.path.join(INSTANCE_FOLDER, "site.yaml")
+
 USER_FOLDER = os.path.join(os.path.expanduser("~"), ".config", "noogle")
 SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", USER_FOLDER)
 SETTINGS_PATH = os.path.join(SETTINGS_FOLDER, SETTINGS_FILENAME)
@@ -36,6 +41,11 @@ FILE_SEARCH = [
 
 # These settings will be removed from `as_string`
 SECRET_SETTINGS = ["nest.product-id", "nest.product-secret", "nest.access-token"]
+
+SITE = {}
+if os.path.exists(SITE_YAML):
+    with open(SITE_YAML) as fh:
+        SITE = ruamel.yaml.safe_load(fh)
 
 
 def get_settings():
