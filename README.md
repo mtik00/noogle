@@ -9,6 +9,7 @@
 [ ] better delineate between `instance` and `~/.config/noogle` folder
 [ ] db migrations?
 [ ] move app config to yaml (already using it during build anyway)
+[ ] have setup create config files and instance folder/files
 
 # Introduction
 Noogle is a Python3.7 project used to control your Nest thermostat through your Google calendar using events.
@@ -47,13 +48,31 @@ wish to change the access bits accordingly.
 In this example, we're going to be storing some credentials and application setup
 in `instance/env.bat` (or `instance/env.sh` on Linux).
 
-**NOTE** I highly recommend using a virtual environment for this!
-1.  Install `noogle` and its requirements
-1.  Create your application ([configuration file](#Configuration)).
+This app is set up in a way that really only works within a virtual environment.  The source ships with a `.envrc` that makes life easier.
+
+1.  Install `direnv` https://direnv.net/
+1.  Clone the source to some location:  
+    `cd ~ && git clone https://github.com/mtik00/noogle.git`
+1.  Create the virtual environment:  
+    `cd noogle && direnv allow`
+1.  Install `noogle` and its requirements:  
+    `pip install -e .[dev] && pip install -r requirements.txt`
+1.  Create your application files (*TODO)*:
+    `noogle setup init`
+1.  Create your Google OAuth credentials
+1.  Create your Nest API OAuth credentials
+1.  Modify your `site.yaml` file
+1.  Modify your `instance/env.sh` file
+1.  Test Google calendar integration:  
+    `noogle show events`
+1.  Test Nest API calendar integration:
+    `noogle show structures`
+1.  Finally deploy the application:  
+    `python deploy`
 
 ## Google OAuth 2.0 Setup
 
-1.  Create an application using [Google API](https://console.developers.google.com/flows/enableapi?apiid=calendar&pli=1)
+1.  Create an application using [Google API](https://console.developers.google.com/flownest-token.jsons/enableapi?apiid=calendar&pli=1)
 1.  Download the credentials to `~/.noogle/google_client_secret.json`
 1.  Run the `noogle` setup for Google: `noogle setup gcal`
 1.  Follow the prompts to allow this computer to access your contacts.
@@ -62,7 +81,7 @@ in `instance/env.bat` (or `instance/env.sh` on Linux).
 
 ## Nest API Setup
 
-1.  Sign in, or sign up for, a [Nest Developer Account](https://developers.nest.com/)
+1.  Sign in, or sign up for, a [Nest Developer Accountnest-token.json](https://developers.nest.com/)
 1.  Click on 'Create New Product'
 1.  Once done, add the `OAuth` parameters to your environment setup file.  For example, add the following to `instance/env.bat`:  
     `set NEST_PRODUCT_ID=ABCDEFG`  
@@ -76,7 +95,7 @@ in `instance/env.bat` (or `instance/env.sh` on Linux).
 1.  Run the `noogle show structure` to ensure you have the credentials stored (you should not
     be prompted again).
 
-**NOTE**: If you change the permissions through the Nest API, you must delete `~/.noogle/google_client_secret.json` and re-run `noogle setup nest`.
+**NOTE**: If you change the permissions through the Nest API, you must delete `~/.noogle/nest-token.json` and re-run `noogle setup nest`.
 
 # DSL
 `noogle` depends on events in your calendar with specific text.  All events should be in the form of:
