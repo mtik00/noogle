@@ -23,8 +23,8 @@ if __name__ == "__main__":
     c = Connection(host)
 
     deploy_commands = [
-        "pip install -e .[dev]",
         "pip install -r requirements.txt",
+        "pip install -e .[dev]",
         "noogle dev build",
     ]
 
