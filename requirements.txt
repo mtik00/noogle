@@ -1,3 +1,4 @@
+alembic==1.0.5
 arrow==0.12.1
 circus==0.15.0
 click==7.0
