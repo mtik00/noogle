@@ -6,11 +6,16 @@ This module holds the interface to the application settings.
 
 # Imports #####################################################################
 from __future__ import print_function
+
+import json
 import os
 import re
+
 import pkg_resources
-import json
+
 import ruamel.yaml
+
+from .utils import absjoin
 
 try:
     from configparser import ConfigParser
@@ -27,16 +32,16 @@ __creationDate__ = "05-JUN-2017"
 _SETTINGS = None
 SETTINGS_FILENAME = "noogle.ini"
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
-INSTANCE_FOLDER = os.path.join(THIS_DIR, "..", "instance")
-SITE_YAML = os.path.join(INSTANCE_FOLDER, "site.yaml")
+INSTANCE_FOLDER = absjoin(THIS_DIR, "..", "instance")
+SITE_YAML = absjoin(INSTANCE_FOLDER, "site.yaml")
 
-USER_FOLDER = os.path.join(os.path.expanduser("~"), ".config", "noogle")
+USER_FOLDER = absjoin(os.path.expanduser("~"), ".config", "noogle")
 SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", USER_FOLDER)
-SETTINGS_PATH = os.path.join(SETTINGS_FOLDER, SETTINGS_FILENAME)
+SETTINGS_PATH = absjoin(SETTINGS_FOLDER, SETTINGS_FILENAME)
 FILE_SEARCH = [
-    os.path.join("/etc/noogle", SETTINGS_FILENAME),
+    absjoin("/etc/noogle", SETTINGS_FILENAME),
     SETTINGS_PATH,
-    os.path.abspath(os.path.join(os.curdir, SETTINGS_FILENAME)),
+    os.path.abspath(absjoin(os.curdir, SETTINGS_FILENAME)),
 ]
 
 # These settings will be removed from `as_string`
