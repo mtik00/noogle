@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from .settings import INSTANCE_FOLDER
 
-db_path = os.path.join(INSTANCE_FOLDER, "noogle.db")
+db_path = os.path.join(INSTANCE_FOLDER, "noogle.sqlite3")
 
 engine = create_engine(f"sqlite:///{db_path}")
 Base = declarative_base()
