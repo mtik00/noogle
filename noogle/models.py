@@ -43,7 +43,7 @@ class Event(Base):
         return f"<Event {self.action}/{self.state}/{self.scheduled_date}"
 
     def __repr__(self):
-        return self.__dict__
+        return str(self)
 
     @classmethod
     def waiting(cls):
