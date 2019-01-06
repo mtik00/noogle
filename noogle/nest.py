@@ -25,9 +25,9 @@ __creationDate__ = "07-JUN-2017"
 
 
 # Globals #####################################################################
-class Unauthorized(Exception):
+class APIError(Exception):
     """
-    Exception raised if the API is not authorized.
+    Exception if something went wrong in the API
     """
 
     def __init__(self, response):
@@ -35,10 +35,20 @@ class Unauthorized(Exception):
         self.response = response
 
     def __str__(self):
-        return self.response.json()
+        return self.response.text
 
     def __repr__(self):
+        return f"<API Error: {self.response.text}"
+
+
+class Unauthorized(APIError):
+    def __repr__(self):
         return f"<Unauthorized: {self.response.text}"
+
+
+class RateLimitExceeded(APIError):
+    def __repr__(self):
+        return f"<RateLimitExceeded: {self.response.text}"
 
 
 @dataclass
@@ -201,6 +211,8 @@ class NestAPI:
 
         if response.status_code == 401:
             raise Unauthorized(response)
+        elif response.status_code == 429:
+            raise RateLimitExceeded(response)
 
         return response.json()
 
@@ -245,6 +257,8 @@ class NestAPI:
 
         if response.status_code == 401:
             raise Unauthorized(response)
+        elif response.status_code == 429:
+            raise RateLimitExceeded(response)
 
         return response.json()
 
@@ -276,7 +290,7 @@ class NestAPI:
         """
         Sets the `away` mode for the structure.
         """
-        if (structure.away == 'away') and (not force):
+        if (structure.away == "away") and (not force):
             return
 
         payload = {"away": away}
@@ -287,7 +301,11 @@ class NestAPI:
         """
         Sets the HVAC mode for all thermostats in a structure.
         """
-        bad_thermostats = [x for x in self._get_structure_thermostats(structure) if x.hvac_mode != hvac_mode]
+        bad_thermostats = [
+            x
+            for x in self._get_structure_thermostats(structure)
+            if x.hvac_mode != hvac_mode
+        ]
         if not (bad_thermostats or force):
             return
 
@@ -353,7 +371,9 @@ class NestAPI:
         if structure.away != away:
             errors.append(f"Structure is not marked as {away}!")
 
-        bad_thermostats = [x for x in self._get_structure_thermostats(structure) if x.hvac_mode != mode]
+        bad_thermostats = [
+            x for x in self._get_structure_thermostats(structure) if x.hvac_mode != mode
+        ]
         if bad_thermostats:
             errors.append(f"Thermostat mode is not set to {mode}!")
 
@@ -374,7 +394,7 @@ class NestAPI:
 
     def do_action(self, action):
         if not self.change_needed(action):
-            print('No action needed')
+            print("No action needed")
             return
 
         action_map = {Action.away.value: self.do_away, Action.home.value: self.do_home}

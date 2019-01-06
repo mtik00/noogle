@@ -10,6 +10,7 @@
 [ ] db migrations?
 [ ] move app config to yaml (already using it during build anyway)
 [ ] have setup create config files and instance folder/files
+[ ] add support for 429: Blocked (back off?)
 
 # Introduction
 Noogle is a Python3.7 project used to control your Nest thermostat through your Google calendar using events.
@@ -134,3 +135,11 @@ Here's how I think this should all work.  The bulk of the logic should be in the
 *   If we have *waiting* events in the DB that aren't found, mark them as missing
 *   The Nest service should check for events in the DB every 5 minutes
 *   If it's time for an event, do it, mark the event done, and send an email
+
+# Rate Limits
+You should not test the service on live hardware.  Nest rate-limits requests.  You'll begin to get `429 Too Many Requests` returns from the API.  The data might look something like this:
+
+    {'error': 'blocked',
+    'instance': '...',
+    'message': 'blocked',
+    'type': 'https://developer.nest.com/documentation/cloud/error-messages#blocked'}
