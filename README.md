@@ -11,6 +11,7 @@
 [ ] move app config to yaml (already using it during build anyway)
 [ ] have setup create config files and instance folder/files
 [ ] add support for 429: Blocked (back off?)
+[ ] logging doesn't seem to work
 
 # Introduction
 Noogle is a Python3.7 project used to control your Nest thermostat through your Google calendar using events.
