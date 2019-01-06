@@ -7,7 +7,6 @@
 [ ] multiple devices/structures?
 [ ] all email subjects are "New event scheduled"; not always True
 [ ] better delineate between `instance` and `~/.config/noogle` folder
-[ ] db migrations?
 [ ] move app config to yaml (already using it during build anyway)
 [ ] have setup create config files and instance folder/files
 [ ] add support for 429: Blocked (back off?)

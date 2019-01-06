@@ -22,12 +22,20 @@ LOGGER = None
 logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.ERROR)
 
 
+def clear_logger():
+    """
+    Removes the current logger.  You must call `get_logger` again!
+    """
+    global LOGGER
+    LOGGER = None
+
+
 def get_logger(
     name=None,
     screen_level=logging.INFO,
     logfile_path=None,
     logfile_level=logging.DEBUG,
-    logfile_mode="wb",
+    logfile_mode="a",
 ):
     """Returns a logging object.
 

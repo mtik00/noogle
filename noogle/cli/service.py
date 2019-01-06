@@ -22,6 +22,9 @@ from ..helpers import format_future_time, print_log
 from ..mailgun import send_message
 from ..models import Event, State
 from ..db import session
+from ..logger import clear_logger, get_logger
+from ..settings import get_settings, SITE
+from ..utils import absjoin
 
 # Globals #####################################################################
 inflect_engine = inflect.engine()
@@ -40,6 +43,14 @@ def gcal(poll):
     ctx = click.get_current_context().obj
     poll *= 60
     text_lines = []
+
+    if get_settings().get('general.use-logfile'):
+        logpath = absjoin(SITE.get("app_log_dir"), "gcal.log")
+
+        clear_logger()
+        ctx.logger = get_logger(
+            logfile_path=logpath
+        )
 
     while True:
         # Grab the next 10 events
@@ -104,6 +115,14 @@ def nest(poll=5):
     poll *= 60
     text_lines = []
     api = None
+
+    if get_settings().get('general.use-logfile'):
+        logpath = absjoin(SITE.get("app_log_dir"), "nest.log")
+
+        clear_logger()
+        ctx.logger = get_logger(
+            logfile_path=logpath
+        )
 
     while True:
         events = Event.waiting()
