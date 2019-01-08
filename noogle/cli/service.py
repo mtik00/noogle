@@ -44,13 +44,11 @@ def gcal(poll):
     poll *= 60
     text_lines = []
 
-    if get_settings().get('general.use-logfile'):
+    if get_settings().get("general.use-logfile"):
         logpath = absjoin(SITE.get("app_log_dir"), "gcal.log")
 
         clear_logger()
-        ctx.logger = get_logger(
-            logfile_path=logpath
-        )
+        ctx.logger = get_logger(logfile_path=logpath)
 
     while True:
         # Grab the next 10 events
@@ -116,13 +114,11 @@ def nest(poll=5):
     text_lines = []
     api = None
 
-    if get_settings().get('general.use-logfile'):
+    if get_settings().get("general.use-logfile"):
         logpath = absjoin(SITE.get("app_log_dir"), "nest.log")
 
         clear_logger()
-        ctx.logger = get_logger(
-            logfile_path=logpath
-        )
+        ctx.logger = get_logger(logfile_path=logpath)
 
     while True:
         events = Event.waiting()

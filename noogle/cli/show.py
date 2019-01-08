@@ -56,8 +56,7 @@ def events(max_events):
     for event in ctx.session.query(Event).filter(Event.scheduled_date >= since):
         print_log(
             "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.format("YYYY-MM-DD h:mmA"),
-                event.state, event.name
+                event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name
             )
         )
 
@@ -74,8 +73,7 @@ def cache():
     for event in ctx.session.query(Event).all():
         str_events.append(
             "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.format("YYYY-MM-DD h:mmA"),
-                event.state, event.name
+                event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name
             )
         )
 
@@ -96,7 +94,6 @@ def away():
 
     structure_name = ctx.project_settings.get("nest.structure")
     structure = next((x for x in napi.structures if x.name == structure_name))
-
 
     print("Structure: %s" % structure.name)
     print("     Away: %s" % structure.away)

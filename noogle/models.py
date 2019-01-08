@@ -19,6 +19,8 @@ class State(enum.Enum):
 class Action(enum.Enum):
     home = 0
     away = 1
+    eco = 2
+    heat = 3
 
     def __str__(self):
         return self.name

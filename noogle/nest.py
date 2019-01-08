@@ -76,8 +76,6 @@ class NestAPI:
     verification_wait = 10
 
     def __init__(self, interactive=True, load=True):
-        # self.structure_url = f"/structures/{structure_id}"
-        # self.thermostat_url = f"/devices/thermostats/{thermostat_id}"
         self.interactive = interactive
         self.project_settings = get_settings()
 
@@ -408,6 +406,6 @@ class NestAPI:
 
             self.verify(action)
         else:
-            raise Exception("Unkown action: {!r}".format(action))
+            raise Exception("Unknown action: {!r}".format(action))
 
         print("...OK")

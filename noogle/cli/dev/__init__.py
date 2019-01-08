@@ -1,6 +1,6 @@
 import click
 
-from.build import build
+from .build import build
 
 
 @click.group(name="dev")

@@ -19,7 +19,7 @@ __creationDate__ = "08-JUN-2017"
 LOGGER = None
 
 # Fix verbose error in google api
-logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.ERROR)
+logging.getLogger("googleapiclient.discovery_cache").setLevel(logging.ERROR)
 
 
 def clear_logger():
