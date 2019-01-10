@@ -15,7 +15,6 @@ from .. import __version__ as library_version
 from ..logger import get_logger
 from ..settings import get_settings
 from ..db import session
-from ..models import Event
 
 from .show import show
 from .init import init
@@ -26,6 +25,7 @@ from .set_ import set_
 from .service import service
 from .dev import dev
 from .logs import logs
+from .shell import shell
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -77,3 +77,4 @@ cli.add_command(set_)
 cli.add_command(service)
 cli.add_command(dev)
 cli.add_command(logs)
+cli.add_command(shell)

@@ -67,12 +67,12 @@ class Event(Base):
 
         parts = e.name.split(":")
         if len(parts) == 2:
-            e.action = Action[parts[1]]
+            e.action = Action[parts[1].strip()]
         elif len(parts) == 3:
-            e.action = Action[parts[1]]
-            e.description = parts[2]
+            e.action = Action[parts[1].strip()]
+            e.description = parts[2].strip()
         else:
-            print(f'WARNING: Cannot parse event name: "{self.name}"')
+            print(f'WARNING: Cannot parse event name: "{e.name}"')
 
         if "date" in gcal_event["start"]:
             # The user has an "all day" event in gcal.
