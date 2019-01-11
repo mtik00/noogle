@@ -13,7 +13,6 @@ This module holds the cli `show` commands
 import click
 import arrow
 
-from ..gcal import get_next_events
 from ..nest import NestAPI
 from ..helpers import print_log
 from ..models import Event
@@ -41,22 +40,20 @@ def events(max_events):
     """Display the next events from Google calendar"""
     ctx = click.get_current_context().obj
 
-    q = "nest"
-    if ctx.debug:
-        q = "nestd"
-
     lookback = ctx.project_settings.get("calendar.lookback") or 0
 
     since = arrow.now().replace(
         days=-1 * lookback, hour=0, minute=0, second=0, microsecond=0
     )
 
-    print_log("Showing events since %s" % since.strftime("%A, %d %B"))
+    print_log("Showing events since %s" % since.to("local").strftime("%A, %d %B"))
 
     for event in ctx.session.query(Event).filter(Event.scheduled_date >= since):
         print_log(
             "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name
+                event.scheduled_date.to("local").format("YYYY-MM-DD h:mmA"),
+                event.state,
+                event.name,
             )
         )
 
