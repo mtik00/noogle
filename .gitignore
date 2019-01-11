@@ -2,6 +2,8 @@
 /.direnv
 /junk.py
 /_build
+env.sh
+*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
