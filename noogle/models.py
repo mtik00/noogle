@@ -40,6 +40,8 @@ class Event(Base):
     scheduled_date = Column(ArrowType, nullable=True)
     actioned_date = Column(ArrowType, nullable=True)
     description = Column(String, nullable=True)
+    structure_name = Column(String, default="", nullable=False)
+    structure_id = Column(String, default="", nullable=False)
 
     def __str__(self):
         return f"<Event {self.action}/{self.state}/{self.scheduled_date}"

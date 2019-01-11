@@ -4,10 +4,8 @@ This script is used to control deployment of the noogle app
 """
 # Imports ######################################################################
 import os
-import sys
 
 from fabric import Connection
-from invoke import run
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -26,6 +24,7 @@ if __name__ == "__main__":
         "pip install -r requirements.txt",
         "pip install -e .[dev]",
         "noogle dev build",
+        "alembic upgrade head",
     ]
 
     with c.cd(NOOGLE_APP_HOME_FOLDER):
@@ -35,9 +34,9 @@ if __name__ == "__main__":
         if VENV_ACTIVATE:
             with c.prefix(VENV_ACTIVATE):
                 for command in deploy_commands:
-                    c.run(command, hide='stdout')
+                    c.run(command, hide="stdout")
                 c.run("sudo bash _build/deploy.bash", pty=True)
         else:
             for command in deploy_commands:
-                c.run(command, hide='stdout')
+                c.run(command, hide="stdout")
             c.run("sudo bash _build/deploy.bash", pty=True)
