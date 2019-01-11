@@ -7,7 +7,6 @@ This module holds the interface to the application settings.
 # Imports #####################################################################
 from __future__ import print_function
 
-import json
 import os
 import re
 
@@ -19,7 +18,7 @@ from .utils import absjoin
 
 try:
     from configparser import ConfigParser
-except:
+except ImportError:
     from ConfigParser import SafeConfigParser as ConfigParser
 
 
@@ -63,11 +62,6 @@ def get_settings():
 
     _SETTINGS = Settings()
     return _SETTINGS
-
-
-def absjoin(*args):
-    """Returns the absolute path returned from `abs.join(*args)`."""
-    return os.path.abspath(os.path.join(*args))
 
 
 class Settings(object):
