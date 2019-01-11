@@ -34,14 +34,9 @@ THIS_DIR = os.path.abspath(os.path.dirname(__file__))
 INSTANCE_FOLDER = absjoin(THIS_DIR, "..", "instance")
 SITE_YAML = absjoin(INSTANCE_FOLDER, "site.yaml")
 
-USER_FOLDER = absjoin(os.path.expanduser("~"), ".config", "noogle")
-SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", USER_FOLDER)
+SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", INSTANCE_FOLDER)
 SETTINGS_PATH = absjoin(SETTINGS_FOLDER, SETTINGS_FILENAME)
-FILE_SEARCH = [
-    absjoin("/etc/noogle", SETTINGS_FILENAME),
-    SETTINGS_PATH,
-    os.path.abspath(absjoin(os.curdir, SETTINGS_FILENAME)),
-]
+FILE_SEARCH = [SETTINGS_PATH]
 
 # These settings will be removed from `as_string`
 SECRET_SETTINGS = ["nest.product-id", "nest.product-secret", "nest.access-token"]
