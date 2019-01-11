@@ -33,9 +33,9 @@ if [[ ! -e {instance_dirname}/env.sh ]]; then
 fi
 
 # Check the circus config######################################################
-if [[ (! -e {instance_dirname}/circus.ini) || (-n `diff _build/circus.ini {instance_dirname}/circus.ini`) ]]; then
-    echo "changes detected in '{instance_dirname}/circus.ini'"
-    cp -f _build/circus.ini {instance_dirname}
+if [[ (! -e {circus_ini}) || (-n `diff _build/circus.ini {circus_ini}`) ]]; then
+    echo "changes detected in '{circus_ini}'"
+    cp -f _build/circus.ini {circus_ini}
 else
     echo "no changes detected in circus.ini"
 fi
