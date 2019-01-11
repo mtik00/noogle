@@ -1,13 +1,13 @@
 #!/usr/bin/env python3.7
 import os
 
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from .settings import INSTANCE_FOLDER
+from .settings import DATA_FOLDER
 
-db_path = os.path.join(INSTANCE_FOLDER, "noogle.sqlite3")
+db_path = os.path.join(DATA_FOLDER, "noogle.sqlite3")
 
 engine = create_engine(f"sqlite:///{db_path}")
 Base = declarative_base()
@@ -16,7 +16,7 @@ session = Session()
 
 
 def init():
-    from .models import Event
+    from .models import Event  # noqa
 
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
