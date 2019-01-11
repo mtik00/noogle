@@ -16,7 +16,7 @@ from typing import List
 import requests
 
 from .models import Action
-from .settings import INSTANCE_FOLDER, get_settings
+from .settings import TOKEN_FOLDER, get_settings
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -71,7 +71,7 @@ class Thermostat:
 class NestAPI:
 
     base_api_url = "https://developer-api.nest.com"
-    token_file = f"{INSTANCE_FOLDER}/nest-token.json"
+    token_file = f"{TOKEN_FOLDER}/nest-token.json"
     verification_wait = 10
 
     def __init__(self, interactive=True, load=True):

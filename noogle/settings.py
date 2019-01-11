@@ -33,6 +33,7 @@ SETTINGS_FILENAME = "noogle.ini"
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
 INSTANCE_FOLDER = absjoin(THIS_DIR, "..", "instance")
 SITE_YAML = absjoin(INSTANCE_FOLDER, "site.yaml")
+TOKEN_FOLDER = absjoin(INSTANCE_FOLDER, "tokens")
 
 SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", INSTANCE_FOLDER)
 SETTINGS_PATH = absjoin(SETTINGS_FOLDER, SETTINGS_FILENAME)
