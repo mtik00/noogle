@@ -17,7 +17,7 @@ def build():
     """
     Build the utility
     """
-    from ...settings import SITE_YAML
+    from ...settings import DEPLOY_CONFIG_PATH
 
     instance_dirname = "instance"
     base_dir = os.path.abspath(
@@ -26,16 +26,16 @@ def build():
     instance_dir = os.path.abspath(os.path.join(base_dir, instance_dirname))
     outdir = os.path.join(base_dir, "_build")
 
-    if not os.path.exists(SITE_YAML):
-        click.echo("ERROR: Could not find %s" % SITE_YAML)
+    if not os.path.exists(DEPLOY_CONFIG_PATH):
+        click.echo("ERROR: Could not find %s" % DEPLOY_CONFIG_PATH)
         click.echo("...a sample is located in `conf`")
         click.echo(
-            "...copy `conf/site-sample.yaml` to your instance folder as `site.yaml`, and modify it as needed"
+            "...copy `conf/deploy-sample.yaml` to your instance folder as `instance/config/deploy.yaml`, and modify it as needed"
         )
         click.echo("...we think your instance folder is here: " + instance_dir)
         raise click.Abort()
 
-    options = ruamel.yaml.safe_load(open(SITE_YAML).read())
+    options = ruamel.yaml.safe_load(open(DEPLOY_CONFIG_PATH).read())
     options["circus_ini"] = os.path.join(instance_dir, "circus.ini")
     options["instance_dirname"] = instance_dirname
     options["env_sh"] = os.path.join(instance_dir, "env.sh")

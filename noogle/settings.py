@@ -37,7 +37,7 @@ TOKEN_FOLDER = absjoin(INSTANCE_FOLDER, "tokens")
 DATA_FOLDER = absjoin(INSTANCE_FOLDER, "data")
 CONFIG_FOLDER = absjoin(INSTANCE_FOLDER, "config")
 
-SITE_YAML = absjoin(CONFIG_FOLDER, "site.yaml")
+DEPLOY_CONFIG_PATH = absjoin(CONFIG_FOLDER, "deploy.yaml")
 
 SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", INSTANCE_FOLDER)
 SETTINGS_PATH = absjoin(SETTINGS_FOLDER, SETTINGS_FILENAME)
@@ -46,10 +46,10 @@ FILE_SEARCH = [SETTINGS_PATH]
 # These settings will be removed from `as_string`
 SECRET_SETTINGS = ["nest.product-id", "nest.product-secret", "nest.access-token"]
 
-SITE = {}
-if os.path.exists(SITE_YAML):
-    with open(SITE_YAML) as fh:
-        SITE = ruamel.yaml.safe_load(fh)
+DEPLOY_SETTINGS = {}
+if os.path.exists(DEPLOY_CONFIG_PATH):
+    with open(DEPLOY_CONFIG_PATH) as fh:
+        DEPLOY_SETTINGS = ruamel.yaml.safe_load(fh)
 
 
 def get_settings():

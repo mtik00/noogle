@@ -5,10 +5,8 @@ This module holds the cli `service` commands
 """
 
 # Imports #####################################################################
-import sys
 import time
 import traceback
-from random import SystemRandom as random
 
 import click
 import arrow
@@ -23,7 +21,7 @@ from ..mailgun import send_message
 from ..models import Event, State
 from ..db import session
 from ..logger import clear_logger, get_logger
-from ..settings import get_settings, SITE
+from ..settings import get_settings, DEPLOY_SETTINGS
 from ..utils import absjoin
 
 # Globals #####################################################################
@@ -45,7 +43,7 @@ def gcal(poll):
     text_lines = []
 
     if get_settings().get("general.use-logfile"):
-        logpath = absjoin(SITE.get("app_log_dir"), "gcal.log")
+        logpath = absjoin(DEPLOY_SETTINGS.get("app_log_dir"), "gcal.log")
 
         clear_logger()
         ctx.logger = get_logger(logfile_path=logpath)
@@ -115,7 +113,7 @@ def nest(poll=5):
     api = None
 
     if get_settings().get("general.use-logfile"):
-        logpath = absjoin(SITE.get("app_log_dir"), "nest.log")
+        logpath = absjoin(DEPLOY_SETTINGS.get("app_log_dir"), "nest.log")
 
         clear_logger()
         ctx.logger = get_logger(logfile_path=logpath)
