@@ -20,23 +20,27 @@ if __name__ == "__main__":
     host = os.environ["NOOGLE_APP_HOST"]
     c = Connection(host)
 
-    deploy_commands = [
-        "pip install -r requirements.txt",
-        "pip install -e .[dev]",
-        "noogle dev build",
-        "alembic upgrade head",
-    ]
-
     with c.cd(NOOGLE_APP_HOME_FOLDER):
         c.run("git fetch")
         c.run("git reset --hard origin/master")
+        c.run("direnv allow")
+
+        deploy_commands = [
+            "pip install -r requirements.txt",
+            "pip install -e .[dev]",
+            "noogle dev build",
+            "alembic upgrade head",
+        ]
 
         if VENV_ACTIVATE:
             with c.prefix(VENV_ACTIVATE):
                 for command in deploy_commands:
                     c.run(command, hide="stdout")
+
                 c.run("sudo bash _build/deploy.bash", pty=True)
+
         else:
             for command in deploy_commands:
                 c.run(command, hide="stdout")
+
             c.run("sudo bash _build/deploy.bash", pty=True)
