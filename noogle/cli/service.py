@@ -141,6 +141,7 @@ def nest(poll=5):
             try:
                 api.do_action(event.action)
                 event.mark_event_done()
+                text_lines.append("NEST: ......done")
             except Exception as e:
                 text_lines.append(str(e))
                 text_lines.append(traceback.format_exc())
