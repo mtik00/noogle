@@ -287,7 +287,7 @@ class NestAPI:
         """
         Sets the `away` mode for the structure.
         """
-        if (structure.away == "away") and (not force):
+        if (structure.away == away) and (not force):
             return
 
         payload = {"away": away}
