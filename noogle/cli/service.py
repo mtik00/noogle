@@ -151,8 +151,8 @@ def nest(poll=5):
         if text_lines:
             print_log("sending message")
             send_message(
-                subject="New {} processed".format(
-                    inflect_engine.plural("event", len(text_lines))
+                subject="{} processed".format(
+                    inflect_engine.plural("Event", len(text_lines))
                 ),
                 text="\n".join(text_lines),
             )
