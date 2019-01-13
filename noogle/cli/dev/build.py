@@ -39,7 +39,7 @@ def build():
     options["circus_ini"] = CIRCUS_INI_PATH
     options["instance_dirname"] = instance_dirname
     options["env_sh"] = os.path.join(INSTANCE_FOLDER, "env.sh")
-
+    options["rotate_log_size"] = options.get("rotate_log_size_mb", 10) * 2 ** 20
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
     else:
