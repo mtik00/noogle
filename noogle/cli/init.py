@@ -74,9 +74,9 @@ def all():
         print_log(f"...{SETTINGS_PATH} has been created")
 
     # Create the deploy settings
-    if not os.path.isfile(SETTINGS_PATH):
+    if not os.path.isfile(DEPLOY_CONFIG_PATH):
         src = absjoin(
-            os.path.dirname(__file__), "..", "..", "conf", "deploy-sample.yaml"
+            os.path.dirname(__file__), "dev", "templates", "deploy-sample.yaml"
         )
         shutil.copyfile(src, DEPLOY_CONFIG_PATH)
 
