@@ -169,7 +169,7 @@ class Settings(object):
         create a user-config file.
         """
         default_settings_file = pkg_resources.resource_filename(
-            "noogle", "conf/conf-format.ini"
+            "noogle", "cli/dev/templates/conf-format.ini"
         )
 
         text = open(default_settings_file).read()

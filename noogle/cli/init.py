@@ -83,7 +83,7 @@ def all():
     # Create a sample `env.sh`
     env_dest = absjoin(INSTANCE_FOLDER, "env.sh")
     if not os.path.isfile(env_dest):
-        env_src = absjoin(os.path.dirname(__file__), "..", "templates", "env.sh")
+        env_src = absjoin(os.path.dirname(__file__), "dev", "templates", "env.sh")
         shutil.copyfile(env_src, env_dest)
 
     print_log("...done")
