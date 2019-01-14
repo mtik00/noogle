@@ -7,7 +7,6 @@
 [ ] multiple devices/structures?
 [ ] all email subjects are "New event scheduled"; not always True
 [ ] move app config to yaml/toml (already using it during build anyway)
-[ ] have setup create config files and instance folder/files
 [ ] add support for 429: Blocked (back off?)
 [ ] stop trying failed commands after X time
 
