@@ -10,13 +10,27 @@ This module holds the cli `init` commands
 """
 
 # Imports #####################################################################
+import os
+import shutil
+
 import click
 
-from ..helpers import print_log
+from ..utils import absjoin
 from ..db import init as init_db
-from ..settings import get_settings
+from ..helpers import print_log
+from ..settings import (
+    CONFIG_FOLDER,
+    DATA_FOLDER,
+    INSTANCE_FOLDER,
+    SETTINGS_FOLDER,
+    TOKEN_FOLDER,
+    get_settings,
+    SETTINGS_PATH,
+    DEPLOY_CONFIG_PATH,
+)
 
 # Metadata ####################################################################
+TEMPLATE_FOLDER = absjoin
 __author__ = "Timothy McFadden"
 __creationDate__ = "11-JUN-2017"
 __license__ = "Proprietary"
@@ -31,6 +45,55 @@ def init():
     # No reason to continue if we're in quiet mode
     if ctx.obj.quiet:
         ctx.exit()
+
+
+@init.command()
+@click.confirmation_option(prompt="Are you sure you want to create a new app?")
+def all():
+    """Initialize all app settings/data"""
+
+    print_log("Creating all folders/files")
+
+    # Create the instance folders
+    if not os.path.isdir(INSTANCE_FOLDER):
+        os.makedirs(INSTANCE_FOLDER)
+        print_log(f"...{INSTANCE_FOLDER} has been created")
+
+    for folder in [CONFIG_FOLDER, DATA_FOLDER, SETTINGS_FOLDER, TOKEN_FOLDER]:
+        if not os.path.isdir(folder):
+            os.makedirs(folder)
+            print_log(f"...{folder} has been created")
+
+    # initialize the DB
+    init_db()
+    print_log("...DB has been initialized")
+
+    # Create the app settings
+    if not os.path.isfile(SETTINGS_PATH):
+        get_settings().make_user_settings()
+        print_log(f"...{SETTINGS_PATH} has been created")
+
+    # Create the deploy settings
+    if not os.path.isfile(SETTINGS_PATH):
+        src = absjoin(
+            os.path.dirname(__file__), "..", "..", "conf", "deploy-sample.yaml"
+        )
+        shutil.copyfile(src, DEPLOY_CONFIG_PATH)
+
+    # Create a sample `env.sh`
+    env_dest = absjoin(INSTANCE_FOLDER, "env.sh")
+    if not os.path.isfile(env_dest):
+        env_src = absjoin(os.path.dirname(__file__), "..", "templates", "env.sh")
+        shutil.copyfile(env_src, env_dest)
+
+    print_log("...done")
+
+    print_log(f"Your *instance* folder has been set up at {INSTANCE_FOLDER}")
+    print_log(f"..you **MUST** configure {env_dest} and {SETTINGS_PATH}")
+    print_log(
+        f"...if this machine is used for deployment, you also must configure {DEPLOY_CONFIG_PATH}"
+    )
+    print_log(f"...you must also put your token files in {TOKEN_FOLDER}")
 
 
 @init.command(name="db")
