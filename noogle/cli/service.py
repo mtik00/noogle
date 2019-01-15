@@ -7,22 +7,21 @@ This module holds the cli `service` commands
 # Imports #####################################################################
 import time
 import traceback
-
-import click
-import arrow
-import inflect
-from sqlalchemy import and_
-from sqlalchemy.exc import IntegrityError
 from pprint import pformat
 
+import arrow
+import click
+import inflect
+from sqlalchemy import and_
+
+from ..db import session
 from ..gcal import get_next_events
-from ..nest import NestAPI
 from ..helpers import format_future_time, print_log
+from ..logger import clear_logger, get_logger
 from ..mailgun import send_message
 from ..models import Event, State
-from ..db import session
-from ..logger import clear_logger, get_logger
-from ..settings import get_settings, DEPLOY_SETTINGS
+from ..nest import NestAPI
+from ..settings import DEPLOY_SETTINGS, get_settings
 from ..utils import absjoin, get_scheduled_date
 
 # Globals #####################################################################
@@ -60,28 +59,25 @@ def gcal(poll):
             if not Event.exists(
                 event["id"], get_scheduled_date(event), state=State.waiting
             ):
+                existing = (
+                    session.query(Event)
+                    .filter(
+                        and_(
+                            Event.event_id == event["id"],
+                            Event.scheduled_date == get_scheduled_date(event),
+                        )
+                    )
+                    .first()
+                )
+
+                if existing and (existing.state != State.waiting):
+                    # The event has already been completed
+                    continue
+
                 message = f"GCAL: caching new event:\n" + pformat(event)
                 print_log(message)
                 text_lines.append(message)
-
-                try:
-                    Event.create_from_gcal(event)
-                except IntegrityError:
-                    # We already have one of these.  Just mark it waiting.
-                    session.rollback()
-                    event = (
-                        session.query(Event)
-                        .filter(
-                            and_(
-                                Event.event_id == event["id"],
-                                Event.scheduled_date == get_scheduled_date(event),
-                            )
-                        )
-                        .first()
-                    )
-                    event.state = State.waiting
-                    session.add(event)
-                    session.commit()
+                Event.create_from_gcal(event)
 
         # Any event that's not completed and not found in our list should be
         # set to 'removed'.
@@ -103,6 +99,9 @@ def gcal(poll):
 
         # Send the email
         if text_lines:
+            print(text_lines)
+            continue
+
             print_log("sending message")
             send_message(
                 subject="{} processed".format(
