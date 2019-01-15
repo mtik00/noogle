@@ -99,9 +99,6 @@ def gcal(poll):
 
         # Send the email
         if text_lines:
-            print(text_lines)
-            continue
-
             print_log("sending message")
             send_message(
                 subject="{} processed".format(
