@@ -105,7 +105,7 @@ def gcal(poll):
         if text_lines:
             print_log("sending message")
             send_message(
-                subject="New {} scheduled".format(
+                subject="{} processed".format(
                     inflect_engine.plural("event", len(text_lines))
                 ),
                 text="\n".join(text_lines),
