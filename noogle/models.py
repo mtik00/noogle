@@ -1,10 +1,11 @@
 import enum
-from sqlalchemy import Integer, String, Column, Enum
-from sqlalchemy.sql import exists
+from sqlalchemy import Integer, String, Column, Enum, UniqueConstraint
+from sqlalchemy.sql import exists, and_
 from sqlalchemy_utils import ArrowType
 from .db import Base, session
 import arrow
 from .settings import get_settings
+from .utils import get_scheduled_date
 
 
 class State(enum.Enum):
@@ -30,8 +31,15 @@ class Event(Base):
     """Describes a single event stored in cache."""
 
     __tablename__ = "events"
+    __table_args__ = (
+        UniqueConstraint(
+            "event_id", "scheduled_date", "calendar_id", name="event_id__date__cal__uc"
+        ),
+        {"sqlite_autoincrement": True},
+    )
 
-    event_id = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    event_id = Column(String, nullable=False)
     name = Column(String, nullable=True)
     action = Column(Enum(Action), nullable=False)
     calendar_id = Column(String, default="primary")
@@ -44,23 +52,31 @@ class Event(Base):
     structure_id = Column(String, default="", nullable=False)
 
     def __str__(self):
-        return f"<Event {self.action}/{self.state}/{self.scheduled_date}"
+        return f"<Event {self.action}/{self.state}/{self.scheduled_date}>"
 
     def __repr__(self):
         return str(self)
 
-    @classmethod
-    def waiting(cls):
+    @staticmethod
+    def waiting():
         """Return all waiting events"""
         return session.query(Event).filter(Event.state == State.waiting).all()
 
-    @classmethod
-    def exists(cls, event_id):
+    @staticmethod
+    def exists(event_id, scheduled_date, state=State.waiting):
         """Returns True if the event_id exists, False otherwise"""
-        return session.query(exists().where(Event.event_id == event_id)).scalar()
+        return session.query(
+            exists().where(
+                and_(
+                    Event.event_id == event_id,
+                    Event.scheduled_date == scheduled_date,
+                    Event.state == state,
+                )
+            )
+        ).scalar()
 
-    @classmethod
-    def create_from_gcal(cls, gcal_event):
+    @staticmethod
+    def create_from_gcal(gcal_event):
         e = Event(
             name=gcal_event["summary"], event_id=gcal_event["id"], state=State.waiting
         )
@@ -93,10 +109,33 @@ class Event(Base):
             )
         else:
             # NOTE: 'dateTime' includes the timezone
-            e.scheduled_date = arrow.get(gcal_event["start"].get("dateTime"))
+            e.scheduled_date = get_scheduled_date(gcal_event)
 
         session.add(e)
         session.commit()
+
+    @staticmethod
+    def events_missing(gcal_event_list):
+        result = []
+        for gcal_event in gcal_event_list:
+            scheduled_date = get_scheduled_date(gcal_event)
+
+            events = (
+                session.query(Event)
+                .filter(
+                    and_(
+                        Event.event_id == gcal_event["id"], Event.state == State.waiting
+                    )
+                )
+                .all()
+            )
+
+            if not events:
+                continue
+
+            result += [x for x in events if x.scheduled_date != scheduled_date]
+
+        return result
 
     def mark_event_missing(self):
         self.state = State.removed
