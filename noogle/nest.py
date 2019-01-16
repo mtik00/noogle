@@ -10,10 +10,11 @@ from __future__ import absolute_import, print_function
 import json
 import os
 import time
-from dataclasses import dataclass
 from typing import List
 
 import requests
+
+from dataclasses import dataclass
 
 from .models import Action
 from .settings import TOKEN_FOLDER, get_settings
@@ -166,7 +167,7 @@ class NestAPI:
 
     def _get_thermostat(self, device_id):
         return next(
-            (x for x in self.thermostat if device_id.lower() == x.device_id.lower()),
+            (x for x in self.thermostats if device_id.lower() == x.device_id.lower()),
             None,
         )
 
