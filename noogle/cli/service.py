@@ -4,7 +4,7 @@
 This module holds the cli `service` commands
 """
 
-# Imports #####################################################################
+import os
 import time
 import traceback
 from pprint import pformat
@@ -26,6 +26,7 @@ from ..utils import absjoin, get_scheduled_date
 
 # Globals #####################################################################
 inflect_engine = inflect.engine()
+DEBUG = os.environ.get("NOOGLE_DEBUG", False)
 
 
 @click.group()
@@ -98,7 +99,10 @@ def gcal(poll):
             event.mark_event_missing()
 
         # Send the email
-        if text_lines:
+        if DEBUG and text_lines:
+            print_log("DEBUG on; would have sent:")
+            print_log("\n".join(text_lines))
+        elif text_lines:
             print_log("sending message")
             send_message(
                 subject="{} processed".format(
