@@ -4,7 +4,6 @@
 This module holds the cli `service` commands
 """
 
-import os
 import time
 import traceback
 from pprint import pformat
@@ -21,12 +20,11 @@ from ..logger import clear_logger, get_logger
 from ..mailgun import send_message
 from ..models import Event, State
 from ..nest import NestAPI
-from ..settings import DEPLOY_SETTINGS, get_settings
+from ..settings import DEBUG, DEPLOY_SETTINGS, get_settings
 from ..utils import absjoin, get_scheduled_date
 
 # Globals #####################################################################
 inflect_engine = inflect.engine()
-DEBUG = os.environ.get("NOOGLE_DEBUG", False)
 
 
 @click.group()
@@ -161,7 +159,11 @@ def nest(poll=5):
 
             print_log("NEST: ......done")
 
-        if text_lines:
+        # Send the email
+        if DEBUG and text_lines:
+            print_log("DEBUG on; would have sent:")
+            print_log("\n".join(text_lines))
+        elif text_lines:
             print_log("sending message")
             send_message(
                 subject="{} processed".format(

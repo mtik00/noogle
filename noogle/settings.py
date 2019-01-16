@@ -27,6 +27,7 @@ __author__ = "Timothy McFadden"
 __creationDate__ = "05-JUN-2017"
 
 # Globals #####################################################################
+DEBUG = os.environ.get("NOOGLE_DEBUG", False)
 
 _SETTINGS = None
 SETTINGS_FILENAME = "noogle.ini"
@@ -87,6 +88,7 @@ class Settings(object):
             "lookback": 2,
             "timezone": "MST",
         },
+        "debug": DEBUG,
     }
 
     def __init__(self):
