@@ -4,6 +4,7 @@ This script is used to control deployment of the noogle app
 """
 # Imports ######################################################################
 import os
+import time
 
 from fabric import Connection
 
@@ -44,3 +45,7 @@ if __name__ == "__main__":
                 c.run(command, hide="stdout")
 
             c.run("sudo bash _build/deploy.bash", pty=True)
+
+    print("Waiting 5s before checking the status of the service")
+    time.sleep(5)
+    c.run("sudo systemctl status noogle", pty=True)
