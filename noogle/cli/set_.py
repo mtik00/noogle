@@ -77,6 +77,11 @@ def events():
     click.clear()
     print_log("Showing events since %s" % since.to("local").strftime("%A, %d %B"))
 
+    states_str = ", ".join(
+        ["{} for {}".format(state.value, state.name) for state in State]
+    )
+    state_values = [state.value for state in State]
+
     while True:
         events = [
             e for e in ctx.session.query(Event).filter(Event.scheduled_date >= since)
@@ -103,10 +108,7 @@ def events():
         print("*" * 40)
         print_event(index=None, event=event)
         print()
-        states = ", ".join(
-            ["{} for {}".format(state.value, state.name) for state in State]
-        )
-        value = input(f"Enter {states}: ")
+        value = input(f"Enter {states_str}: ")
 
         if not value.isdigit():
             print(f"ERROR: Invalid value '{value}'.  Please try again")
@@ -114,7 +116,7 @@ def events():
 
         value = int(value)
 
-        if value not in [0, 1, 2]:
+        if value not in state_values:
             print(f"ERROR: Invalid value '{value}'.  Please try again")
             continue
 
