@@ -6,11 +6,9 @@ This module holds the cli `set` commands
 
 # Imports #####################################################################
 import click
-import arrow
 
-from ..gcal import get_next_events
+from ..gcal import get_next_gcal_events
 from ..nest import NestAPI
-from ..helpers import print_log
 from ..models import Action
 
 # Metadata ####################################################################
@@ -33,7 +31,6 @@ def set_():
 @set_.command()
 def home():
     """Sets the structure to `home` and thermostat to `heat`"""
-    ctx = click.get_current_context().obj
     napi = NestAPI()
     napi.do_action(Action.home)
 
@@ -41,6 +38,11 @@ def home():
 @set_.command()
 def away():
     """Sets the structure to `away` and thermostat to `eco`"""
-    ctx = click.get_current_context().obj
     napi = NestAPI()
     napi.do_action(Action.away)
+
+
+@set_.command()
+def events():
+    """Sets the states of events"""
+    get_next_gcal_events

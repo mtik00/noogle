@@ -14,7 +14,7 @@ import inflect
 from sqlalchemy import and_
 
 from ..db import session
-from ..gcal import get_next_events
+from ..gcal import get_next_gcal_events
 from ..helpers import format_future_time, print_log
 from ..logger import clear_logger, get_logger
 from ..mailgun import send_message
@@ -51,7 +51,7 @@ def gcal(poll):
         # Grab the next 10 events
         print_log("GCAL: Reading events from Google calendar...")
         q_filter = "nest"
-        gcal_events = get_next_events(max_results=10, q_filter=q_filter)
+        gcal_events = get_next_gcal_events(max_results=10, q_filter=q_filter)
         print_log("GCAL: ...done")
 
         for event in gcal_events:

@@ -80,7 +80,7 @@ def setup(auth_local_webserver=False):
     """
     noauth_local_webserver = not auth_local_webserver
     get_credentials(noauth_local_webserver=noauth_local_webserver)
-    events = get_next_events()
+    events = get_next_gcal_events()
     if not events:
         print("No upcoming events found.")
         return
@@ -93,7 +93,7 @@ def setup(auth_local_webserver=False):
         )
 
 
-def get_next_events(max_results=10, q_filter="nest", since=None):
+def get_next_gcal_events(max_results=10, q_filter="nest", since=None):
     """
     Returns a list of events filtered by ``q_filter``.
 

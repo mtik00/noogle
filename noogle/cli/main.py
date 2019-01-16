@@ -12,7 +12,7 @@ This module holds the cli `main` command
 # Imports #####################################################################
 import click
 
-from ..gcal import get_next_events
+from ..gcal import get_next_gcal_events
 from ..helpers import print_log
 
 # Metadata ####################################################################
@@ -39,7 +39,7 @@ def go():
     # Grab the next 10 events
     print_log("Reading events from Google calendar...", nl=False)
     q_filter = "nestd" if ctx.debug else "nest"
-    my_events = get_next_events(max_results=10, q_filter=q_filter)
+    my_events = get_next_gcal_events(max_results=10, q_filter=q_filter)
     print_log("...done")
 
     ctx.cache.add_if_not_exists(ctx, my_events)
