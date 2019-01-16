@@ -4,13 +4,12 @@
 This module holds the cli `set` commands
 """
 
-# Imports #####################################################################
-import click
 import arrow
+import click
 
 from ..helpers import print_log
-from ..nest import NestAPI
 from ..models import Action, Event, State
+from ..nest import NestAPI
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -77,9 +76,8 @@ def events():
     click.clear()
     print_log("Showing events since %s" % since.to("local").strftime("%A, %d %B"))
 
-    states_str = ", ".join(
-        ["{} for {}".format(state.value, state.name) for state in State]
-    )
+    states = ["{} for {}".format(state.value, state.name) for state in State]
+
     state_values = [state.value for state in State]
 
     while True:
@@ -90,16 +88,17 @@ def events():
         for index, event in enumerate(events):
             print_event(index, event)
 
-        value = input("Which event would you like to change (q to quit): ")
-        if value.lower().startswith("q"):
+        choices = [str(x) for x in range(0, len(events) + 1)]
+        value = click.prompt(
+            "Which event would you like to change (0 to quit)",
+            type=click.Choice(choices),
+            value_proc=lambda x: int(x),
+            show_choices=True,
+        )
+
+        if value == 0:
             return
-        elif not value.isdigit():
-            print(f"ERROR: Invalid value '{value}'.  Please try again")
-            continue
-
-        value = int(value)
-
-        if not (1 <= value <= len(events)):
+        elif not (1 <= value <= len(events)):
             print(f"ERROR: Invalid value '{value}'.  Please try again")
             continue
 
@@ -108,13 +107,13 @@ def events():
         print("*" * 40)
         print_event(index=None, event=event)
         print()
-        value = input(f"Enter {states_str}: ")
 
-        if not value.isdigit():
-            print(f"ERROR: Invalid value '{value}'.  Please try again")
-            continue
-
-        value = int(value)
+        value = click.prompt(
+            "Enter",
+            type=click.Choice(states),
+            value_proc=lambda x: int(x),
+            show_choices=True,
+        )
 
         if value not in state_values:
             print(f"ERROR: Invalid value '{value}'.  Please try again")
