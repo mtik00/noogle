@@ -93,7 +93,7 @@ This will create a file located at `instance/config/noogle.ini`.  To change the 
 1.  Each part of the command must be separated with a colon (`:`)
 1.  Supported commands are:
     *   `away` : Sets the structure to `away` and the thermostat to `eco`
-    *   `home` : Sets the structure to `home` and the thermostat to `heat`
+    *   `home` : Sets the structure to `home` and the thermostat to the previous mode
 
 A typical command looks like this: `nest:away:Spring Break!`.  The third field
 is an optional description.

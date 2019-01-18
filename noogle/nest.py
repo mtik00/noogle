@@ -51,7 +51,7 @@ class RateLimitExceeded(APIError):
         return f"<RateLimitExceeded: {self.response.text}"
 
 
-@dataclass
+@dataclass(frozen=True)
 class Structure:
     structure_id: str
     name: str
@@ -59,7 +59,7 @@ class Structure:
     thermostats: List[str]
 
 
-@dataclass
+@dataclass(frozen=True)
 class Thermostat:
     device_id: str
     name: str
@@ -67,6 +67,7 @@ class Thermostat:
     eco_temperature_low_f: float
     structure_id: str
     hvac_mode: str
+    previous_hvac_mode: str
 
 
 class NestAPI:
@@ -113,6 +114,7 @@ class NestAPI:
                 eco_temperature_low_f=thermostat["eco_temperature_low_f"],
                 structure_id=thermostat["structure_id"],
                 hvac_mode=thermostat["hvac_mode"],
+                previous_hvac_mode=thermostat["previous_hvac_mode"],
             )
             self.thermostats.append(t)
 
@@ -299,18 +301,30 @@ class NestAPI:
         """
         Sets the HVAC mode for all thermostats in a structure.
         """
-        bad_thermostats = [
-            x
-            for x in self._get_structure_thermostats(structure)
-            if x.hvac_mode != hvac_mode
-        ]
+        thermostats = self._get_structure_thermostats(structure)
+
+        if hvac_mode == "__previous_hvac_mode__":
+            modes = [x.previous_hvac_mode for x in thermostats]
+        else:
+            modes = [hvac_mode] * len(thermostats)
+
+        t_map = {t: mode for t in thermostats for mode in modes}
+
+        bad_thermostats = {
+            thermostat: mode
+            for thermostat, mode in t_map.items()
+            if thermostat.hvac_mode != mode
+        }
+
         if not (bad_thermostats or force):
             return
 
-        thermostats = bad_thermostats or self._get_structure_thermostats(structure)
-        payload = {"hvac_mode": hvac_mode}
-        for thermostat_id in [x.device_id for x in thermostats]:
-            url = f"/devices/thermostats/{thermostat_id}"
+        if not bad_thermostats:
+            bad_thermostats = t_map
+
+        for t, mode in bad_thermostats.items():
+            payload = {"hvac_mode": mode}
+            url = f"/devices/thermostats/{t.device_id}"
             self.put(url, payload)
 
     def do_away(self):
@@ -347,7 +361,7 @@ class NestAPI:
             raise ValueError(f"Could not find structure in API: {structure_name}")
 
         self.set_away(structure, "home")
-        self.set_hvac_mode(structure, "heat")
+        self.set_hvac_mode(structure, "__previous_hvac_mode__")
 
     def verify(self, action, force_load=True):
         """
