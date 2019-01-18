@@ -48,7 +48,11 @@ def events(max_events):
 
     print_log("Showing events since %s" % since.to("local").strftime("%A, %d %B"))
 
-    for event in ctx.session.query(Event).filter(Event.scheduled_date >= since):
+    for event in (
+        ctx.session.query(Event)
+        .filter(Event.scheduled_date >= since)
+        .order_by(Event.scheduled_date)
+    ):
         print_log(
             "{:<19s}({:^9}) {}".format(
                 event.scheduled_date.to("local").format("YYYY-MM-DD h:mmA"),
