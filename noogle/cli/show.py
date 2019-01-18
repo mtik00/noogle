@@ -36,7 +36,11 @@ def show():
 
 @show.command()
 @click.option("--max-events", default=10, help="maximum number of events to show")
-@click.option("--removed/--no-removed", default=False, help="show removed events too")
+@click.option(
+    "--removed/--no-removed",
+    default=False,
+    help="show removed events too (default is --no-removed)",
+)
 def events(max_events, removed):
     """Display the next events from Google calendar"""
     ctx = click.get_current_context().obj
