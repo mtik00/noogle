@@ -15,7 +15,7 @@ import arrow
 
 from ..nest import NestAPI
 from ..helpers import print_log
-from ..models import Event
+from ..models import Event, State
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -36,7 +36,8 @@ def show():
 
 @show.command()
 @click.option("--max-events", default=10, help="maximum number of events to show")
-def events(max_events):
+@click.option("--removed/--no-removed", default=False, help="show removed events too")
+def events(max_events, removed):
     """Display the next events from Google calendar"""
     ctx = click.get_current_context().obj
 
@@ -48,11 +49,12 @@ def events(max_events):
 
     print_log("Showing events since %s" % since.to("local").strftime("%A, %d %B"))
 
-    for event in (
-        ctx.session.query(Event)
-        .filter(Event.scheduled_date >= since)
-        .order_by(Event.scheduled_date)
-    ):
+    events = ctx.session.query(Event).filter(Event.scheduled_date >= since)
+
+    if not removed:
+        events = events.filter(Event.state != State.removed)
+
+    for event in events.order_by(Event.scheduled_date):
         print_log(
             "{:<19s}({:^9}) {}".format(
                 event.scheduled_date.to("local").format("YYYY-MM-DD h:mmA"),
