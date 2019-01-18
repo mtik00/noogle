@@ -71,7 +71,7 @@ class Settings(object):
     """A simple interface to a project's settings stored as a dictionary."""
 
     settings = {
-        "general": {"use-logfile": True},
+        "general": {"use-logfile": True, "debug": DEBUG},
         "nest": {
             "structure": None,
             "thermostat": None,
@@ -88,7 +88,6 @@ class Settings(object):
             "lookback": 2,
             "timezone": "MST",
         },
-        "debug": DEBUG,
     }
 
     def __init__(self):
