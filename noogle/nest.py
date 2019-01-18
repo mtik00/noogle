@@ -280,7 +280,7 @@ class NestAPI:
                 if t.hvac_mode == "eco":
                     setpoint = f"{t.eco_temperature_low_f} F (eco)"
                 else:
-                    setpoint = f"{t.target_temperature_low_f} F"
+                    setpoint = f"{t.target_temperature_low_f} F ({t.hvac_mode})"
 
                 print(f"        Device: {t.name}")
                 print(f"            ID: {t.device_id}")
