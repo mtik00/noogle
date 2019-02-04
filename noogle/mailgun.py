@@ -5,11 +5,11 @@
 import os
 import requests
 
-domain = os.environ["MAILGUN_DOMAIN_NAME"]
-mailgun_api_key = os.environ["MAILGUN_API_KEY"]
+domain = os.environ.get("MAILGUN_DOMAIN_NAME", 'mailgun-domain-name')
+mailgun_api_key = os.environ.get("MAILGUN_API_KEY", "mailgun-api-key")
 mailgun_url = f"https://api.mailgun.net/v3/{domain}/messages"
-from_address = os.environ["MAILGUN_FROM"]
-to_address = os.environ["MAILGUN_TO"]
+from_address = os.environ.get("MAILGUN_FROM", f"noogle@{domain}")
+to_address = os.environ.get("MAILGUN_TO", 'mailgun-to')
 
 
 def send_message(subject="Notification from noogle", text=None, html=None):
