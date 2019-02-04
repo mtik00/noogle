@@ -76,7 +76,7 @@ class Event(Base):
         ).scalar()
 
     @staticmethod
-    def create_from_gcal(gcal_event):
+    def create_from_gcal(gcal_event, commit=True):
         e = Event(
             name=gcal_event["summary"], event_id=gcal_event["id"], state=State.waiting
         )
@@ -111,8 +111,11 @@ class Event(Base):
             # NOTE: 'dateTime' includes the timezone
             e.scheduled_date = get_scheduled_date(gcal_event)
 
-        session.add(e)
-        session.commit()
+        if commit:
+            session.add(e)
+            session.commit()
+        
+        return e
 
     @staticmethod
     def events_missing(gcal_event_list):
