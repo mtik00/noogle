@@ -37,7 +37,7 @@ This app is set up in a way that really only works within a virtual environment.
 1.  Install `noogle` and its requirements:  
     `pip install -e .[dev] && pip install -r requirements.txt`
 1.  Create your application files (*TODO)*:
-    `noogle setup init`
+    `noogle init all`
 1.  Create your Google OAuth credentials
 1.  Create your Nest API OAuth credentials
 1.  Modify your `instance/config/deploy.yaml` file (if needed)
