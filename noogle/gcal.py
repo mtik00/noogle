@@ -20,7 +20,7 @@ from googleapiclient.errors import HttpError
 
 from .settings import TOKEN_FOLDER, get_settings
 from .models import Event
-t
+
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
