@@ -19,8 +19,8 @@ from oauth2client.file import Storage
 from googleapiclient.errors import HttpError
 
 from .settings import TOKEN_FOLDER, get_settings
-
-# from .event import Event
+from .models import Event
+t
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -86,9 +86,10 @@ def setup(auth_local_webserver=False):
         return
 
     for event in events:
+        e = Event.create_from_gcal(event, commit=False)
         print(
             "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.format("YYYY-MM-DD h:mmA"), event.state, event.name
+                e.scheduled_date.format("YYYY-MM-DD h:mmA"), e.state, e.name
             )
         )
 
