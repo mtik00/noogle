@@ -13,15 +13,12 @@ to_address = os.environ.get("MAILGUN_TO", 'mailgun-to')
 
 
 def send_message(subject="Notification from noogle", text=None, html=None):
+    if not (text or html):
+        raise ValueError("Must pass both/either of `text` and `html`")
+
     auth = ("api", mailgun_api_key)
-
-    data = {"from": from_address, "to": [to_address], "subject": subject}
-
-    if text:
-        data["text"] = text
-    elif html:
-        data["html"] = html
-    else:
-        data["text"] = "unknown message"
+    data = {
+        "from": from_address, "to": [to_address], "subject": subject,
+        "text": text, "html": html}
 
     return requests.post(mailgun_url, auth=auth, data=data)
