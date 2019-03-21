@@ -35,9 +35,16 @@ def service():
 
 @service.command()
 @click.option("-p", "--poll", default=5)
-def gcal(poll):
+@click.option("--quiet", "-q", is_flag=True, help="Only report errors")
+def gcal(poll, quiet):
     """Look for events in Google and add them to the cache"""
-    ctx = click.get_current_context().obj
+    ctx = click.get_current_context()
+    ctx.obj.quiet = quiet
+
+    if quiet:
+        # Let the user know we started up.
+        print_log("GCAL: Starting service", force_print=True)
+
     poll *= 60
     text_lines = []
 
@@ -45,7 +52,7 @@ def gcal(poll):
         logpath = absjoin(DEPLOY_SETTINGS.get("app_log_dir"), "gcal.log")
 
         clear_logger()
-        ctx.logger = get_logger(logfile_path=logpath)
+        ctx.obj.logger = get_logger(logfile_path=logpath)
 
     while True:
         # Grab the next 10 events
@@ -116,9 +123,16 @@ def gcal(poll):
 
 @service.command()
 @click.option("-p", "--poll", default=5)
-def nest(poll=5):
+@click.option("--quiet", "-q", is_flag=True, help="Only report errors")
+def nest(poll, quiet):
     """Wait for and process Nest events"""
-    ctx = click.get_current_context().obj
+    ctx = click.get_current_context()
+    ctx.obj.quiet = quiet
+
+    if quiet:
+        # Let the user know we started up.
+        print_log("NEST: Starting service", force_print=True)
+
     poll *= 60
     text_lines = []
     api = None
@@ -127,7 +141,7 @@ def nest(poll=5):
         logpath = absjoin(DEPLOY_SETTINGS.get("app_log_dir"), "nest.log")
 
         clear_logger()
-        ctx.logger = get_logger(logfile_path=logpath)
+        ctx.obj.logger = get_logger(logfile_path=logpath)
 
     while True:
         events = Event.waiting()

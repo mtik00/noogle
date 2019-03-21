@@ -11,7 +11,6 @@ This modules holds common project functions.
 
 # Imports #####################################################################
 import logging
-import time
 from datetime import datetime, timedelta
 
 import click
@@ -23,13 +22,13 @@ __license__ = "Proprietary"
 
 
 # Globals #####################################################################
-def print_log(message, nl=True, log_level=logging.DEBUG):
-    ctx = click.get_current_context().obj
+def print_log(message, nl=True, log_level=logging.DEBUG, force_print=False):
+    ctx = click.get_current_context()
 
-    if not ctx.quiet:
+    if force_print or (not ctx.obj.quiet):
         click.echo(message, nl=nl)
 
-    ctx.logger.log(log_level, message)
+    ctx.obj.logger.log(log_level, message)
 
 
 def format_future_time(minutes=0, seconds=0):
