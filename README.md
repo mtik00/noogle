@@ -1,13 +1,13 @@
 # TODO
 
-[ ] `circusd` error reporting through `mailgun`
-[ ] documentation
-[ ] debug mode (Nest dev?)
-[ ] env var setup
-[ ] multiple devices/structures?
-[ ] move app config to yaml/toml (already using it during build anyway)
-[ ] add support for 429: Blocked (back off?)
-[ ] stop trying failed commands after X time
+- [ ] `circusd` error reporting through `mailgun`
+- [ ] documentation
+- [ ] debug mode (Nest dev?)
+- [ ] env var setup
+- [ ] multiple devices/structures?
+- [ ] move app config to yaml/toml (already using it during build anyway)
+- [ ] add support for 429: Blocked (back off?)
+- [ ] stop trying failed commands after X time
  
 # Introduction
 Noogle is a Python3.7 project used to control your Nest thermostat through your Google calendar using events.
