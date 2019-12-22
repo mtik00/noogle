@@ -8,4 +8,4 @@ This file holds the project metadata.
 __author__ = "Timothy McFadden"
 __creationDate__ = "08-JUN-2017"
 __license__ = "MIT"
-__version__ = "1.0.0b1"
+__version__ = "1.0.0b2"
