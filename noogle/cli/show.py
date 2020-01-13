@@ -58,6 +58,10 @@ def events(max_events, removed):
     if not removed:
         events = events.filter(Event.state != State.removed)
 
+    if not events.count():
+        print_log("--- no events found")
+        return
+
     for event in events.order_by(Event.scheduled_date):
         print_log(
             "{:<19s}({:^9}) {}".format(
