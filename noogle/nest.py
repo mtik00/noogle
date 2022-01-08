@@ -64,6 +64,7 @@ class Thermostat:
     device_id: str
     name: str
     target_temperature_low_f: float
+    target_temperature_f: int
     eco_temperature_low_f: float
     structure_id: str
     hvac_mode: str
@@ -107,10 +108,12 @@ class NestAPI:
         self.thermostats = []
 
         for thermostat in data.get("devices", {}).get("thermostats", {}).values():
+            breakpoint()
             t = Thermostat(
                 device_id=thermostat["device_id"],
                 name=thermostat["name"],
                 target_temperature_low_f=thermostat["target_temperature_low_f"],
+                target_temperature_f=thermostat["target_temperature_f"],
                 eco_temperature_low_f=thermostat["eco_temperature_low_f"],
                 structure_id=thermostat["structure_id"],
                 hvac_mode=thermostat["hvac_mode"],
@@ -297,6 +300,16 @@ class NestAPI:
         url = f"/structures/{structure.structure_id}"
         return self.put(url, payload)
 
+    def set_temperature(self, structure, temp_f, force=False):
+
+        thermostats = self._get_structure_thermostats(structure)
+        bad_thermostats = [t for t in thermostats if t.target_temperature_f != temp_f]
+
+        for thermostat in bad_thermostats:
+            payload = {"target_temperature_f": temp_f}
+            url = f"/devices/thermostats/{thermostat.device_id}"
+            self.put(url, payload)
+
     def set_hvac_mode(self, structure, hvac_mode, force=False):
         """
         Sets the HVAC mode for all thermostats in a structure.
@@ -361,7 +374,8 @@ class NestAPI:
             raise ValueError(f"Could not find structure in API: {structure_name}")
 
         self.set_away(structure, "home")
-        self.set_hvac_mode(structure, "__previous_hvac_mode__")
+        # self.set_hvac_mode(structure, "__previous_hvac_mode__")
+        self.set_hvac_mode(structure, "heat")
 
     def verify(self, action, force_load=True):
         """
