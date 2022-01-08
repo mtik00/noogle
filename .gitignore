@@ -4,6 +4,7 @@
 /_build
 env.sh
 *.json
+.secrets
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
