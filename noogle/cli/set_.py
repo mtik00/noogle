@@ -70,8 +70,8 @@ def events():
     lookback = ctx.project_settings.get("calendar.lookback") or 0
 
     since = arrow.now().replace(
-        days=-1 * lookback, hour=0, minute=0, second=0, microsecond=0
-    )
+        hour=0, minute=0, second=0, microsecond=0
+    ).shift(days=-1 * lookback)
 
     click.clear()
     print_log("Showing events since %s" % since.to("local").strftime("%A, %d %B"))

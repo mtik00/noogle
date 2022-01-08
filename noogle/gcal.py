@@ -114,7 +114,8 @@ def get_next_gcal_events(max_results=10, q_filter="nest", since=None):
         lookback = get_settings().get("calendar.lookback") or 0
         since = (
             arrow.now()
-            .replace(days=-1 * lookback, hour=0, minute=0, second=0, microsecond=0)
+            .replace(hour=0, minute=0, second=0, microsecond=0)
+            .shift(days=-1 * lookback)
             .isoformat()
         )
 
