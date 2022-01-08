@@ -10,11 +10,11 @@
 - [ ] stop trying failed commands after X time
  
 # Introduction
-Noogle is a Python3.7 project used to control your Nest thermostat through your Google calendar using events.
+Noogle is a Python3.7+ project used to control your Nest thermostat through your Google calendar using events.
 
 # Requirements
 
-*   Python3.7
+*   Python3.7+
 *   Nest Developer Account (free)
 *   Google Developer API Access (free)
 
