@@ -26,6 +26,7 @@ from .service import service
 from .dev import dev
 from .logs import logs
 from .shell import shell
+from ..cache import Cache
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -50,6 +51,7 @@ class Ctx(object):
         self.quiet = False
         self.napi = None
         self.debug = False
+        self.cache = Cache()
 
 
 CTX = click.make_pass_decorator(Ctx, ensure=True)

@@ -2,6 +2,8 @@ import enum
 from sqlalchemy import Integer, String, Column, Enum, UniqueConstraint
 from sqlalchemy.sql import exists, and_
 from sqlalchemy_utils import ArrowType
+from sqlalchemy.exc import IntegrityError
+
 from .db import Base, session
 import arrow
 from .settings import get_settings
@@ -112,9 +114,12 @@ class Event(Base):
             e.scheduled_date = get_scheduled_date(gcal_event)
 
         if commit:
-            session.add(e)
-            session.commit()
-        
+            try:
+                session.add(e)
+                session.commit()
+            except IntegrityError:
+                session.rollback()
+
         return e
 
     @staticmethod

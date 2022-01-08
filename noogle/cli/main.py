@@ -14,6 +14,7 @@ import click
 
 from ..gcal import get_next_gcal_events
 from ..helpers import print_log
+from ..models import Event
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -42,6 +43,7 @@ def go():
     my_events = get_next_gcal_events(max_results=10, q_filter=q_filter)
     print_log("...done")
 
+    my_events = [Event.create_from_gcal(x) for x in my_events]
     ctx.cache.add_if_not_exists(ctx, my_events)
 
     for event in my_events:
