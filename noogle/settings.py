@@ -32,7 +32,7 @@ DEBUG = os.environ.get("NOOGLE_DEBUG", False)
 _SETTINGS = None
 SETTINGS_FILENAME = "noogle.ini"
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
-INSTANCE_FOLDER = absjoin(THIS_DIR, "..", "instance")
+INSTANCE_FOLDER = os.environ.get("SECRETS_FOLDER", absjoin(THIS_DIR, "..", "instance"))
 
 TOKEN_FOLDER = absjoin(INSTANCE_FOLDER, "tokens")
 DATA_FOLDER = absjoin(INSTANCE_FOLDER, "data")

@@ -25,7 +25,7 @@ See `requirements.txt` for a complete list of Python requirements.
 # Setup
 
 In this example, we're going to be storing some credentials and application setup
-in `instance/env.bat` (or `instance/env.sh` on Linux).
+in `${SECRETS_FOLDER}/env.bat` (or `${SECRETS_FOLDER}/env.sh` on Linux).
 
 This app is set up in a way that really only works within a virtual environment.  The source ships with a `.envrc` that makes life easier.
 
@@ -40,8 +40,8 @@ This app is set up in a way that really only works within a virtual environment.
     `noogle init all`
 1.  Create your Google OAuth credentials
 1.  Create your Nest API OAuth credentials
-1.  Modify your `instance/config/deploy.yaml` file (if needed)
-1.  Modify your `instance/env.sh` file
+1.  Modify your `${SECRETS_FOLDER}/config/deploy.yaml` file (if needed)
+1.  Modify your `${SECRETS_FOLDER}/env.sh` file
 1.  Test Google calendar integration:  
     `noogle show events`
 1.  Test Nest API calendar integration:
@@ -62,7 +62,7 @@ This app is set up in a way that really only works within a virtual environment.
 
 1.  Sign in, or sign up for, a [Nest Developer Account](https://developers.nest.com/)
 1.  Click on 'Create New Product'
-1.  Once done, add the `OAuth` parameters to your environment setup file.  For example, add the following to `instance/env.bat`:  
+1.  Once done, add the `OAuth` parameters to your environment setup file.  For example, add the following to `${SECRETS_FOLDER}/env.bat`:  
     `export NEST_PRODUCT_ID=ABCDEFG`  
     `export NEST_PRODUCT_SECRET=ABCDEFG`  
 1.  Run the `noogle` setup for Nest: `noogle setup nest`
@@ -73,7 +73,7 @@ This app is set up in a way that really only works within a virtual environment.
     *   Enter the *pincode* in to the prompt
 1.  Run the `noogle show structures` to ensure you have the credentials stored (you should not be prompted again).
 
-**NOTE**: If you change the permissions through the Nest API, you must delete `instance/tokens/nest-token.json` and re-run `noogle setup nest`.
+**NOTE**: If you change the permissions through the Nest API, you must delete `${SECRETS_FOLDER}/tokens/nest-token.json` and re-run `noogle setup nest`.
 
 # Configuration
 
@@ -82,7 +82,7 @@ settings.  You should probably create your own configuration file:
 
     noogle settings make
 
-This will create a file located at `instance/config/noogle.ini`.  To change the location of the file, you must set the `SETTINGS_FOLDER` environment variable before making the settings.
+This will create a file located at `${SECRETS_FOLDER}/config/noogle.ini`.  To change the location of the file, you must set the `SETTINGS_FOLDER` environment variable before making the settings.
 
 # DSL
 `noogle` depends on events in your calendar with specific text.  All events should be in the form of:
@@ -117,7 +117,7 @@ I use *Fabric* to deploy this application to my VPS.  If you are running everyth
 ## Dirvnev
 This project ships with a `.envrc` file.  This file is read by `Direnv` to control creation of the virtual environment used by the app.
 
-Part of `.envrc` is sourcing `instance/env.sh` in order to set up the application variables as needed.  You *must* export the following shell variables:
+Part of `.envrc` is sourcing `${SECRETS_FOLDER}/env.sh` in order to set up the application variables as needed.  You *must* export the following shell variables:
 *   `NEST_PRODUCT_ID`: Get this from your Nest developer account
 *   `NEST_PRODUCT_SECRET`: Get this from your Nest developer account
 *   `MAILGUN_API_KEY`: Get this from your Mailgun account
