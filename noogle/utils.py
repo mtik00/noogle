@@ -15,3 +15,11 @@ def get_scheduled_date(gcal_event):
         raise ValueError("Can't find `['start']['dateTime']` in event")
 
     return arrow.get(gcal_event["start"].get("dateTime"))
+
+
+def is_winter(date: arrow.Arrow = arrow.now()) -> bool:
+    """
+    Returns `True` if the date is considered winter.
+    """
+    month = date.date().month
+    return (1 <= month <= 4) or (10 <= month <= 12)

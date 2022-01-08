@@ -18,6 +18,7 @@ from dataclasses import dataclass
 
 from .models import Action
 from .settings import TOKEN_FOLDER, get_settings
+from .utils import is_winter
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -374,8 +375,13 @@ class NestAPI:
             raise ValueError(f"Could not find structure in API: {structure_name}")
 
         self.set_away(structure, "home")
-        # self.set_hvac_mode(structure, "__previous_hvac_mode__")
-        self.set_hvac_mode(structure, "heat")
+        if is_winter():
+            self.set_hvac_mode(structure, "heat")
+            self.set_temperature(
+                structure, self.project_settings.get("winter-home-temp")
+            )
+        else:
+            self.set_hvac_mode(structure, "__previous_hvac_mode__")
 
     def verify(self, action, force_load=True):
         """
