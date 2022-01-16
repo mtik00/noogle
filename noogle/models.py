@@ -8,6 +8,7 @@ from .db import Base, session
 import arrow
 from .settings import get_settings
 from .utils import get_scheduled_date
+from .helpers import print_log
 
 
 class State(enum.Enum):
@@ -92,7 +93,7 @@ class Event(Base):
             e.action = Action[parts[1].strip()]
             e.description = parts[2].strip()
         else:
-            print(f'WARNING: Cannot parse event name: "{e.name}"')
+            print_log(f'WARNING: Cannot parse event name: "{e.name}"')
 
         if "date" in gcal_event["start"]:
             # The user has an "all day" event in gcal.

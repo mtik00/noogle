@@ -19,6 +19,7 @@ from googleapiclient.errors import HttpError
 
 from .settings import TOKEN_FOLDER, get_settings
 from .models import Event
+from .helpers import print_log
 
 
 # Metadata ####################################################################
@@ -45,11 +46,11 @@ def get_credentials(noauth_local_webserver=False):
         Credentials, the obtained credential.
     """
     if not os.path.exists(CLIENT_SECRET_FILE):
-        print("ERROR: Google client secrect not found at: %s" % CLIENT_SECRET_FILE)
-        print("...Download the JSON credentials from:")
-        print("...https://console.developers.google.com/apis/credentials")
-        print("...and put them here: %s" % CLIENT_SECRET_FILE)
-        print("Dont forget to rename the file!")
+        print_log("ERROR: Google client secrect not found at: %s" % CLIENT_SECRET_FILE)
+        print_log("...Download the JSON credentials from:")
+        print_log("...https://console.developers.google.com/apis/credentials")
+        print_log("...and put them here: %s" % CLIENT_SECRET_FILE)
+        print_log("Dont forget to rename the file!")
         sys.exit(1)
 
     if not os.path.exists(TOKEN_FOLDER):
@@ -69,7 +70,7 @@ def get_credentials(noauth_local_webserver=False):
         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store, flags)
-        print("Storing credentials to " + credential_path)
+        print_log("Storing credentials to " + credential_path)
     return credentials
 
 
@@ -81,12 +82,12 @@ def setup(auth_local_webserver=False):
     get_credentials(noauth_local_webserver=noauth_local_webserver)
     events = get_next_gcal_events()
     if not events:
-        print("No upcoming events found.")
+        print_log("No upcoming events found.")
         return
 
     for event in events:
         e = Event.create_from_gcal(event, commit=False)
-        print(
+        print_log(
             "{:<19s}({:^9}) {}".format(
                 e.scheduled_date.format("YYYY-MM-DD h:mmA"), e.state, e.name
             )

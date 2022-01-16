@@ -69,9 +69,11 @@ def events():
 
     lookback = ctx.project_settings.get("calendar.lookback") or 0
 
-    since = arrow.now().replace(
-        hour=0, minute=0, second=0, microsecond=0
-    ).shift(days=-1 * lookback)
+    since = (
+        arrow.now()
+        .replace(hour=0, minute=0, second=0, microsecond=0)
+        .shift(days=-1 * lookback)
+    )
 
     click.clear()
     print_log("Showing events since %s" % since.to("local").strftime("%A, %d %B"))
@@ -99,14 +101,14 @@ def events():
         if value == 0:
             return
         elif not (1 <= value <= len(events)):
-            print(f"ERROR: Invalid value '{value}'.  Please try again")
+            print_log(f"ERROR: Invalid value '{value}'.  Please try again")
             continue
 
         event = events[value - 1]
 
-        print("*" * 40)
+        print_log("*" * 40)
         print_event(index=None, event=event)
-        print()
+        print_log()
 
         value = click.prompt(
             "Enter",
@@ -116,7 +118,7 @@ def events():
         )
 
         if value not in state_values:
-            print(f"ERROR: Invalid value '{value}'.  Please try again")
+            print_log(f"ERROR: Invalid value '{value}'.  Please try again")
             continue
 
         event.state = State(value).name
