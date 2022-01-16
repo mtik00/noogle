@@ -126,6 +126,11 @@ class Event(Base):
     @staticmethod
     def events_missing(gcal_event_list):
         result = []
+
+        # If there are no events returned, return all waiting events.
+        if not gcal_event_list:
+            return session.query(Event).filter(Event.state == State.waiting).all()
+
         for gcal_event in gcal_event_list:
             scheduled_date = get_scheduled_date(gcal_event)
 
@@ -143,6 +148,15 @@ class Event(Base):
                 continue
 
             result += [x for x in events if x.scheduled_date != scheduled_date]
+
+        # Ensure that future events cached in the DB show up in the list from google
+        gcal_ids = [x["id"] for x in gcal_event_list]
+        removed_events = (
+            session.query(Event).filter(
+                and_(Event.state == State.waiting, Event.event_id.notin_(gcal_ids))
+            )
+        ).all()
+        result += removed_events
 
         return result
 
