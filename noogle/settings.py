@@ -32,16 +32,18 @@ DEBUG = os.environ.get("NOOGLE_DEBUG", False)
 _SETTINGS = None
 SETTINGS_FILENAME = "noogle.ini"
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
-INSTANCE_FOLDER = os.environ.get("SECRETS_FOLDER", absjoin(THIS_DIR, "..", "instance"))
+BASE_CONFIG_FOLDER = os.environ.get(
+    "CONFIG_FOLDER", absjoin(THIS_DIR, "..", "instance")
+)
 
-TOKEN_FOLDER = absjoin(INSTANCE_FOLDER, "tokens")
-DATA_FOLDER = absjoin(INSTANCE_FOLDER, "data")
-CONFIG_FOLDER = absjoin(INSTANCE_FOLDER, "config")
+TOKEN_FOLDER = absjoin(BASE_CONFIG_FOLDER, "tokens")
+DATA_FOLDER = absjoin(BASE_CONFIG_FOLDER, "data")
+CONFIG_FOLDER = absjoin(BASE_CONFIG_FOLDER, "config")
 
 DEPLOY_CONFIG_PATH = absjoin(CONFIG_FOLDER, "deploy.yaml")
 CIRCUS_INI_PATH = absjoin(CONFIG_FOLDER, "circus.ini")
 
-_DEFAULT_SETTINGS_FOLDER = absjoin(INSTANCE_FOLDER, "config")
+_DEFAULT_SETTINGS_FOLDER = absjoin(BASE_CONFIG_FOLDER, "config")
 SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", _DEFAULT_SETTINGS_FOLDER)
 SETTINGS_PATH = absjoin(SETTINGS_FOLDER, SETTINGS_FILENAME)
 FILE_SEARCH = [SETTINGS_PATH]

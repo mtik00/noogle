@@ -15,19 +15,19 @@ import shutil
 
 import click
 
-from ..utils import absjoin
 from ..db import init as init_db
 from ..helpers import print_log
 from ..settings import (
+    BASE_CONFIG_FOLDER,
     CONFIG_FOLDER,
     DATA_FOLDER,
-    INSTANCE_FOLDER,
+    DEPLOY_CONFIG_PATH,
     SETTINGS_FOLDER,
+    SETTINGS_PATH,
     TOKEN_FOLDER,
     get_settings,
-    SETTINGS_PATH,
-    DEPLOY_CONFIG_PATH,
 )
+from ..utils import absjoin
 
 # Metadata ####################################################################
 TEMPLATE_FOLDER = absjoin
@@ -55,9 +55,9 @@ def all():
     print_log("Creating all folders/files")
 
     # Create the instance folders
-    if not os.path.isdir(INSTANCE_FOLDER):
-        os.makedirs(INSTANCE_FOLDER)
-        print_log(f"...{INSTANCE_FOLDER} has been created")
+    if not os.path.isdir(BASE_CONFIG_FOLDER):
+        os.makedirs(BASE_CONFIG_FOLDER)
+        print_log(f"...{BASE_CONFIG_FOLDER} has been created")
 
     for folder in [CONFIG_FOLDER, DATA_FOLDER, SETTINGS_FOLDER, TOKEN_FOLDER]:
         if not os.path.isdir(folder):
@@ -81,14 +81,14 @@ def all():
         shutil.copyfile(src, DEPLOY_CONFIG_PATH)
 
     # Create a sample `env.sh`
-    env_dest = absjoin(INSTANCE_FOLDER, "env.sh")
+    env_dest = absjoin(BASE_CONFIG_FOLDER, "env.sh")
     if not os.path.isfile(env_dest):
         env_src = absjoin(os.path.dirname(__file__), "dev", "templates", "env.sh")
         shutil.copyfile(env_src, env_dest)
 
     print_log("...done")
 
-    print_log(f"Your *instance* folder has been set up at {INSTANCE_FOLDER}")
+    print_log(f"Your *instance* folder has been set up at {BASE_CONFIG_FOLDER}")
     print_log(f"..you **MUST** configure {env_dest} and {SETTINGS_PATH}")
     print_log(
         f"...if this machine is used for deployment, you also must configure {DEPLOY_CONFIG_PATH}"

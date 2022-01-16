@@ -109,7 +109,6 @@ class NestAPI:
         self.thermostats = []
 
         for thermostat in data.get("devices", {}).get("thermostats", {}).values():
-            breakpoint()
             t = Thermostat(
                 device_id=thermostat["device_id"],
                 name=thermostat["name"],
