@@ -9,7 +9,7 @@ import os
 
 import click
 
-from ..settings import DEPLOY_SETTINGS
+from ..settings import LOG_FILE_DIRECTORY
 
 # Globals #####################################################################
 
@@ -23,7 +23,7 @@ def logs():
 @logs.command()
 def clear():
     """Clears the log files"""
-    logdir = DEPLOY_SETTINGS.get("app_log_dir")
+    logdir = LOG_FILE_DIRECTORY
     if os.path.isdir(logdir):
         files = glob.glob(f"{logdir}/*")
         for f in files:
