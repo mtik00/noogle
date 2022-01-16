@@ -7,6 +7,7 @@ This module holds the cli `service` commands
 import time
 import traceback
 from pprint import pformat
+import logging
 
 import arrow
 import click
@@ -34,7 +35,9 @@ def service():
 
 
 @service.command()
-@click.option("-p", "--poll", default=5)
+@click.option(
+    "-p", "--poll", help="Number of minutes to wait between checks", default=5
+)
 @click.option("--quiet", "-q", is_flag=True, help="Only report errors")
 def gcal(poll, quiet):
     """Look for events in Google and add them to the cache"""
@@ -88,13 +91,13 @@ def gcal(poll, quiet):
         # Any event that's not completed and not found in our list should be
         # set to 'removed'.
         removed_events = Event.events_missing(gcal_events)
-
         if removed_events:
             print_log(
                 "found {} cached {} that aren't in gcal".format(
                     len(removed_events),
                     inflect_engine.plural("event", len(removed_events)),
-                )
+                ),
+                log_level=logging.WARNING,
             )
 
         for event in removed_events:
