@@ -16,10 +16,11 @@ requests = "^2.27.1"
 "ruamel.yaml" = "^0.17.20"
 SQLAlchemy-Utils = "^0.38.2"
 SQLAlchemy = "^1.4.29"
+ipython = "^8.0.0"
 
 [tool.poetry.dev-dependencies]
-ipython = "^8.0.0"
 ipdb = "^0.13.9"
+black = "^21.12b0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
