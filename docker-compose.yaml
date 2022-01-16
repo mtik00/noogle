@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+    noogle:
+        image: mtik00/noogle:latest
+        env_file: .env
+        environment:
+            - NEST_PRODUCT_ID
+            - NEST_PRODUCT_SECRET
+        volumes:
+            - ".secrets/config:/usr/src/app/config"
+            - ".secrets/data:/usr/src/app/data"
+            - ".secrets/tokens:/usr/src/app/tokens"
+        build: .
