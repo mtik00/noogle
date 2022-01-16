@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import subprocess
+import sys
+from getpass import getuser
 from pathlib import Path
 
 
@@ -38,6 +41,23 @@ def create_logs() -> None:
     path = Path(".secrets", "logs")
     for fname in ["gcal.log", "nest.log", "noogle.log"]:
         (path / fname).touch()
+
+
+def set_permissions() -> None:
+
+    if sys.platform == "linux":
+        user = getuser()
+        cmd = ["sudo", "chown", "-R", f"{user}:{user}", ".secrets"]
+        subprocess.check_output(cmd, stdin=subprocess.PIPE)
+
+    for file in Path(".secrets", "logs").glob("*.log"):
+        file.chmod(0o600)
+
+    for file in Path(".secrets", "tokens").glob("*.json"):
+        file.chmod(0o600)
+
+    for file in Path(".secrets", "data").glob("*"):
+        file.chmod(0o600)
 
 
 def create_config() -> None:
@@ -109,6 +129,7 @@ def main():
     create_config()
     create_env()
     create_logs()
+    set_permissions()
 
 
 if __name__ == "__main__":
