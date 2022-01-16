@@ -24,7 +24,8 @@ ARG  APP_USERID=9000
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/usr/src/app/.venv/bin:$PATH"
+    PATH="/usr/src/app/.venv/bin:$PATH" \
+    IPYTHONDIR=/tmp
 
 LABEL maintainer="Tim McFadden <mtik00@users.noreply.github.com>"
 LABEL app="noogle"
@@ -47,13 +48,7 @@ COPY --chown=noogle-user:noogle-user ./noogle ./noogle
 ENTRYPOINT [ "/usr/bin/tini", "--", "python", "-m", "noogle" ]
 CMD [ "--help" ]
 
-# DOC : More debugging things.  This is really helpful if you need debugging
-#       tools inside your runtime container.  I recommend keeping this commented
-#       out for production builds.
-
 # Stuff to help debug (as long as you didn't remove pip above)
 # RUN python -m pip install ipdb
 
-# DOC : Switch to the application user.  Any Dockerfile commands put _after_
-#       this line will be executed by this user.
-# USER noogle-user
+USER noogle-user
