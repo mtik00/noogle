@@ -4,7 +4,10 @@ import arrow
 
 
 def absjoin(*args):
-    return os.path.abspath(os.path.join(*args))
+    if any(args):
+        return os.path.abspath(os.path.join(*args))
+
+    return None
 
 
 def get_scheduled_date(gcal_event):
