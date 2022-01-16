@@ -39,7 +39,8 @@ def service():
     "-p", "--poll", help="Number of minutes to wait between checks", default=5
 )
 @click.option("--quiet", "-q", is_flag=True, help="Only report errors")
-def gcal(poll, quiet):
+@click.option("--once", "-o", is_flag=True, help="Only run once; do not loop")
+def gcal(poll, quiet, once: bool = False):
     """Look for events in Google and add them to the cache"""
     ctx = click.get_current_context()
     ctx.obj.quiet = quiet
@@ -120,6 +121,9 @@ def gcal(poll, quiet):
             )
             text_lines = []
 
+        if once:
+            return
+
         print_log("GCAL: waiting until %s" % format_future_time(seconds=poll))
         time.sleep(poll)
 
@@ -127,7 +131,8 @@ def gcal(poll, quiet):
 @service.command()
 @click.option("-p", "--poll", default=5)
 @click.option("--quiet", "-q", is_flag=True, help="Only report errors")
-def nest(poll, quiet):
+@click.option("--once", "-o", is_flag=True, help="Only run once; do not loop")
+def nest(poll, quiet, once: bool = False):
     """Wait for and process Nest events"""
     ctx = click.get_current_context()
     ctx.obj.quiet = quiet
@@ -189,6 +194,9 @@ def nest(poll, quiet):
                 text="\n".join(text_lines),
             )
             text_lines = []
+
+        if once:
+            return
 
         print_log("NEST: waiting until %s" % format_future_time(seconds=poll))
         time.sleep(poll)

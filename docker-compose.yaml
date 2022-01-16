@@ -15,7 +15,8 @@ services:
             - ".secrets/tokens:/usr/src/app/tokens"
             - ".secrets/logs:/usr/src/app/logs"
         build: .
-        command: ["service", "gcal", "--poll", "5"]
+        # command: ["service", "gcal", "--poll", "5"]
+        command: ["service", "gcal", "--once"]
 
     nest:
         image: mtik00/noogle:latest
@@ -32,4 +33,5 @@ services:
             - ".secrets/tokens:/usr/src/app/tokens"
             - ".secrets/logs:/usr/src/app/logs"
         build: .
-        command: ["service", "nest", "--poll", "5"]
+        # command: ["service", "nest", "--poll", "5"]
+        command: ["service", "nest", "--once"]
