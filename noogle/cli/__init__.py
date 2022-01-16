@@ -7,8 +7,6 @@ line.
 # pylint:disable=W0212
 
 # Imports #####################################################################
-from __future__ import print_function
-
 import click
 
 from .. import __version__ as library_version

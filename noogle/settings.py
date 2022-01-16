@@ -5,22 +5,14 @@ This module holds the interface to the application settings.
 """
 
 # Imports #####################################################################
-from __future__ import print_function
-
 import os
 import re
+from configparser import ConfigParser
 
 import pkg_resources
-
 import ruamel.yaml
 
 from .utils import absjoin
-
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import SafeConfigParser as ConfigParser
-
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
