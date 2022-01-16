@@ -17,6 +17,8 @@ from dataclasses import dataclass
 from .models import Action
 from .settings import TOKEN_FOLDER, get_settings
 from .utils import is_winter
+from .helpers import print_log
+
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -146,8 +148,8 @@ class NestAPI:
             f"https://home.nest.com/login/oauth2?client_id={client_id}&state=1"
         )
 
-        print("Go to the following URL and accept the permissions:")
-        print(authorization_url)
+        print_log("Go to the following URL and accept the permissions:")
+        print_log(authorization_url)
         auth_code = input("...enter the pincode given: ")
 
         token_url = "https://api.home.nest.com/oauth2/access_token"
@@ -271,10 +273,10 @@ class NestAPI:
         self.load(request_auth=request_auth)
 
         for structure in self.structures:
-            print(structure.name)
-            print(f"    ID: {structure.structure_id}")
-            print(f"    Away: {structure.away}")
-            print("    Thermostats:")
+            print_log(structure.name)
+            print_log(f"    ID: {structure.structure_id}")
+            print_log(f"    Away: {structure.away}")
+            print_log("    Thermostats:")
             for t in [
                 x for x in self.thermostats if x.device_id in structure.thermostats
             ]:
@@ -283,9 +285,9 @@ class NestAPI:
                 else:
                     setpoint = f"{t.target_temperature_low_f} F ({t.hvac_mode})"
 
-                print(f"        Device: {t.name}")
-                print(f"            ID: {t.device_id}")
-                print(f"            Setpoint: {setpoint}")
+                print_log(f"        Device: {t.name}")
+                print_log(f"            ID: {t.device_id}")
+                print_log(f"            Setpoint: {setpoint}")
 
     def set_away(self, structure, away="away", force=False):
         """
@@ -423,7 +425,7 @@ class NestAPI:
 
     def do_action(self, action):
         if not self.change_needed(action):
-            print("No action needed")
+            print_log("No action needed")
             return
 
         action_map = {Action.away.value: self.do_away, Action.home.value: self.do_home}
@@ -432,11 +434,11 @@ class NestAPI:
         if func:
             func()
 
-            print(f"...waiting {NestAPI.verification_wait}s before verification")
+            print_log(f"...waiting {NestAPI.verification_wait}s before verification")
             time.sleep(NestAPI.verification_wait)
 
             self.verify(action)
         else:
             raise Exception("Unknown action: {!r}".format(action))
 
-        print("...OK")
+        print_log("...OK")

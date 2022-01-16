@@ -7,24 +7,25 @@ line.
 # pylint:disable=W0212
 
 # Imports #####################################################################
+from pathlib import Path
+
 import click
 
 from .. import __version__ as library_version
-from ..logger import get_logger
-from ..settings import get_settings
-from ..db import session
-
-from .show import show
-from .init import init
-from .setup import setup
-from .settings import settings
-from .main import go
-from .set_ import set_
-from .service import service
-from .dev import dev
-from .logs import logs
-from .shell import shell
 from ..cache import Cache
+from ..db import session
+from ..logger import get_logger
+from ..settings import LOG_FILE_DIRECTORY, get_settings
+from .dev import dev
+from .init import init
+from .logs import logs
+from .main import go
+from .service import service
+from .set_ import set_
+from .settings import settings
+from .setup import setup
+from .shell import shell
+from .show import show
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -43,13 +44,17 @@ class Ctx(object):
     """The context object"""
 
     def __init__(self):
-        self.logger = get_logger()
         self.project_settings = get_settings()
         self.session = None
         self.quiet = False
         self.napi = None
         self.debug = False
         self.cache = Cache()
+
+        logfile = None
+        if self.project_settings.get("general.use-logfile"):
+            logfile = Path(LOG_FILE_DIRECTORY, "noogle.log")
+        self.logger = get_logger(logfile_path=logfile)
 
 
 CTX = click.make_pass_decorator(Ctx, ensure=True)

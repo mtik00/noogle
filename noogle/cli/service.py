@@ -20,7 +20,7 @@ from ..logger import clear_logger, get_logger
 from ..mailgun import send_message
 from ..models import Event, State
 from ..nest import NestAPI
-from ..settings import DEBUG, DEPLOY_SETTINGS, get_settings
+from ..settings import DEBUG, GCAL_LOG, NEST_LOG, get_settings
 from ..utils import absjoin, get_scheduled_date
 
 # Globals #####################################################################
@@ -49,7 +49,7 @@ def gcal(poll, quiet):
     text_lines = []
 
     if get_settings().get("general.use-logfile"):
-        logpath = absjoin(DEPLOY_SETTINGS.get("app_log_dir"), "gcal.log")
+        logpath = GCAL_LOG
 
         clear_logger()
         ctx.obj.logger = get_logger(logfile_path=logpath)
@@ -138,7 +138,7 @@ def nest(poll, quiet):
     api = None
 
     if get_settings().get("general.use-logfile"):
-        logpath = absjoin(DEPLOY_SETTINGS.get("app_log_dir"), "nest.log")
+        logpath = NEST_LOG
 
         clear_logger()
         ctx.obj.logger = get_logger(logfile_path=logpath)

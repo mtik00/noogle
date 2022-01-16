@@ -46,7 +46,11 @@ def events(max_events, removed):
     ctx = click.get_current_context().obj
 
     lookback = ctx.project_settings.get("calendar.lookback") or 0
-    since = arrow.now().replace(hour=0, minute=0, second=0, microsecond=0).shift(days=-1 * lookback)
+    since = (
+        arrow.now()
+        .replace(hour=0, minute=0, second=0, microsecond=0)
+        .shift(days=-1 * lookback)
+    )
 
     print_log("Showing events since %s" % since.to("local").strftime("%A, %d %B"))
 
@@ -103,5 +107,5 @@ def away():
     structure_name = ctx.project_settings.get("nest.structure")
     structure = next((x for x in napi.structures if x.name == structure_name))
 
-    print("Structure: %s" % structure.name)
-    print("     Away: %s" % structure.away)
+    print_log("Structure: %s" % structure.name)
+    print_log("     Away: %s" % structure.away)

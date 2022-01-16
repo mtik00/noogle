@@ -48,6 +48,12 @@ if os.path.exists(DEPLOY_CONFIG_PATH):
     with open(DEPLOY_CONFIG_PATH) as fh:
         DEPLOY_SETTINGS = ruamel.yaml.safe_load(fh)
 
+LOG_FILE_DIRECTORY = os.environ.get(
+    "LOG_FILE_DIRECTORY", absjoin(DEPLOY_SETTINGS.get("app_log_dir"))
+)
+GCAL_LOG = absjoin(LOG_FILE_DIRECTORY, "gcal.log")
+NEST_LOG = absjoin(LOG_FILE_DIRECTORY, "nest.log")
+
 
 def get_settings():
     """

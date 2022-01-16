@@ -7,7 +7,7 @@ def create_folders() -> None:
     if not Path(".secrets").exists():
         Path(".secrets").mkdir()
 
-    for d in ["config", "data", "tokens"]:
+    for d in ["config", "data", "tokens", "logs"]:
         path = Path(".secrets") / d
         if not path.exists():
             print("Creating", str(path))
@@ -32,6 +32,12 @@ def create_env() -> None:
         print(
             str(path), "has been created.  You must modify set the variables defined."
         )
+
+
+def create_logs() -> None:
+    path = Path(".secrets", "logs")
+    for fname in ["gcal.log", "nest.log", "noogle.log"]:
+        (path / fname).touch()
 
 
 def create_config() -> None:
@@ -102,6 +108,7 @@ def main():
     create_folders()
     create_config()
     create_env()
+    create_logs()
 
 
 if __name__ == "__main__":
