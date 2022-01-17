@@ -196,7 +196,7 @@ class NestAPI:
             else:
                 raise
 
-    def _get(self, url="/"):
+    def _get(self, url="/", wait: float = 2.0):
         """
         Use the token to request the provided URL.
         """
@@ -217,6 +217,7 @@ class NestAPI:
         elif response.status_code == 429:
             raise RateLimitExceeded(response)
 
+        time.sleep(wait)
         return response.json()
 
     def put(self, url, payload, request_auth=True):
@@ -233,7 +234,7 @@ class NestAPI:
             else:
                 raise
 
-    def _put(self, url, payload):
+    def _put(self, url, payload, wait: float = 2.0):
         """
         Use the token to `put` the payload to the provided URL.
         """
@@ -266,6 +267,8 @@ class NestAPI:
             raise APIError(response)
 
         response.raise_for_status()
+
+        time.sleep(wait)
         return response.json()
 
     def show(self, request_auth=True):
@@ -303,7 +306,7 @@ class NestAPI:
         url = f"/structures/{structure.structure_id}"
         return self.put(url, payload)
 
-    def set_temperature(self, structure, temp_f, force=False):
+    def set_temperature(self, structure, temp_f: int, force=False):
 
         thermostats = self._get_structure_thermostats(structure)
         bad_thermostats = [t for t in thermostats if t.target_temperature_f != temp_f]
@@ -378,10 +381,9 @@ class NestAPI:
 
         self.set_away(structure, "home")
         if is_winter():
+            temp_f = int(self.project_settings.get("nest.winter-home-temp", 60))
             self.set_hvac_mode(structure, "heat")
-            self.set_temperature(
-                structure, self.project_settings.get("winter-home-temp")
-            )
+            self.set_temperature(structure, temp_f, force=True)
         else:
             self.set_hvac_mode(structure, "__previous_hvac_mode__")
 
