@@ -49,7 +49,7 @@ class Formatter(logging.Formatter):
 
     def converter(self, timestamp):
         dt = arrow.get(timestamp)
-        return dt.to("local")
+        return dt.to(self._timezone)
 
     def formatTime(self, record, datefmt=None):
         dt = self.converter(record.created)

@@ -10,7 +10,7 @@ if settings.get("general.use-logfile"):
     logfile = APP_LOG
 
 init_logger(
-    timezone=settings.get("gcal.timezone", "UTC"),
+    timezone=settings.get("calendar.timezone", "UTC"),
     logfile=logfile,
     logfile_mode="a",
     logfile_level=logging.DEBUG,

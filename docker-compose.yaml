@@ -15,4 +15,4 @@ services:
             - ".secrets/tokens:/usr/src/app/tokens"
             - ".secrets/logs:/usr/src/app/logs"
         build: .
-        command: ["service", "both", "--poll", "1", "--once"]
+        command: ["service", "both", "--once"]
