@@ -9,6 +9,7 @@ import json
 import os
 import time
 from typing import List
+import operator
 
 import requests
 
@@ -306,10 +307,12 @@ class NestAPI:
         url = f"/structures/{structure.structure_id}"
         return self.put(url, payload)
 
-    def set_temperature(self, structure, temp_f: int, force=False):
+    def set_temperature(self, structure, temp_f: int, comparison=operator.ne):
 
         thermostats = self._get_structure_thermostats(structure)
-        bad_thermostats = [t for t in thermostats if t.target_temperature_f != temp_f]
+        bad_thermostats = [
+            t for t in thermostats if comparison(t.target_temperature_f, temp_f)
+        ]
 
         for thermostat in bad_thermostats:
             payload = {"target_temperature_f": temp_f}
@@ -383,7 +386,7 @@ class NestAPI:
         if is_winter():
             temp_f = int(self.project_settings.get("nest.winter-home-temp", 60))
             self.set_hvac_mode(structure, "heat")
-            self.set_temperature(structure, temp_f, force=True)
+            self.set_temperature(structure, temp_f, comparison=operator.lt)
         else:
             self.set_hvac_mode(structure, "__previous_hvac_mode__")
 
