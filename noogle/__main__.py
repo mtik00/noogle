@@ -15,6 +15,7 @@ init_logger(
     logfile_mode="a",
     logfile_level=logging.DEBUG,
     debug=DEBUG,
+    third_party_loggers=["googleapiclient", "oauth2client"],
 )
 
 cli()

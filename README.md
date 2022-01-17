@@ -20,7 +20,7 @@ Noogle is a Python3.7+ project used to control your Nest thermostat through your
 
 See `requirements.txt` for a complete list of Python requirements.
 
-**This service only runs on Python3.7.**
+**This service only runs on Python3.7+**
 
 # Setup
 

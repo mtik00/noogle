@@ -5,20 +5,15 @@ Basic application logger with optional logfile.
 Usage:
     - modify/remove arrow as neccessary
     - modify `shorten_path` if needed
-    - modify/remove 3rd party package loggers
     - call `init_logger()` as soon as possible
     - use `logging.[debug,info,error,etc]` in your modules.
 """
 import logging
 import os
 from pathlib import Path
-from typing import Literal, Optional
+from typing import List, Optional
 
 import arrow
-
-# Fix verbose logging in google api
-logging.getLogger("googleapiclient").setLevel(logging.ERROR)
-logging.getLogger("oauth2client").setLevel(logging.ERROR)
 
 
 def shorten_path(path):
@@ -68,9 +63,14 @@ def init_logger(
     timezone: str,
     logfile: Optional[Path] = None,
     logfile_mode: str = "a",
-    logfile_level: Literal = logging.DEBUG,
+    logfile_level: int = logging.DEBUG,
     debug: bool = False,
+    third_party_loggers: List[str] = [],
 ) -> None:
+
+    for module in third_party_loggers:
+        logging.getLogger(module).setLevel(logging.ERROR)
+
     fmt = Formatter(
         timezone=timezone,
         fmt="%(asctime)s {%(pathname)20s:%(lineno)3s} %(levelname)s: %(message)s",
@@ -83,7 +83,7 @@ def init_logger(
     if debug:
         stream_handler.setLevel(logging.DEBUG)
 
-    handlers = [stream_handler]
+    handlers: List[logging.Handler] = [stream_handler]
 
     if logfile:
         file_handler = logging.FileHandler(logfile, logfile_mode)
