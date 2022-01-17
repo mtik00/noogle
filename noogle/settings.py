@@ -13,13 +13,14 @@ import pkg_resources
 import ruamel.yaml
 
 from .utils import absjoin
+from .helpers import to_bool
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
 __creationDate__ = "05-JUN-2017"
 
 # Globals #####################################################################
-DEBUG = os.environ.get("NOOGLE_DEBUG", False)
+DEBUG = to_bool(os.environ.get("NOOGLE_DEBUG", False))
 
 _SETTINGS = None
 SETTINGS_FILENAME = "noogle.ini"

@@ -6,6 +6,7 @@ This modules holds common project functions.
 
 # Imports #####################################################################
 import logging
+from typing import Any
 from datetime import timedelta
 
 import arrow
@@ -17,7 +18,6 @@ __creationDate__ = "20-JUN-2017"
 __license__ = "Proprietary"
 
 
-# Globals #####################################################################
 def print_log(message, nl=True, log_level=logging.DEBUG, force_print=False):
     ctx = click.get_current_context()
 
@@ -33,3 +33,12 @@ def format_future_time(minutes=0, seconds=0):
         .strftime("%d-%b-%Y %I:%M %p %Z")
         .upper()
     )
+
+
+def to_bool(obj: Any) -> bool:
+    if isinstance(obj, bool):
+        return obj
+    elif isinstance(obj, int):
+        return obj != 0
+    else:
+        return str(obj)[0].lower() in ["y", "1", "t"]
