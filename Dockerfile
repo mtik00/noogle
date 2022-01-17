@@ -1,4 +1,4 @@
-FROM python:3.10.1-buster as compile
+FROM python:3.10-buster as compile
 
 WORKDIR /usr/src/app
 
@@ -19,7 +19,7 @@ RUN python -m pip uninstall --yes --no-input poetry virtualenv
 #     echo "alias ll='ls -alh'" >> /root/.bashrc
 
 ###############################################################################
-FROM python:3.10.1-slim-buster
+FROM python:3.10-slim-buster
 ARG  APP_USERID=9000
 
 ENV PYTHONUNBUFFERED=1 \
