@@ -17,7 +17,6 @@ from sqlalchemy import and_
 from ..db import session
 from ..gcal import get_next_gcal_events
 from ..helpers import format_future_time, print_log
-from ..logger import clear_logger, get_logger
 from ..mailgun import send_message
 from ..models import Event, State
 from ..nest import NestAPI
@@ -114,11 +113,6 @@ def gcal(poll, quiet, once: bool = False):
 
     poll *= 60
 
-    if get_settings().get("general.use-logfile"):
-        logpath = GCAL_LOG
-        clear_logger()
-        ctx.obj.logger = get_logger(logfile_path=logpath)
-
     while True:
         # Grab the next 10 events
         check_gcal()
@@ -144,10 +138,11 @@ def check_nest() -> None:
         and (arrow.get(event.scheduled_date) <= arrow.now())
     ]
 
-    api = None
-    if events:
-        print_log("NEST: %d events waiting..." % len(events), nl=False)
-        api = NestAPI()
+    if not events:
+        return
+
+    print_log("NEST: %d events waiting..." % len(events), nl=False)
+    api = NestAPI()
 
     for event in events:
         text_lines.append(f"NEST:...doing {event}")
@@ -192,12 +187,6 @@ def nest(poll, quiet, once: bool = False):
 
     poll *= 60
 
-    if get_settings().get("general.use-logfile"):
-        logpath = NEST_LOG
-
-        clear_logger()
-        ctx.obj.logger = get_logger(logfile_path=logpath)
-
     while True:
         check_nest()
 
@@ -222,12 +211,6 @@ def both(poll, quiet, once: bool = False):
         print_log("noogle: Starting service", force_print=True)
 
     poll *= 60
-
-    if get_settings().get("general.use-logfile"):
-        logpath = APP_LOG
-
-        clear_logger()
-        ctx.obj.logger = get_logger(logfile_path=logpath)
 
     while True:
         check_gcal()

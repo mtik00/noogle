@@ -1,80 +1,94 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """
-This module holds the single logging object for the project.
-"""
+Basic application logger with optional logfile.
 
-# Imports #####################################################################
-import os
+Usage:
+    - modify/remove arrow as neccessary
+    - modify `shorten_path` if needed
+    - modify/remove 3rd party package loggers
+    - call `init_logger()` as soon as possible
+    - use `logging.[debug,info,error,etc]` in your modules.
+"""
 import logging
+import os
+from pathlib import Path
+from typing import Literal, Optional
 
-# from .settings import settings
+import arrow
 
-# Metadata ####################################################################
-__author__ = "Timothy McFadden"
-__creationDate__ = "08-JUN-2017"
-
-
-# Globals #####################################################################
-LOGGER = None
-
-# Fix verbose error in google api
-logging.getLogger("googleapiclient.discovery_cache").setLevel(logging.ERROR)
+# Fix verbose logging in google api
+logging.getLogger("googleapiclient").setLevel(logging.ERROR)
+logging.getLogger("oauth2client").setLevel(logging.ERROR)
 
 
-def clear_logger():
+def shorten_path(path):
     """
-    Removes the current logger.  You must call `get_logger` again!
+    This seems like a pretty bad idea, but I'm doing it anyway.
+    I want to convert an asbolute path to a kind of module-relative path.
+
+    Something like:
+        /usr/src/app/free_game_notifier/notifier/slack.py
+    would be shortend to:
+        notifier/slack.py
     """
-    global LOGGER
-    LOGGER = None
+    base, _ = os.path.split(__file__)
+    return path.replace(base + os.path.sep, "")
 
 
-def get_logger(
-    name=None,
-    screen_level=logging.INFO,
-    logfile_path=None,
-    logfile_level=logging.DEBUG,
-    logfile_mode="a",
-):
-    """Returns a logging object.
+class Formatter(logging.Formatter):
+    """override logging.Formatter to use an aware datetime object"""
 
-    You should use the parameterized function once to initialize
-    the logger.  Subsequent calls should use ``get_logger()`` to
-    use the common logging object.
+    def __init__(self, timezone, *args, **kwargs):
+        self._timezone = timezone
+        super().__init__(*args, **kwargs)
 
-    :param str name: The name of the logger; defaults to the script name
-    :param int screen_level: The level of the screen logger
-    :param str logfile_path: The path of the log file, if any
-    :param int logfile_level: The level of the file logger
-    :param str logfile_mode: The file mode of the file logger
+    def format(self, record):
+        """shorten the absolute path"""
+        record.pathname = shorten_path(record.pathname)
+        return super().format(record)
 
-    :rtype: logging.logger
-    :returns: A common logger for a project
-    """
-    global LOGGER
-    if LOGGER:
-        return LOGGER
+    def converter(self, timestamp):
+        dt = arrow.get(timestamp)
+        return dt.to("local")
 
-    name = name or os.path.splitext(os.path.basename(__file__))[0]
+    def formatTime(self, record, datefmt=None):
+        dt = self.converter(record.created)
+        if datefmt:
+            s = dt.strftime(datefmt)
+        else:
+            s = dt.isoformat()
+        return s
 
-    _format = "%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s"
 
-    _logger = logging.getLogger(name)
-    _logger.setLevel(logging.DEBUG)
+def set_root_level(level):
+    logging.getLogger().setLevel(level)
 
-    console_handler = logging.StreamHandler()
-    screen_formatter = logging.Formatter(_format)
-    console_handler.setFormatter(screen_formatter)
-    console_handler.setLevel(screen_level)
-    _logger.addHandler(console_handler)
 
-    if logfile_path:
-        logfile_formatter = logging.Formatter(_format)
-        file_handler = logging.FileHandler(logfile_path, logfile_mode)
+def init_logger(
+    timezone: str,
+    logfile: Optional[Path] = None,
+    logfile_mode: str = "a",
+    logfile_level: Literal = logging.DEBUG,
+    debug: bool = False,
+) -> None:
+    fmt = Formatter(
+        timezone=timezone,
+        fmt="%(asctime)s {%(pathname)20s:%(lineno)3s} %(levelname)s: %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S %Z",
+    )
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(fmt)
+
+    stream_handler.setLevel(logging.INFO)
+    if debug:
+        stream_handler.setLevel(logging.DEBUG)
+
+    handlers = [stream_handler]
+
+    if logfile:
+        file_handler = logging.FileHandler(logfile, logfile_mode)
         file_handler.setLevel(logfile_level)
-        file_handler.setFormatter(logfile_formatter)
-        _logger.addHandler(file_handler)
+        file_handler.setFormatter(fmt)
+        handlers.append(file_handler)
 
-    LOGGER = _logger
-    return _logger
+    logging.basicConfig(level=logging.DEBUG, handlers=handlers)
