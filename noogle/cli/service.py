@@ -20,8 +20,8 @@ from ..helpers import format_future_time, print_log
 from ..mailgun import send_message
 from ..models import Event, State
 from ..nest import NestAPI
-from ..settings import DEBUG, GCAL_LOG, NEST_LOG, get_settings, APP_LOG
-from ..utils import absjoin, get_scheduled_date
+from ..settings import DEBUG
+from ..utils import get_scheduled_date
 
 # Globals #####################################################################
 inflect_engine = inflect.engine()
@@ -59,7 +59,7 @@ def check_gcal() -> None:
                 # The event has already been completed
                 continue
 
-            message = f"GCAL: caching new event:\n" + pformat(event)
+            message = "GCAL: caching new event:\n" + pformat(event)
             print_log(message)
             text_lines.append(message)
             Event.create_from_gcal(event)
@@ -77,7 +77,7 @@ def check_gcal() -> None:
         )
 
     for event in removed_events:
-        message = f"GCAL: marking missing event:\n" + pformat(repr(event))
+        message = "GCAL: marking missing event:\n" + pformat(repr(event))
         text_lines.append(message)
         print_log(message)
         event.mark_event_missing()
@@ -153,6 +153,7 @@ def check_nest() -> None:
             event.mark_event_done()
             text_lines.append("NEST: ......done")
         except Exception as e:
+            logging.exception(e)
             text_lines.append(str(e))
             text_lines.append(traceback.format_exc())
 

@@ -229,7 +229,7 @@ class NestAPI:
         except Unauthorized:
             if request_auth:
                 self._get_access_token()
-                return self._put(url, payload)
+                return self._put(url, payload, request_auth=False)
             else:
                 raise
 
@@ -262,7 +262,10 @@ class NestAPI:
             raise Unauthorized(response)
         elif response.status_code == 429:
             raise RateLimitExceeded(response)
+        elif response.status_code >= 400:
+            raise APIError(response)
 
+        response.raise_for_status()
         return response.json()
 
     def show(self, request_auth=True):
