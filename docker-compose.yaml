@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-    gcal:
+    noogle:
         image: mtik00/noogle:latest
         env_file: .env
         environment:
@@ -15,23 +15,4 @@ services:
             - ".secrets/tokens:/usr/src/app/tokens"
             - ".secrets/logs:/usr/src/app/logs"
         build: .
-        # command: ["service", "gcal", "--poll", "5"]
-        command: ["service", "gcal", "--once"]
-
-    nest:
-        image: mtik00/noogle:latest
-        env_file: .env
-        environment:
-            - NEST_PRODUCT_ID
-            - NEST_PRODUCT_SECRET
-            - CONFIG_FOLDER=/usr/src/app
-            - LOG_FILE_DIRECTORY=/usr/src/app/logs
-            # - NOOGLE_DEBUG=1
-        volumes:
-            - ".secrets/config:/usr/src/app/config"
-            - ".secrets/data:/usr/src/app/data"
-            - ".secrets/tokens:/usr/src/app/tokens"
-            - ".secrets/logs:/usr/src/app/logs"
-        build: .
-        # command: ["service", "nest", "--poll", "5"]
-        command: ["service", "nest", "--once"]
+        command: ["service", "both", "--poll", "1", "--once"]

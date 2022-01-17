@@ -53,6 +53,7 @@ LOG_FILE_DIRECTORY = os.environ.get(
 )
 GCAL_LOG = absjoin(LOG_FILE_DIRECTORY, "gcal.log")
 NEST_LOG = absjoin(LOG_FILE_DIRECTORY, "nest.log")
+APP_LOG = absjoin(LOG_FILE_DIRECTORY, "noogle.log")
 
 
 def get_settings():
