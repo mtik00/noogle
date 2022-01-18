@@ -9,13 +9,14 @@
 This module holds the cli `show` commands
 """
 
-# Imports #####################################################################
-import click
 import arrow
 
-from ..nest import NestAPI
+# Imports #####################################################################
+import click
+
 from ..helpers import print_log
 from ..models import Event, State
+from ..nest import NestAPI
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -63,10 +64,11 @@ def events(max_events, removed):
         print_log("--- no events found")
         return
 
+    timezone = ctx.project_settings.get("calendar.timezone", "UTC")
     for event in events.order_by(Event.scheduled_date):
         print_log(
-            "{:<19s}({:^9}) {}".format(
-                event.scheduled_date.to("local").format("YYYY-MM-DD h:mmA"),
+            "{:<20s}({:^9}) {}".format(
+                event.scheduled_date.to(timezone).format("YYYY-MM-DD hh:mm A"),
                 event.state,
                 event.name,
             )
