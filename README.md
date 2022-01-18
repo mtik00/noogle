@@ -75,6 +75,23 @@ This app is set up in a way that really only works within a virtual environment.
 
 **NOTE**: If you change the permissions through the Nest API, you must delete `${SECRETS_FOLDER}/tokens/nest-token.json` and re-run `noogle setup nest`.
 
+# Docker / docker-compose
+
+You can build and run the service using `docker-compose`.
+
+For example:
+```
+/usr/local/bin/docker-compose pull && \
+/usr/local/bin/docker-compose run --rm --user 1000 noogle service both --poll 5
+ ```
+
+or run it on a cron schedule:
+```
+*/5 * * * * cd /home/ubuntu/code/noogle && /usr/local/bin/docker-compose run --rm --user 1000 noogle service both --once
+```
+
+NOTE: ymmv: `sudo setfacl --modify user:<user name or ID>:rw /var/run/docker.sock`
+
 # Configuration
 
 This application makes use of configuration files to store your specific
