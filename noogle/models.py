@@ -169,3 +169,12 @@ class Event(Base):
         self.state = State.complete
         session.add(self)
         session.commit()
+
+    def commit(self):
+        try:
+            session.add(self)
+            session.commit()
+            return True
+        except IntegrityError:
+            session.rollback()
+            raise
