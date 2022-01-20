@@ -57,6 +57,12 @@ NEST_LOG = absjoin(LOG_FILE_DIRECTORY, "nest.log")
 APP_LOG = absjoin(LOG_FILE_DIRECTORY, "noogle.log")
 
 
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    db_path = os.path.join(DATA_FOLDER, "noogle.sqlite3")
+    DATABASE_URL = f"sqlite:///{db_path}"
+
+
 def get_settings():
     """
     Return, or create and return, the settings object.

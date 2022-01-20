@@ -1,15 +1,13 @@
 #!/usr/bin/env python3.7
-import os
+
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from .settings import DATA_FOLDER
+from .settings import DATABASE_URL
 
-db_path = os.path.join(DATA_FOLDER, "noogle.sqlite3")
-
-engine = create_engine(f"sqlite:///{db_path}")
+engine = create_engine(DATABASE_URL)
 Base: DeclarativeMeta = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
