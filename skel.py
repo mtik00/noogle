@@ -79,8 +79,9 @@ def create_config() -> None:
         "...enter the name of the thermostat to control (optional): "
     )
     nest_eco_temperature = input("...enter the eco temperature [50]: ") or "50"
-    nest_winter_home_temperature = (
-        input("...enter the temperature to set when 'home' in winter [65]: ") or "65"
+    nest_winter_home_min_temperature = (
+        input("...enter the minimum temperature to set when 'home' in winter [65]: ")
+        or "65"
     )
     nest_max_hold = (
         input("...enter the maximum number of days for 'nest:home' (optional): ") or ""
@@ -109,7 +110,7 @@ def create_config() -> None:
         nest_structure=nest_structure,
         nest_thermostat=nest_thermostat,
         nest_eco_temperature=nest_eco_temperature,
-        nest_winter_home_temperature=nest_winter_home_temperature,
+        nest_winter_home_min_temperature=nest_winter_home_min_temperature,
         nest_max_hold=nest_max_hold,
         gcal_calendar_id=gcal_calendar_id,
         default_home_time=default_home_time,

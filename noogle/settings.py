@@ -82,7 +82,7 @@ class Settings(object):
             "product-id": None,
             "product-secret": None,
             "access-token": None,
-            "winter-home-temp": 65,
+            "winter-home-min-temp": 65,
         },
         "calendar": {
             "name": "primary",
@@ -193,9 +193,9 @@ class Settings(object):
             nest_eco_temperature=""
             if self.settings["nest"]["eco-temperature"] is None
             else self.settings["nest"]["eco-temperature"],
-            nest_winter_home_temperature=""
-            if self.settings["nest"]["winter-home-temp"] is None
-            else self.settings["nest"]["winter-home-temp"],
+            nest_winter_home_min_temperature=""
+            if self.settings["nest"]["winter-home-min-temp"] is None
+            else self.settings["nest"]["winter-home-min-temp"],
             nest_max_hold=""
             if self.settings["nest"]["maximum-hold-days"] is None
             else self.settings["nest"]["maximum-hold-days"],
