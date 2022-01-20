@@ -7,14 +7,12 @@ line.
 # pylint:disable=W0212
 
 # Imports #####################################################################
-from pathlib import Path
-import logging
 import click
 
 from .. import __version__ as library_version
-from ..cache import Cache
+
 from ..db import session
-from ..settings import LOG_FILE_DIRECTORY, get_settings
+from ..settings import get_settings
 from .dev import dev
 from .init import init
 from .logs import logs
@@ -48,11 +46,6 @@ class Ctx(object):
         self.quiet = False
         self.napi = None
         self.debug = False
-        self.cache = Cache()
-
-        logfile = None
-        if self.project_settings.get("general.use-logfile"):
-            logfile = Path(LOG_FILE_DIRECTORY, "noogle.log")
 
 
 CTX = click.make_pass_decorator(Ctx, ensure=True)

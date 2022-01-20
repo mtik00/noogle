@@ -1,10 +1,5 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-###############################################################################
-#                                                                             #
-#  Copyright (C) 2017 Broadcom Ltd.  All rights reserved.                     #
-#                                                                             #
-###############################################################################
 """
 This module holds the cli `main` command
 """
@@ -30,27 +25,19 @@ def go():
     """
     ctx = click.get_current_context().obj
 
-    # get new events
-    # put them in cache, if they aren't there already
-    # see if we need to do anything
-    # do it!
-    # click.clear()
-    # ctx.logger.fatal("doh!")
-
     # Grab the next 10 events
     print_log("Reading events from Google calendar...", nl=False)
     q_filter = "nestd" if ctx.debug else "nest"
     my_events = get_next_gcal_events(max_results=10, q_filter=q_filter)
     print_log("...done")
 
-    my_events = [Event.create_from_gcal(x) for x in my_events]
-    ctx.cache.add_if_not_exists(ctx, my_events)
+    my_events = [Event.create_from_gcal(x, commit=False) for x in my_events]
 
     for event in my_events:
-        if not ctx.cache.exists(event.event_id):
+        if not Event.exists(event.event_id, event.scheduled_date):
             print_log("caching new event: {0}".format(event))
-            ctx.cache.add_event(event)
+            event.commit()
 
     # Get all events that haven't been actioned
-    my_events = [x for x in ctx.cache.waiting()]
-    print_log(my_events)
+    waiting_events = Event.waiting()
+    print_log(waiting_events)

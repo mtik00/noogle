@@ -114,17 +114,3 @@ def settings():
     ctx.project_settings.make_user_settings()
     print_log("...done")
     print_log("...settings file at: %s" % ctx.project_settings._user_path)
-
-
-@init.command()
-@click.confirmation_option(prompt="Are you sure you want to clear the cache?")
-def cache():
-    """
-    Clears the cache
-    """
-    ctx = click.get_current_context().obj
-
-    print_log("Initializing cache...", nl=False)
-    ctx.cache.init()
-    print_log("...done")
-    print_log("...cache file at: %s" % ctx.cache.default_path)
