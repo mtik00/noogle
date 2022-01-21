@@ -18,6 +18,35 @@ def create_folders() -> None:
 
 
 def create_env() -> None:
+    path = Path(".env")
+    if not path.exists():
+        path.write_text(
+            (
+                "NOOGLE_GENERAL__USE_LOGFILE=\n"
+                "\n"
+                "NOOGLE_NEST__STRUCTURE=\n"
+                "NOOGLE_NEST__ECO_TEMPERATURE=\n"
+                "NOOGLE_NEST__PRODUCT_ID=\n"
+                "NOOGLE_NEST__PRODUCT_SECRET=\n"
+                "NOOGLE_NEST__WINTER_HOME_MIN_TEMP=\n"
+                "\n"
+                "NOOGLE_CALENDAR__NAME=\n"
+                "NOOGLE_CALENDAR__DEFAULT_HOME_TIME=\n"
+                "NOOGLE_CALENDAR__DEFAULT_AWAY_TIME=\n"
+                "NOOGLE_CALENDAR__LOOKBACK=\n"
+                "NOOGLE_CALENDAR__TIMEZONE=\n"
+                "\n"
+                "NOOGLE_MAILGUN__API_KEY=\n"
+                "NOOGLE_MAILGUN__DOMAIN_NAME=\n"
+                "NOOGLE_MAILGUN__FROM_ADDRESS=\n"
+                "NOOGLE_MAILGUN__TO_ADDRESS=\n"
+                "\n"
+                "NOOGLE_DATABASE__URI=\n"
+            )
+        )
+
+
+def create_env_sh() -> None:
     path = Path(".secrets", "env.sh")
     if not path.exists():
         path.write_text(
@@ -128,6 +157,7 @@ def create_config() -> None:
 def main():
     create_folders()
     create_config()
+    create_env_sh()
     create_env()
     create_logs()
     set_permissions()

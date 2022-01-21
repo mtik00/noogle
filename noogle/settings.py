@@ -6,7 +6,7 @@ This module holds the interface to the application settings.
 from datetime import time
 from typing import Optional
 
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel, BaseSettings, SecretStr
 
 # Imports #####################################################################
 import os
@@ -23,8 +23,8 @@ from .utils import absjoin
 class Nest(BaseModel):
     eco_temperature: int = 50
     maximum_hold_days: int = 10
-    product_id: str
-    product_secret: str
+    product_id: SecretStr
+    product_secret: SecretStr
     structure: str
     thermostat: Optional[str]
     winter_home_min_temp: int = 65
@@ -43,10 +43,23 @@ class General(BaseModel):
     use_logfile: bool = True
 
 
+class Mailgun(BaseModel):
+    api_key: SecretStr
+    domain_name: str
+    from_address: str
+    to_address: str
+
+
+class Database(BaseModel):
+    uri: Optional[SecretStr]
+
+
 class NewSettings(BaseSettings):
     general: General
     nest: Nest
     calendar: Calendar
+    mailgun: Mailgun
+    database: Database = Database()
 
     class Config:
         env_prefix = "noogle_"
