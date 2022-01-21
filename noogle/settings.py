@@ -3,6 +3,10 @@
 """
 This module holds the interface to the application settings.
 """
+from datetime import time
+from typing import Optional
+
+from pydantic import BaseModel, BaseSettings
 
 # Imports #####################################################################
 import os
@@ -12,12 +16,43 @@ from configparser import ConfigParser
 import pkg_resources
 import ruamel.yaml
 
-from .utils import absjoin
 from .helpers import to_bool
+from .utils import absjoin
 
-# Metadata ####################################################################
-__author__ = "Timothy McFadden"
-__creationDate__ = "05-JUN-2017"
+
+class Nest(BaseModel):
+    eco_temperature: int = 50
+    maximum_hold_days: int = 10
+    product_id: str
+    product_secret: str
+    structure: str
+    thermostat: Optional[str]
+    winter_home_min_temp: int = 65
+
+
+class Calendar(BaseModel):
+    name: str = "primary"
+    default_home_time: time = "9:00"
+    default_away_time: time = "19:00"
+    lookback: int = 2
+    timezone: str = "MST"
+
+
+class General(BaseModel):
+    debug: bool = False
+    use_logfile: bool = True
+
+
+class NewSettings(BaseSettings):
+    general: General
+    nest: Nest
+    calendar: Calendar
+
+    class Config:
+        env_prefix = "noogle_"
+        env_file = ".env"
+        env_nested_delimiter = "__"
+
 
 # Globals #####################################################################
 DEBUG = to_bool(os.environ.get("NOOGLE_DEBUG", False))
