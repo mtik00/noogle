@@ -10,6 +10,7 @@ import click
 from ..helpers import print_log
 from ..models import Action, Event, State
 from ..nest import NestAPI
+from ..settings import settings
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -67,7 +68,7 @@ def events():
     """Sets the states of cached events"""
     ctx = click.get_current_context().obj
 
-    lookback = ctx.project_settings.get("calendar.lookback") or 0
+    lookback = settings.calendar.lookback
 
     since = (
         arrow.now()

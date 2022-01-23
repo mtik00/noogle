@@ -17,6 +17,7 @@ import click
 from ..helpers import print_log
 from ..models import Event, State
 from ..nest import NestAPI
+from ..settings import settings
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -46,7 +47,7 @@ def events(max_events, removed):
     """Display the next events from Google calendar"""
     ctx = click.get_current_context().obj
 
-    lookback = ctx.project_settings.get("calendar.lookback") or 0
+    lookback = settings.calendar.lookback
     since = (
         arrow.now()
         .replace(hour=0, minute=0, second=0, microsecond=0)
@@ -64,7 +65,7 @@ def events(max_events, removed):
         print_log("--- no events found")
         return
 
-    timezone = ctx.project_settings.get("calendar.timezone", "UTC")
+    timezone = settings.calendar.timezone
     for event in events.order_by(Event.scheduled_date):
         print_log(
             "{:<20s}({:^9}) {}".format(
@@ -106,7 +107,7 @@ def away():
     ctx = click.get_current_context().obj
     napi = NestAPI()
 
-    structure_name = ctx.project_settings.get("nest.structure")
+    structure_name = settings.nest.structure
     structure = next((x for x in napi.structures if x.name == structure_name))
 
     print_log("Structure: %s" % structure.name)

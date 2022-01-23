@@ -2,23 +2,41 @@
 # -*- coding: utf-8 -*-
 """
 """
-import os
+from typing import Optional
+
 import requests
+from pydantic import SecretStr
 
-domain = os.environ.get("MAILGUN_DOMAIN_NAME", 'mailgun-domain-name')
-mailgun_api_key = os.environ.get("MAILGUN_API_KEY", "mailgun-api-key")
-mailgun_url = f"https://api.mailgun.net/v3/{domain}/messages"
-from_address = os.environ.get("MAILGUN_FROM", f"noogle@{domain}")
-to_address = os.environ.get("MAILGUN_TO", 'mailgun-to')
+from .settings import settings
 
 
-def send_message(subject="Notification from noogle", text=None, html=None):
+def send_message(
+    subject: str = "Notification from noogle",
+    text: str = None,
+    html: str = None,
+    domain: str = None,
+    api_key: Optional[SecretStr] = None,
+    to_address: str = None,
+    from_address: str = None,
+):
     if not (text or html):
         raise ValueError("Must pass both/either of `text` and `html`")
 
-    auth = ("api", mailgun_api_key)
-    data = {
-        "from": from_address, "to": [to_address], "subject": subject,
-        "text": text, "html": html}
+    domain = domain or settings.mailgun.domain_name
+    api_key = api_key or settings.mailgun.api_key
+    to_address = to_address or settings.mailgun.to_address
+    from_address = from_address or settings.mailgun.from_address
 
-    return requests.post(mailgun_url, auth=auth, data=data)
+    data = {
+        "from": from_address,
+        "to": [to_address],
+        "subject": subject,
+        "text": text,
+        "html": html,
+    }
+
+    auth = ("api", api_key.get_secret_value())
+    mailgun_url = f"https://api.mailgun.net/v3/{domain}/messages"
+    response = requests.post(mailgun_url, auth=auth, data=data)
+    response.raise_for_status()
+    return response

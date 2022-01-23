@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from .db import Base, session
 import arrow
-from .settings import get_settings
+from .settings import settings
 from .utils import get_scheduled_date
 from .helpers import print_log
 
@@ -98,16 +98,17 @@ class Event(Base):
         if "date" in gcal_event["start"]:
             # The user has an "all day" event in gcal.
             default_time = (
-                get_settings().get("calendar.default-home-time")
+                settings.calendar.default_home_time
                 if e.action.value == Action.home
-                else get_settings().get("calendar.default-away-time")
+                else settings.calendar.default_away_time
             )
+
             e.scheduled_date = arrow.get(
                 gcal_event["start"]["date"]
                 + " "
                 + default_time
                 + " "
-                + get_settings().get("calendar.timezone", "MST"),
+                + settings.calendar.timezone,
                 "YYYY-MM-DD H:mm ZZZ",
             )
         else:

@@ -12,7 +12,6 @@ import click
 from .. import __version__ as library_version
 
 from ..db import session
-from ..settings import get_settings
 from .dev import dev
 from .init import init
 from .logs import logs
@@ -41,7 +40,6 @@ class Ctx(object):
     """The context object"""
 
     def __init__(self):
-        self.project_settings = get_settings()
         self.session = None
         self.quiet = False
         self.napi = None
