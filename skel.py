@@ -7,11 +7,15 @@ from pathlib import Path
 
 
 def create_folders() -> None:
-    if not Path(".secrets").exists():
-        Path(".secrets").mkdir()
+    secrets = Path(".secrets")
+
+    if not secrets.exists():
+        secrets.mkdir(parents=True)
+
+    secrets.chmod(0o700)
 
     for d in ["config", "data", "tokens", "logs"]:
-        path = Path(".secrets") / d
+        path = secrets / d
         if not path.exists():
             print("Creating", str(path))
             path.mkdir()
