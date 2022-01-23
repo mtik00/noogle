@@ -18,35 +18,11 @@ def create_folders() -> None:
 
 
 def create_env() -> None:
+    template = Path("noogle", "cli", "dev", "templates", ".env").read_text()
     for path in [Path(".env"), Path(".secrets", ".env")]:
         if not path.exists():
             print("Creating", path.resolve())
-            path.write_text(
-                (
-                    "NOOGLE_GENERAL__DEBUG=True\n"
-                    "\n"
-                    "NOOGLE_LOGGING__LOGFILE=\n"
-                    "\n"
-                    "NOOGLE_NEST__STRUCTURE=\n"
-                    "NOOGLE_NEST__ECO_TEMPERATURE=50\n"
-                    "NOOGLE_NEST__PRODUCT_ID=\n"
-                    "NOOGLE_NEST__PRODUCT_SECRET=\n"
-                    "NOOGLE_NEST__WINTER_HOME_MIN_TEMP=65\n"
-                    "\n"
-                    "NOOGLE_CALENDAR__NAME=primary\n"
-                    "NOOGLE_CALENDAR__DEFAULT_HOME_TIME=06:00\n"
-                    "NOOGLE_CALENDAR__DEFAULT_AWAY_TIME=18:00\n"
-                    "NOOGLE_CALENDAR__LOOKBACK=2\n"
-                    "NOOGLE_CALENDAR__TIMEZONE=\n"
-                    "\n"
-                    "NOOGLE_MAILGUN__API_KEY=\n"
-                    "NOOGLE_MAILGUN__DOMAIN_NAME=\n"
-                    "NOOGLE_MAILGUN__FROM_ADDRESS=\n"
-                    "NOOGLE_MAILGUN__TO_ADDRESS=\n"
-                    "\n"
-                    "NOOGLE_DATABASE__URI=sqlite:////<thisdir>/.secrets/data/noogle.sqlite3\n"
-                )
-            )
+            path.write_text(template)
 
 
 def create_logs() -> None:
