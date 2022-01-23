@@ -73,6 +73,10 @@ python -m noogle init db
 
 You can build and run the service using `docker-compose`.
 
+It's "best" to run docker as your user to keep the permissions in the bind mounts.  We're using `1000` here.  You can find your user ID by running `echo $UID` in your shell.
+
+NOTE: Normally `$UID` isn't an actual environment variable.  You probably can't use `$UID` in your `docker-compose run` command.
+
 For example:
 ```
 /usr/local/bin/docker-compose pull && \
