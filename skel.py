@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os
+import shutil
 import subprocess
 import sys
 from getpass import getuser
@@ -38,23 +40,22 @@ def create_logs() -> None:
 
 
 def set_permissions() -> None:
+    user_group = getuser()
 
-    if sys.platform == "linux":
-        user = getuser()
-        cmd = ["sudo", "chown", "-R", f"{user}:{user}", ".secrets"]
-        subprocess.check_output(cmd, stdin=subprocess.PIPE)
+    base = Path(".secrets")
+    base.chmod(0o700)
+    shutil.chown(base, user_group, user_group)
 
-    for file in Path(".secrets", "logs").glob("*.log"):
-        file.chmod(0o600)
+    for root, dirs, files in os.walk(base, topdown=False):
+        for name in files:
+            f = Path(root, name)
+            f.chmod(0o600)
+            shutil.chown(f, user_group, user_group)
 
-    for file in Path(".secrets", "tokens").glob("*.json"):
-        file.chmod(0o600)
-
-    for file in Path(".secrets", "data").glob("*"):
-        file.chmod(0o600)
-
-    for file in Path(".secrets").glob(".env"):
-        file.chmod(0o600)
+        for name in dirs:
+            d = Path(root, name)
+            d.chmod(0o700)
+            shutil.chown(d, user_group, user_group)
 
 
 def main():
