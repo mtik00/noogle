@@ -18,36 +18,30 @@ Noogle is a Python3.7+ project used to control your Nest thermostat through your
 *   Nest Developer Account (free)
 *   Google Developer API Access (free)
 
-See `requirements.txt` for a complete list of Python requirements.
+See `pyproject.toml` for a complete list of Python requirements.
 
 **This service only runs on Python3.7+**
 
 # Setup
 
-In this example, we're going to be storing some credentials and application setup
-in `${SECRETS_FOLDER}/env.bat` (or `${SECRETS_FOLDER}/env.sh` on Linux).
+We're using docker-compose and local files for this setup.  You should clone this repo.  It will make things a lot easier.
 
-This app is set up in a way that really only works within a virtual environment.  The source ships with a `.envrc` that makes life easier.
+After cloning the repo, run this script to create a virtual environment and create the basic folder structure:
+```
+python3 -m venv --copies .venv && \
+source .venv/bin/activate && \
+./.venv/bin/pip install --upgrade pip poetry && \
+./.venv/bin/poetry install && \
+python ./skel.py
+```
+Get your tokens from both Google and Nest an place them in `.secrets/tokens`.
 
-1.  Install `direnv` https://direnv.net/
-1.  Clone the source to some location:  
-    `cd ~ && git clone https://github.com/mtik00/noogle.git`
-1.  Create the virtual environment:  
-    `cd noogle && direnv allow`
-1.  Install `noogle` and its requirements:  
-    `pip install -e .[dev] && pip install -r requirements.txt`
-1.  Create your application files (*TODO)*:
-    `noogle init all`
-1.  Create your Google OAuth credentials
-1.  Create your Nest API OAuth credentials
-1.  Modify your `${SECRETS_FOLDER}/config/deploy.yaml` file (if needed)
-1.  Modify your `${SECRETS_FOLDER}/env.sh` file
-1.  Test Google calendar integration:  
-    `noogle show events`
-1.  Test Nest API calendar integration:
-    `noogle show structures`
-1.  Finally deploy the application:  
-    `python deploy`
+Change the values in `.env` as needed.
+
+Initialize the database with:
+```
+python -m noogle init db
+```
 
 ## Google OAuth 2.0 Setup
 
@@ -94,12 +88,11 @@ NOTE: ymmv: `sudo setfacl --modify user:<user name or ID>:rw /var/run/docker.soc
 
 # Configuration
 
-This application makes use of configuration files to store your specific
-settings.  You should probably create your own configuration file:
+All application configuration is handled by environment variables and an optional _dotenv_ file.
 
-    noogle settings make
+You should have a sample `.env` file that was generated when you ran `python skel.py`.
 
-This will create a file located at `${SECRETS_FOLDER}/config/noogle.ini`.  To change the location of the file, you must set the `SETTINGS_FOLDER` environment variable before making the settings.
+You can read more about how settings work here: https://pydantic-docs.helpmanual.io/usage/settings/
 
 # DSL
 `noogle` depends on events in your calendar with specific text.  All events should be in the form of:
@@ -110,39 +103,10 @@ This will create a file located at `${SECRETS_FOLDER}/config/noogle.ini`.  To ch
 1.  Each part of the command must be separated with a colon (`:`)
 1.  Supported commands are:
     *   `away` : Sets the structure to `away` and the thermostat to `eco`
-    *   `home` : Sets the structure to `home` and the thermostat to the previous mode
+    *   `home` : Sets the structure to `home` and the thermostat to the previous mode (or _heat_ in the winter)
 
 A typical command looks like this: `nest:away:Spring Break!`.  The third field
 is an optional description.
-
-# Services
-There are two service scripts.  One script reads events from your Google calendar, and the other script reads the cache and controls the Nest API.
-
-These two scripts can be run using `circusd` like so:
-
-    circusd circus.ini
-
-# Environment Setup
-## Fabric
-I use *Fabric* to deploy this application to my VPS.  If you are running everything directly on your VPS, you can ignore this section.
-
-`deploy.py` depends on these environment variable being set:
-*   `NOOGLE_APP_HOST`: This is the hostname of where the app will be deployed
-*   `NOOGLE_APP_HOME_FOLDER`: This is the absolute path to the cloned folder.
-*   `NOOGLE_VENV_ACTIVATE_COMMAND`: This is the command you use to activate your virtual environment.  Optional.
-
-## Dirvnev
-This project ships with a `.envrc` file.  This file is read by `Direnv` to control creation of the virtual environment used by the app.
-
-Part of `.envrc` is sourcing `${SECRETS_FOLDER}/env.sh` in order to set up the application variables as needed.  You *must* export the following shell variables:
-*   `NEST_PRODUCT_ID`: Get this from your Nest developer account
-*   `NEST_PRODUCT_SECRET`: Get this from your Nest developer account
-*   `MAILGUN_API_KEY`: Get this from your Mailgun account
-*   `MAILGUN_DOMAIN_NAME`: Get this from your Mailgun account
-*   `MAILGUN_FROM`: The `from` address for the emails sent by the app
-*   `MAILGUN_TO`: The `to` address where emails will be sent
-
-If you are deploying to a different server, also see [Fabric](#Fabric) setup.
 
 # Theory
 Here's how I think this should all work.  The bulk of the logic should be in the calendar service, since we need to figure out upcoming events, deleted events, etc.  The nest service only needs to the check the DB for something to do at that exact moment.
