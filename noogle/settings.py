@@ -40,7 +40,7 @@ class Calendar(BaseModel):
 class General(BaseModel):
     debug: bool = False
     base_config_folder: DirectoryPath
-    token_folder: FilePath
+    token_folder: Optional[FilePath]
 
 
 class Mailgun(BaseModel):

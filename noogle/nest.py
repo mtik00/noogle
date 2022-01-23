@@ -353,7 +353,7 @@ class NestAPI:
         """
         self.load()
 
-        structure_name = self.project_settings.get("nest.structure").lower()
+        structure_name = settings.nest.structure.lower()
         structure = self._get_structure_by_name(structure_name)
 
         if not structure:
@@ -371,7 +371,7 @@ class NestAPI:
         """
         self.load()
 
-        structure_name = self.project_settings.get("nest.structure").lower()
+        structure_name = settings.nest.structure.lower()
         structure = self._get_structure_by_name(structure_name)
 
         if not structure:
@@ -379,7 +379,7 @@ class NestAPI:
 
         self.set_away(structure, "home")
         if is_winter():
-            temp_f = int(self.project_settings.get("nest.winter-home-min-temp", 60))
+            temp_f = settings.nest.winter_home_min_temp
             self.set_hvac_mode(structure, "heat")
             self.set_temperature(structure, temp_f, comparison=operator.lt)
         else:
@@ -392,7 +392,7 @@ class NestAPI:
         errors = []
 
         self.load(force=force_load)
-        structure_name = self.project_settings.get("nest.structure").lower()
+        structure_name = settings.nest.structure.lower()
         structure = self._get_structure_by_name(structure_name)
 
         if action.value == Action.home.value:
