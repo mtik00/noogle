@@ -44,7 +44,7 @@ def create_env() -> None:
                     "NOOGLE_MAILGUN__FROM_ADDRESS=\n"
                     "NOOGLE_MAILGUN__TO_ADDRESS=\n"
                     "\n"
-                    "NOOGLE_DATABASE__URI=sqlite:///.secrets/data/noogle.sqlite3\n"
+                    "NOOGLE_DATABASE__URI=sqlite:////<thisdir>/.secrets/data/noogle.sqlite3\n"
                 )
             )
 
