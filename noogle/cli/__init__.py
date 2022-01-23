@@ -12,7 +12,6 @@ import click
 from .. import __version__ as library_version
 
 from ..db import session
-from .dev import dev
 from .init import init
 from .logs import logs
 from .main import go
@@ -69,6 +68,5 @@ cli.add_command(settings)
 cli.add_command(go)
 cli.add_command(set_)
 cli.add_command(service)
-cli.add_command(dev)
 cli.add_command(logs)
 cli.add_command(shell)
