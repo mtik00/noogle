@@ -6,20 +6,19 @@ This module has the class used to control the Nest thermostat.
 
 # Imports #####################################################################
 import json
+import operator
 import os
 import time
+from dataclasses import dataclass
+from pathlib import Path
 from typing import List
-import operator
 
 import requests
 
-from dataclasses import dataclass
-
-from .models import Action
-from .settings import TOKEN_FOLDER, get_settings
-from .utils import is_winter
 from .helpers import print_log
-
+from .models import Action
+from .settings import settings
+from .utils import is_winter
 
 # Metadata ####################################################################
 __author__ = "Timothy McFadden"
@@ -76,12 +75,11 @@ class Thermostat:
 class NestAPI:
 
     base_api_url = "https://developer-api.nest.com"
-    token_file = f"{TOKEN_FOLDER}/nest-token.json"
+    token_file = Path(settings.general.token_folder, "nest-token.json")
     verification_wait = 10
 
     def __init__(self, interactive=True, load=True):
         self.interactive = interactive
-        self.project_settings = get_settings()
 
         if not os.path.exists(NestAPI.token_file):
             self._get_access_token()
@@ -137,11 +135,8 @@ class NestAPI:
         if not self.interactive:
             raise Exception("Cannot request access token unless in interactive mode")
 
-        settings = get_settings()
-        client_id = settings.get("nest.product-id") or os.environ.get("NEST_PRODUCT_ID")
-        client_secret = settings.get("nest.product-secret") or os.environ.get(
-            "NEST_PRODUCT_SECRET"
-        )
+        client_id = settings.nest.product_id
+        client_secret = settings.nest.product_secret
 
         # If we have to re-authorize, show this URL in the window, have the
         # user accept the perms, and enter the code

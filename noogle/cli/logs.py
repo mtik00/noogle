@@ -9,9 +9,8 @@ import os
 
 import click
 
-from ..settings import LOG_FILE_DIRECTORY
-
-# Globals #####################################################################
+from ..settings import settings
+from pathlib import Path
 
 
 @click.group()
@@ -23,10 +22,8 @@ def logs():
 @logs.command()
 def clear():
     """Clears the log files"""
-    logdir = LOG_FILE_DIRECTORY
-    if os.path.isdir(logdir):
-        files = glob.glob(f"{logdir}/*")
-        for f in files:
-            open(f, "w")
-    else:
-        raise Exception("Could not find log folder")
+    if not settings.logging.logfile:
+        return
+
+    path = Path(settings.logging.logfile)
+    path.write_text("")

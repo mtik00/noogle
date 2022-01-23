@@ -9,7 +9,7 @@ from datetime import time
 from pathlib import Path
 from typing import Any, Optional
 
-from pydantic import BaseModel, BaseSettings, FilePath, SecretStr
+from pydantic import BaseModel, BaseSettings, DirectoryPath, FilePath, SecretStr
 from pydantic.typing import StrPath
 
 
@@ -39,6 +39,8 @@ class Calendar(BaseModel):
 
 class General(BaseModel):
     debug: bool = False
+    base_config_folder: DirectoryPath
+    token_folder: FilePath
 
 
 class Mailgun(BaseModel):
@@ -49,7 +51,7 @@ class Mailgun(BaseModel):
 
 
 class Database(BaseModel):
-    uri: Optional[SecretStr]
+    uri: SecretStr
 
 
 class Settings(BaseSettings):
@@ -78,11 +80,20 @@ class Settings(BaseSettings):
         elif __pydantic_self__.general.debug:
             print("DEBUG: No env file loaded")
 
+        if __pydantic_self__.general.base_config_folder:
+            __pydantic_self__.general.base_config_folder = (
+                __pydantic_self__.general.base_config_folder.resolve()
+            )
+
+            __pydantic_self__.general.token_folder = Path(
+                __pydantic_self__.general.base_config_folder, "tokens"
+            ).resolve()
+
     class Config:
         env_prefix = "noogle_"
         env_nested_delimiter = "__"
 
 
 CUSTOM_ENV = os.environ.get("NOOGLE_ENV", ".env")
-settings = Settings(_env_file=CUSTOM_ENV)
+settings: Settings = Settings(_env_file=CUSTOM_ENV)
 DEBUG = settings.general.debug

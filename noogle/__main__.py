@@ -2,19 +2,16 @@ import logging
 
 from .cli import cli
 from .logger import init_logger
-from .settings import APP_LOG, DEBUG, get_settings
+from .settings import settings
 
-logfile = None
-settings = get_settings()
-if settings.get("general.use-logfile"):
-    logfile = APP_LOG
+logfile = settings.logging.logfile
 
 init_logger(
-    timezone=settings.get("calendar.timezone", "UTC"),
+    timezone=settings.calendar.timezone,
     logfile=logfile,
     logfile_mode="a",
     logfile_level=logging.DEBUG,
-    debug=DEBUG,
+    debug=settings.general.debug,
     third_party_loggers=["googleapiclient", "oauth2client"],
 )
 

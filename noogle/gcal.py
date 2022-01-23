@@ -9,6 +9,7 @@ import os
 import sys
 import argparse
 import httplib2
+from pathlib import Path
 
 import arrow
 from apiclient import discovery
@@ -17,7 +18,7 @@ from oauth2client import tools
 from oauth2client.file import Storage
 from googleapiclient.errors import HttpError
 
-from .settings import TOKEN_FOLDER, get_settings
+from .settings import settings
 from .models import Event
 from .helpers import print_log
 
@@ -29,7 +30,7 @@ __creationDate__ = "08-JUN-2017"
 
 # Globals #####################################################################
 SCOPES = "https://www.googleapis.com/auth/calendar.readonly"
-CLIENT_SECRET_FILE = os.path.join(TOKEN_FOLDER, "google-client-secret.json")
+CLIENT_SECRET_FILE = Path(settings.general.token_folder, "google-client-secret.json")
 APPLICATION_NAME = "Google Calendar API Python Quickstart"
 
 
@@ -102,7 +103,7 @@ def get_next_gcal_events(max_results=10, q_filter="nest", since=None):
     :param str q: This is the "advanced search syntax" item
     :param datetime since: Get the events since this date
     """
-    calendar_id = get_settings().get("calendar.name") or "primary"
+    calendar_id = settings.calendar.name
 
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
@@ -111,7 +112,7 @@ def get_next_gcal_events(max_results=10, q_filter="nest", since=None):
     if since:
         since = since.to("UTC").isoformat()
     else:
-        lookback = get_settings().get("calendar.lookback") or 0
+        lookback = settings.calendar.lookback
         since = (
             arrow.now()
             .replace(hour=0, minute=0, second=0, microsecond=0)
