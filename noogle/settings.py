@@ -3,21 +3,22 @@
 """
 This module holds the interface to the application settings.
 """
-from datetime import time
-from typing import Optional
-
-from pydantic import BaseModel, BaseSettings, SecretStr
-
 # Imports #####################################################################
 import os
-import re
-from configparser import ConfigParser
+from datetime import time
+from typing import Any, Optional
 
-import pkg_resources
-import ruamel.yaml
+from pydantic import BaseModel, BaseSettings, SecretStr
+from pydantic.typing import StrPath
 
-from .helpers import to_bool
+# from .helpers import to_bool
 from .utils import absjoin
+
+# import re
+# from configparser import ConfigParser
+
+# import pkg_resources
+# import ruamel.yaml
 
 
 class Nest(BaseModel):
@@ -32,8 +33,8 @@ class Nest(BaseModel):
 
 class Calendar(BaseModel):
     name: str = "primary"
-    default_home_time: time = "9:00"
-    default_away_time: time = "19:00"
+    default_home_time: time = time(hour=9)
+    default_away_time: time = time(hour=19)
     lookback: int = 2
     timezone: str = "MST"
 
@@ -54,12 +55,24 @@ class Database(BaseModel):
     uri: Optional[SecretStr]
 
 
-class NewSettings(BaseSettings):
+class Settings(BaseSettings):
     general: General
     nest: Nest
     calendar: Calendar
     mailgun: Mailgun
-    database: Database = Database()
+    database: Database
+
+    def __init__(
+        __pydantic_self__,
+        _env_file: Optional[StrPath] = ...,
+        _env_file_encoding: Optional[str] = None,
+        _env_nested_delimiter: Optional[str] = None,
+        _secrets_dir: Optional[StrPath] = None,
+        **values: Any,
+    ) -> None:
+        super().__init__(
+            _env_file, _env_file_encoding, _env_nested_delimiter, _secrets_dir, **values
+        )
 
     class Config:
         env_prefix = "noogle_"
@@ -67,255 +80,258 @@ class NewSettings(BaseSettings):
         env_nested_delimiter = "__"
 
 
+CUSTOM_ENV = os.environ.get("NOOGLE_ENV", ".env")
+settings = Settings(_env_file=CUSTOM_ENV)
+
 # Globals #####################################################################
-DEBUG = to_bool(os.environ.get("NOOGLE_DEBUG", False))
+DEBUG = settings.general.debug
 
-_SETTINGS = None
-SETTINGS_FILENAME = "noogle.ini"
-THIS_DIR = os.path.abspath(os.path.dirname(__file__))
-BASE_CONFIG_FOLDER = os.environ.get(
-    "CONFIG_FOLDER", absjoin(THIS_DIR, "..", "instance")
-)
+# _SETTINGS = None
+# SETTINGS_FILENAME = "noogle.ini"
+# THIS_DIR = os.path.abspath(os.path.dirname(__file__))
+# BASE_CONFIG_FOLDER = os.environ.get(
+#     "CONFIG_FOLDER", absjoin(THIS_DIR, "..", "instance")
+# )
 
-TOKEN_FOLDER = absjoin(BASE_CONFIG_FOLDER, "tokens")
-DATA_FOLDER = absjoin(BASE_CONFIG_FOLDER, "data")
-CONFIG_FOLDER = absjoin(BASE_CONFIG_FOLDER, "config")
+# TOKEN_FOLDER = absjoin(BASE_CONFIG_FOLDER, "tokens")
+# DATA_FOLDER = absjoin(BASE_CONFIG_FOLDER, "data")
+# CONFIG_FOLDER = absjoin(BASE_CONFIG_FOLDER, "config")
 
-DEPLOY_CONFIG_PATH = absjoin(CONFIG_FOLDER, "deploy.yaml")
-CIRCUS_INI_PATH = absjoin(CONFIG_FOLDER, "circus.ini")
+# DEPLOY_CONFIG_PATH = absjoin(CONFIG_FOLDER, "deploy.yaml")
+# CIRCUS_INI_PATH = absjoin(CONFIG_FOLDER, "circus.ini")
 
-_DEFAULT_SETTINGS_FOLDER = absjoin(BASE_CONFIG_FOLDER, "config")
-SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", _DEFAULT_SETTINGS_FOLDER)
-SETTINGS_PATH = absjoin(SETTINGS_FOLDER, SETTINGS_FILENAME)
-FILE_SEARCH = [SETTINGS_PATH]
+# _DEFAULT_SETTINGS_FOLDER = absjoin(BASE_CONFIG_FOLDER, "config")
+# SETTINGS_FOLDER = os.getenv("SETTINGS_FOLDER", _DEFAULT_SETTINGS_FOLDER)
+# SETTINGS_PATH = absjoin(SETTINGS_FOLDER, SETTINGS_FILENAME)
+# FILE_SEARCH = [SETTINGS_PATH]
 
-# These settings will be removed from `as_string`
-SECRET_SETTINGS = ["nest.product-id", "nest.product-secret", "nest.access-token"]
+# # These settings will be removed from `as_string`
+# SECRET_SETTINGS = ["nest.product-id", "nest.product-secret", "nest.access-token"]
 
-DEPLOY_SETTINGS = {}
-if os.path.exists(DEPLOY_CONFIG_PATH):
-    with open(DEPLOY_CONFIG_PATH) as fh:
-        DEPLOY_SETTINGS = ruamel.yaml.safe_load(fh)
+# DEPLOY_SETTINGS = {}
+# if os.path.exists(DEPLOY_CONFIG_PATH):
+#     with open(DEPLOY_CONFIG_PATH) as fh:
+#         DEPLOY_SETTINGS = ruamel.yaml.safe_load(fh)
 
-LOG_FILE_DIRECTORY = os.environ.get(
-    "LOG_FILE_DIRECTORY", absjoin(DEPLOY_SETTINGS.get("app_log_dir"))
-)
-GCAL_LOG = absjoin(LOG_FILE_DIRECTORY, "gcal.log")
-NEST_LOG = absjoin(LOG_FILE_DIRECTORY, "nest.log")
-APP_LOG = absjoin(LOG_FILE_DIRECTORY, "noogle.log")
-
-
-DATABASE_URL = os.environ.get("DATABASE_URL")
-if not DATABASE_URL:
-    db_path = os.path.join(DATA_FOLDER, "noogle.sqlite3")
-    DATABASE_URL = f"sqlite:///{db_path}"
+# LOG_FILE_DIRECTORY = os.environ.get(
+#     "LOG_FILE_DIRECTORY", absjoin(DEPLOY_SETTINGS.get("app_log_dir"))
+# )
+# GCAL_LOG = absjoin(LOG_FILE_DIRECTORY, "gcal.log")
+# NEST_LOG = absjoin(LOG_FILE_DIRECTORY, "nest.log")
+# APP_LOG = absjoin(LOG_FILE_DIRECTORY, "noogle.log")
 
 
-def get_settings():
-    """
-    Return, or create and return, the settings object.
-    """
-    global _SETTINGS
-    if _SETTINGS:
-        return _SETTINGS
-
-    _SETTINGS = Settings()
-    return _SETTINGS
+# DATABASE_URL = os.environ.get("DATABASE_URL")
+# if not DATABASE_URL:
+#     db_path = os.path.join(DATA_FOLDER, "noogle.sqlite3")
+#     DATABASE_URL = f"sqlite:///{db_path}"
 
 
-class Settings(object):
-    """A simple interface to a project's settings stored as a dictionary."""
+# def get_settings():
+#     """
+#     Return, or create and return, the settings object.
+#     """
+#     global _SETTINGS
+#     if _SETTINGS:
+#         return _SETTINGS
 
-    settings = {
-        "general": {"use-logfile": True, "debug": DEBUG},
-        "nest": {
-            "structure": None,
-            "thermostat": None,
-            "eco-temperature": 50,
-            "maximum-hold-days": 10,
-            "product-id": None,
-            "product-secret": None,
-            "access-token": None,
-            "winter-home-min-temp": 65,
-        },
-        "calendar": {
-            "name": "primary",
-            "default-home-time": "9:00",
-            "default-away-time": "19:00",
-            "lookback": 2,
-            "timezone": "MST",
-        },
-    }
+#     _SETTINGS = Settings()
+#     return _SETTINGS
 
-    def __init__(self):
-        # Do our own converstions for certain items.  The ones built in to
-        # ConfigParser (e.g. `.getboolean()`) are finicky.
-        self.conversions = {
-            "general.use-logfile": self._to_bool_or_none,
-            "calendar.lookback": self._to_int,
-        }
 
-        config = ConfigParser()
+# class Settings(object):
+#     """A simple interface to a project's settings stored as a dictionary."""
 
-        self._user_path = SETTINGS_PATH
-        self._loaded_paths = config.read(FILE_SEARCH)
+#     settings = {
+#         "general": {"use-logfile": True, "debug": DEBUG},
+#         "nest": {
+#             "structure": None,
+#             "thermostat": None,
+#             "eco-temperature": 50,
+#             "maximum-hold-days": 10,
+#             "product-id": None,
+#             "product-secret": None,
+#             "access-token": None,
+#             "winter-home-min-temp": 65,
+#         },
+#         "calendar": {
+#             "name": "primary",
+#             "default-home-time": "9:00",
+#             "default-away-time": "19:00",
+#             "lookback": 2,
+#             "timezone": "MST",
+#         },
+#     }
 
-        for section in config.sections():
-            for key, value in config.items(section):
-                if value is not None:
-                    self.settings[section][key] = value
+#     def __init__(self):
+#         # Do our own converstions for certain items.  The ones built in to
+#         # ConfigParser (e.g. `.getboolean()`) are finicky.
+#         self.conversions = {
+#             "general.use-logfile": self._to_bool_or_none,
+#             "calendar.lookback": self._to_int,
+#         }
 
-        self._validate()
+#         config = ConfigParser()
 
-    def _to_int(self, value, base=10):
-        """
-        Tries to convert the value to an integer or None.
-        """
-        if isinstance(value, int):
-            return value
-        elif (value is None) or (not value.isdigit()):
-            return None
+#         self._user_path = SETTINGS_PATH
+#         self._loaded_paths = config.read(FILE_SEARCH)
 
-        return int(value, base=base)
+#         for section in config.sections():
+#             for key, value in config.items(section):
+#                 if value is not None:
+#                     self.settings[section][key] = value
 
-    def _to_bool_or_none(self, value):
-        """
-        Tries to convert the value to a boolean or None.  We use this
-        because `ConfigParser.getboolean()` does not work with None.
-        """
-        if isinstance(value, bool):
-            return value
-        elif value is None:
-            return None
+#         self._validate()
 
-        return bool(re.match(r"^[1ty]", str(value), re.IGNORECASE))
+#     def _to_int(self, value, base=10):
+#         """
+#         Tries to convert the value to an integer or None.
+#         """
+#         if isinstance(value, int):
+#             return value
+#         elif (value is None) or (not value.isdigit()):
+#             return None
 
-    def _validate(self):
-        """
-        Validates the settings to ensure they're correct.
-        """
-        start = self.settings["calendar"]["default-home-time"]
-        if not re.match(r"^\d+:\d{2}$", start):
-            raise ValueError(
-                (
-                    "calendar.default-home-time ({0}) not " "in correct format: H:mm"
-                ).format(start)
-            )
+#         return int(value, base=base)
 
-    def get(self, item, default=None):
-        """
-        Get a setting in the form of "section.key" (e.g. "nest.thermostat").
-        """
-        section, key = item.split(".", 1)
-        val = self.settings.get(section, {}).get(key, default)
+#     def _to_bool_or_none(self, value):
+#         """
+#         Tries to convert the value to a boolean or None.  We use this
+#         because `ConfigParser.getboolean()` does not work with None.
+#         """
+#         if isinstance(value, bool):
+#             return value
+#         elif value is None:
+#             return None
 
-        if item in self.conversions:
-            return self.conversions[item](val)
+#         return bool(re.match(r"^[1ty]", str(value), re.IGNORECASE))
 
-        return val
+#     def _validate(self):
+#         """
+#         Validates the settings to ensure they're correct.
+#         """
+#         start = self.settings["calendar"]["default-home-time"]
+#         if not re.match(r"^\d+:\d{2}$", start):
+#             raise ValueError(
+#                 (
+#                     "calendar.default-home-time ({0}) not " "in correct format: H:mm"
+#                 ).format(start)
+#             )
 
-    def set(self, item, value):
-        """
-        Set a setting in the form of `"section.key" = value` (e.g. "nest.thermostat", 'Test').
-        """
-        section, key = item.split(".", 1)
-        self.settings[section][key] = value
+#     def get(self, item, default=None):
+#         """
+#         Get a setting in the form of "section.key" (e.g. "nest.thermostat").
+#         """
+#         section, key = item.split(".", 1)
+#         val = self.settings.get(section, {}).get(key, default)
 
-    def as_ini_file(self):
-        """
-        Return the settings formatted as in INI file.  This would be used to
-        create a user-config file.
-        """
-        default_settings_file = pkg_resources.resource_filename(
-            "noogle", "cli/dev/templates/conf-format.ini"
-        )
+#         if item in self.conversions:
+#             return self.conversions[item](val)
 
-        text = open(default_settings_file).read()
+#         return val
 
-        # FYI, we don't need to convert these values; They will default to
-        # string(), which is fine.
-        return text.format(
-            use_logfile=""
-            if self.settings["general"]["use-logfile"] is None
-            else self.settings["general"]["use-logfile"],
-            nest_thermostat=""
-            if self.settings["nest"]["thermostat"] is None
-            else self.settings["nest"]["thermostat"],
-            nest_structure=""
-            if self.settings["nest"]["structure"] is None
-            else self.settings["nest"]["structure"],
-            nest_eco_temperature=""
-            if self.settings["nest"]["eco-temperature"] is None
-            else self.settings["nest"]["eco-temperature"],
-            nest_winter_home_min_temperature=""
-            if self.settings["nest"]["winter-home-min-temp"] is None
-            else self.settings["nest"]["winter-home-min-temp"],
-            nest_max_hold=""
-            if self.settings["nest"]["maximum-hold-days"] is None
-            else self.settings["nest"]["maximum-hold-days"],
-            gcal_calendar_id=""
-            if self.settings["calendar"]["name"] is None
-            else self.settings["calendar"]["name"],
-            default_start_time=""
-            if self.settings["calendar"]["default-home-time"] is None
-            else self.settings["calendar"]["default-home-time"],
-            lookback=""
-            if self.settings["calendar"]["lookback"] is None
-            else self.settings["calendar"]["lookback"],
-            timezone=""
-            if self.settings["calendar"]["timezone"] is None
-            else self.settings["calendar"]["timezone"],
-        )
+#     def set(self, item, value):
+#         """
+#         Set a setting in the form of `"section.key" = value` (e.g. "nest.thermostat", 'Test').
+#         """
+#         section, key = item.split(".", 1)
+#         self.settings[section][key] = value
 
-    def as_string(self, mask=True):
-        """
-        Return the settings as a formatted string.
-        """
-        lines = []
+#     def as_ini_file(self):
+#         """
+#         Return the settings formatted as in INI file.  This would be used to
+#         create a user-config file.
+#         """
+#         default_settings_file = pkg_resources.resource_filename(
+#             "noogle", "cli/dev/templates/conf-format.ini"
+#         )
 
-        for section in sorted(self.settings.keys()):
-            for key in sorted(self.settings[section].keys()):
-                value = self.settings[section][key]
-                modified = section + "." + key
-                if (value is not None) and mask and (modified in SECRET_SETTINGS):
-                    lines.append("%s.%s = <MASKED>" % (section, key))
-                elif value is not None:
-                    lines.append("%s.%s = %s" % (section, key, value))
-                else:
-                    lines.append("%s.%s = <EMPTY>" % (section, key))
+#         text = open(default_settings_file).read()
 
-        return "\n".join(lines)
+#         # FYI, we don't need to convert these values; They will default to
+#         # string(), which is fine.
+#         return text.format(
+#             use_logfile=""
+#             if self.settings["general"]["use-logfile"] is None
+#             else self.settings["general"]["use-logfile"],
+#             nest_thermostat=""
+#             if self.settings["nest"]["thermostat"] is None
+#             else self.settings["nest"]["thermostat"],
+#             nest_structure=""
+#             if self.settings["nest"]["structure"] is None
+#             else self.settings["nest"]["structure"],
+#             nest_eco_temperature=""
+#             if self.settings["nest"]["eco-temperature"] is None
+#             else self.settings["nest"]["eco-temperature"],
+#             nest_winter_home_min_temperature=""
+#             if self.settings["nest"]["winter-home-min-temp"] is None
+#             else self.settings["nest"]["winter-home-min-temp"],
+#             nest_max_hold=""
+#             if self.settings["nest"]["maximum-hold-days"] is None
+#             else self.settings["nest"]["maximum-hold-days"],
+#             gcal_calendar_id=""
+#             if self.settings["calendar"]["name"] is None
+#             else self.settings["calendar"]["name"],
+#             default_start_time=""
+#             if self.settings["calendar"]["default-home-time"] is None
+#             else self.settings["calendar"]["default-home-time"],
+#             lookback=""
+#             if self.settings["calendar"]["lookback"] is None
+#             else self.settings["calendar"]["lookback"],
+#             timezone=""
+#             if self.settings["calendar"]["timezone"] is None
+#             else self.settings["calendar"]["timezone"],
+#         )
 
-    def save(self):
-        """
-        Stores the settings to the user's configuration file.
-        """
-        path = self._user_path
-        dirname = os.path.dirname(path)
+#     def as_string(self, mask=True):
+#         """
+#         Return the settings as a formatted string.
+#         """
+#         lines = []
 
-        if not os.path.isdir(dirname):
-            os.makedirs(dirname)
+#         for section in sorted(self.settings.keys()):
+#             for key in sorted(self.settings[section].keys()):
+#                 value = self.settings[section][key]
+#                 modified = section + "." + key
+#                 if (value is not None) and mask and (modified in SECRET_SETTINGS):
+#                     lines.append("%s.%s = <MASKED>" % (section, key))
+#                 elif value is not None:
+#                     lines.append("%s.%s = %s" % (section, key, value))
+#                 else:
+#                     lines.append("%s.%s = <EMPTY>" % (section, key))
 
-        text = self.as_ini_file()
+#         return "\n".join(lines)
 
-        open(path, "wb").write(text.encode("utf-8"))
+#     def save(self):
+#         """
+#         Stores the settings to the user's configuration file.
+#         """
+#         path = self._user_path
+#         dirname = os.path.dirname(path)
 
-    def print_settings(self):
-        """Display the project settings"""
-        print(self.as_string())
+#         if not os.path.isdir(dirname):
+#             os.makedirs(dirname)
 
-        if self._loaded_paths:
-            print("\nSettings files loaded in the following order:")
-            for index, path in enumerate(self._loaded_paths):
-                print("    %i) %s" % (index + 1, path))
+#         text = self.as_ini_file()
 
-        print("")
+#         open(path, "wb").write(text.encode("utf-8"))
 
-    def make_user_settings(self, display_result=False):
-        """
-        Create a user settings file.
-        """
-        self.save()
+#     def print_settings(self):
+#         """Display the project settings"""
+#         print(self.as_string())
 
-        if display_result:
-            print("Settings file stored at: %s" % self._user_path)
+#         if self._loaded_paths:
+#             print("\nSettings files loaded in the following order:")
+#             for index, path in enumerate(self._loaded_paths):
+#                 print("    %i) %s" % (index + 1, path))
+
+#         print("")
+
+#     def make_user_settings(self, display_result=False):
+#         """
+#         Create a user settings file.
+#         """
+#         self.save()
+
+#         if display_result:
+#             print("Settings file stored at: %s" % self._user_path)
