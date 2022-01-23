@@ -46,7 +46,7 @@ python -m noogle init db
 ## Google OAuth 2.0 Setup
 
 1.  Create an application using [Google API](https://console.developers.google.com/flownest-token.jsons/enableapi?apiid=calendar&pli=1)
-1.  Download the credentials to `~/.noogle/google_client_secret.json`
+1.  Download the credentials to `~/.secrets/tokens/google_client_secret.json`
 1.  Run the `noogle` setup for Google: `noogle setup gcal`
 1.  Follow the prompts to allow this computer to access your contacts.
 1.  Run the script again to ensure you have the credentials stored (you should not
@@ -56,9 +56,9 @@ python -m noogle init db
 
 1.  Sign in, or sign up for, a [Nest Developer Account](https://developers.nest.com/)
 1.  Click on 'Create New Product'
-1.  Once done, add the `OAuth` parameters to your environment setup file.  For example, add the following to `${SECRETS_FOLDER}/env.bat`:  
-    `export NEST_PRODUCT_ID=ABCDEFG`  
-    `export NEST_PRODUCT_SECRET=ABCDEFG`  
+1.  Once done, add the `OAuth` parameters to your environment setup file.  For example, add the following to `.env`:  
+    `NOOGLE_NEST__PRODUCT_ID=ABCDEFG`  
+    `NOOGLE_NEST__PRODUCT_SECRET=ABCDEFG`  
 1.  Run the `noogle` setup for Nest: `noogle setup nest`
 1.  If presented with a URL:
     *   Go to the URL
@@ -67,7 +67,7 @@ python -m noogle init db
     *   Enter the *pincode* in to the prompt
 1.  Run the `noogle show structures` to ensure you have the credentials stored (you should not be prompted again).
 
-**NOTE**: If you change the permissions through the Nest API, you must delete `${SECRETS_FOLDER}/tokens/nest-token.json` and re-run `noogle setup nest`.
+**NOTE**: If you change the permissions through the Nest API, you must delete `.secrets/tokens/nest-token.json` and re-run `noogle setup nest`.
 
 # Docker / docker-compose
 
