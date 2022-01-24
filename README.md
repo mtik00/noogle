@@ -45,6 +45,18 @@ python -m noogle init db
 
 ## Google OAuth 2.0 Setup
 
+1.  Make sure you Nest account has been migrated to Google.
+    WARNING: You can't use a GSuite account for this as of 2022-JAN.  You must use a `gmail.com` account.
+1   Create a new GCP project: https://console.cloud.google.com/ called `noogle`
+1.  Add the "Calendar" and "Smart Device Management" APIs https://console.cloud.google.com/apis
+1.  Create a google a new _OAuth 2.0 Client ID_ https://console.cloud.google.com/apis/credentials
+1.  Download the OAuth 2.0 Client `json` file to `.secrets/tokens/google-oauth-client-secret.json`
+1.  Create a new "Nest Device Access" project: https://console.nest.google.com/device-access/project-list.  This is US$5 as of 2022-JAN.
+1.  Run the sample script: `python sample-scripts/google.py`
+1.  Visit the URL to authorize the application
+1.  You should see a message like "Getting upcoming 10 events"
+
+
 1.  Create an application using [Google API](https://console.developers.google.com/flownest-token.jsons/enableapi?apiid=calendar&pli=1)
 1.  Download the credentials to `~/.secrets/tokens/google_client_secret.json`
 1.  Run the `noogle` setup for Google: `noogle setup gcal`
