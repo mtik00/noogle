@@ -26,3 +26,11 @@ def is_winter(date: arrow.Arrow = arrow.now()) -> bool:
     """
     month = date.date().month
     return (1 <= month <= 4) or (10 <= month <= 12)
+
+
+def celsius_to_fahrenheit(celsius: float) -> float:
+    return celsius * (9 / 5) + 32
+
+
+def fahrenheit_to_celsius(fahrenheit: float) -> float:
+    return (fahrenheit - 32) * (5 / 9)

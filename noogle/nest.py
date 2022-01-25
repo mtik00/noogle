@@ -6,15 +6,17 @@ This module has the class used to control the Nest thermostat.
 
 # Imports #####################################################################
 import json
+import logging
 import operator
 import os
+import re
 import time
 from dataclasses import dataclass
-from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 import requests
 
+from .google_auth import get_credentials
 from .helpers import print_log
 from .models import Action
 from .settings import settings
@@ -53,130 +55,90 @@ class RateLimitExceeded(APIError):
 
 
 @dataclass(frozen=True)
-class Structure:
-    structure_id: str
-    name: str
-    away: str
-    thermostats: List[str]
-
-
-@dataclass(frozen=True)
 class Thermostat:
     device_id: str
-    name: str
-    target_temperature_low_f: float
-    target_temperature_f: int
-    eco_temperature_low_f: float
+    label: str
+    mode: str
+    eco: str
+    setpoint_c: float
     structure_id: str
-    hvac_mode: str
-    previous_hvac_mode: str
+    parent_id: str
 
 
 class NestAPI:
-
-    base_api_url = "https://developer-api.nest.com"
-    token_file = Path(settings.general.token_folder, "nest-token.json")
+    base_api_url = f"https://smartdevicemanagement.googleapis.com/v1/enterprises/{settings.nest.product_id.get_secret_value()}"
     verification_wait = 10
 
-    def __init__(self, interactive=True, load=True):
-        self.interactive = interactive
+    def __init__(self, load=True):
+        creds = get_credentials()
+        self.token = creds.token
 
-        if not os.path.exists(NestAPI.token_file):
-            self._get_access_token()
-
-        with open(NestAPI.token_file) as fh:
-            self.token = json.load(fh)["access_token"]
-
-        self.structures = []
-        self.thermostats = []
+        self.thermostats: Dict[str, Thermostat] = {}
 
         self.__loaded = False
+
         if load:
             self.load()
 
-    def load(self, force=False, request_auth=True):
+    def _get_token(self):
+        creds = get_credentials()
+        self.token = creds.token
+
+    def load(self, force=False):
         """
         Reads the data structures from the API.
         """
         if self.__loaded and not force:
             return
 
-        data = self.get(request_auth=request_auth)
-
         self.__loaded = False
-        self.structures = []
-        self.thermostats = []
 
-        for thermostat in data.get("devices", {}).get("thermostats", {}).values():
-            t = Thermostat(
-                device_id=thermostat["device_id"],
-                name=thermostat["name"],
-                target_temperature_low_f=thermostat["target_temperature_low_f"],
-                target_temperature_f=thermostat["target_temperature_f"],
-                eco_temperature_low_f=thermostat["eco_temperature_low_f"],
-                structure_id=thermostat["structure_id"],
-                hvac_mode=thermostat["hvac_mode"],
-                previous_hvac_mode=thermostat["previous_hvac_mode"],
+        self.thermostats = {}
+        data = self.get(url="/devices")
+        for item in data["devices"]:
+            logging.debug(item)
+            device_id = item["name"].replace(
+                f"enterprises/{settings.nest.product_id.get_secret_value()}/devices/",
+                "",
             )
-            self.thermostats.append(t)
+            label = (
+                item.get("traits", {})
+                .get("sdm.devices.traits.Info", {})
+                .get("customName")
+            ) or ""
 
-        for structure in data.get("structures", {}).values():
-            s = Structure(
-                structure_id=structure["structure_id"],
-                name=structure["name"],
-                away=structure["away"],
-                thermostats=structure["thermostats"],
+            if not label:
+                raise ValueError("No custom label set for thermostat")
+            elif label in self.thermostats:
+                raise ValueError(f"Multiple thermostats found labeled: '{label}'")
+
+            mode = item["traits"]["sdm.devices.traits.ThermostatMode"]["mode"]
+            eco = item["traits"]["sdm.devices.traits.ThermostatEco"]["mode"]
+            setpoint_c = (
+                item["traits"]["sdm.devices.traits.ThermostatTemperatureSetpoint"].get(
+                    "heatCelsius"
+                )
+                or 0.0
             )
-            self.structures.append(s)
+            parent_id = item["parentRelations"][0]["parent"]
+            structure_id = re.search(
+                ".*?(?P<structure>structures/.*?)/", parent_id
+            ).group(1)
+
+            self.thermostats[label] = Thermostat(
+                device_id=device_id,
+                label=label,
+                mode=mode,
+                eco=eco,
+                setpoint_c=setpoint_c,
+                structure_id=structure_id,
+                parent_id=parent_id,
+            )
 
         self.__loaded = True
 
-    def _get_access_token(self):
-        if not self.interactive:
-            raise Exception("Cannot request access token unless in interactive mode")
-
-        client_id = settings.nest.product_id
-        client_secret = settings.nest.product_secret
-
-        # If we have to re-authorize, show this URL in the window, have the
-        # user accept the perms, and enter the code
-        authorization_url = (
-            f"https://home.nest.com/login/oauth2?client_id={client_id}&state=1"
-        )
-
-        print_log("Go to the following URL and accept the permissions:")
-        print_log(authorization_url)
-        auth_code = input("...enter the pincode given: ")
-
-        token_url = "https://api.home.nest.com/oauth2/access_token"
-        payload = f"code={auth_code}&client_id={client_id}&client_secret={client_secret}&grant_type=authorization_code"
-        headers = {"content-type": "application/x-www-form-urlencoded"}
-        response = requests.post(token_url, data=payload, headers=headers)
-
-        if response.status_code != 200:
-            raise Exception("Could not authenticate: " + response.json())
-
-        with open(NestAPI.token_file, "w") as fh:
-            fh.write(response.text)
-
-        self.token = response.json()["access_token"]
-
-    def _get_structure_by_name(self, name):
-        return next(
-            (x for x in self.structures if name.lower() == x.name.lower()), None
-        )
-
-    def _get_thermostat(self, device_id):
-        return next(
-            (x for x in self.thermostats if device_id.lower() == x.device_id.lower()),
-            None,
-        )
-
-    def _get_structure_thermostats(self, structure):
-        """
-        Returns all thermostat objects found in the structure.
-        """
-        return [t for t in self.thermostats if t.device_id in structure.thermostats]
+    def _get_thermostat(self, label):
+        return self.thermostats.get(label)
 
     def get(self, url="/", request_auth=True):
         """
@@ -187,7 +149,7 @@ class NestAPI:
             return self._get(url)
         except Unauthorized:
             if request_auth:
-                self._get_access_token()
+                self._get_token()
                 return self._get(url)
             else:
                 raise
@@ -225,7 +187,7 @@ class NestAPI:
             return self._put(url, payload)
         except Unauthorized:
             if request_auth:
-                self._get_access_token()
+                self._get_token()
                 return self._put(url, payload, request_auth=False)
             else:
                 raise
@@ -267,29 +229,22 @@ class NestAPI:
         time.sleep(wait)
         return response.json()
 
-    def show(self, request_auth=True):
+    def show(self):
         """
         Displays some information about the structure and thermostat using
         the NestAPI.
         """
-        self.load(request_auth=request_auth)
+        self.load()
 
-        for structure in self.structures:
-            print_log(structure.name)
-            print_log(f"    ID: {structure.structure_id}")
-            print_log(f"    Away: {structure.away}")
-            print_log("    Thermostats:")
-            for t in [
-                x for x in self.thermostats if x.device_id in structure.thermostats
-            ]:
-                if t.hvac_mode == "eco":
-                    setpoint = f"{t.eco_temperature_low_f} F (eco)"
-                else:
-                    setpoint = f"{t.target_temperature_low_f} F ({t.hvac_mode})"
-
-                print_log(f"        Device: {t.name}")
-                print_log(f"            ID: {t.device_id}")
-                print_log(f"            Setpoint: {setpoint}")
+        for label, thermostat in self.thermostats.items():
+            print(label)
+            print("    ID:", thermostat.device_id)
+            print("    Mode:", thermostat.mode)
+            print("    ECO:", thermostat.eco)
+            print(
+                "    Setpoint:",
+                "N/A" if thermostat.eco == "MANUAL_ECO" else thermostat.setpoint_c,
+            )
 
     def set_away(self, structure, away="away", force=False):
         """

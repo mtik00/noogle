@@ -52,6 +52,8 @@ python -m noogle init db
 1.  Create a google a new _OAuth 2.0 Client ID_ https://console.cloud.google.com/apis/credentials
 1.  Download the OAuth 2.0 Client `json` file to `.secrets/tokens/google-oauth-client-secret.json`
 1.  Create a new "Nest Device Access" project: https://console.nest.google.com/device-access/project-list.  This is US$5 as of 2022-JAN.
+1.  Use your oauth client ID and your Nest device project ID and follow these directions: https://developers.google.com/nest/device-access/authorize
+    NOTE: You need to follow those and allow each "structure"
 1.  Run the sample script: `python sample-scripts/google.py`
 1.  Visit the URL to authorize the application
 1.  You should see a message like "Getting upcoming 10 events"
