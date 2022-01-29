@@ -38,6 +38,9 @@ class Structure(Base):
     name = Column(String, nullable=False)
     custom_name = Column(String, nullable=True)
 
+    def __repr__(self) -> str:
+        return f"<Structure(custom_name={self.custom_name})>"
+
 
 class Thermostat(Base):
     """Describes a Nest thermostat."""
@@ -47,6 +50,9 @@ class Thermostat(Base):
     name = Column(String, nullable=False)
     label = Column(String, nullable=True)
     structure_name = Column(String, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"<Thermostat(label={self.label})>"
 
 
 class Event(Base):
