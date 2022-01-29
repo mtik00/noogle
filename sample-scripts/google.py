@@ -45,7 +45,7 @@ def main():
     Prints the start and name of the next 10 events on the user's calendar.
     """
     oauth_token = Path(".secrets", "tokens", "calendar-oauth-client-secret.json")
-    access_token = Path(".secrets", "tokens", "tmp-calendar-token.json")
+    access_token = Path(".secrets", "tokens", "tmp-calendar-access-token.json")
     scopes = [
         "https://www.googleapis.com/auth/calendar.readonly",
         "https://www.googleapis.com/auth/sdm.service",
