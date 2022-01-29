@@ -30,6 +30,25 @@ class Action(enum.Enum):
         return self.name
 
 
+class Structure(Base):
+    """Describes a Google structure."""
+
+    __tablename__ = "structures"
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    name = Column(String, nullable=False)
+    custom_name = Column(String, nullable=True)
+
+
+class Thermostat(Base):
+    """Describes a Nest thermostat."""
+
+    __tablename__ = "thermostats"
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    name = Column(String, nullable=False)
+    label = Column(String, nullable=True)
+    structure_name = Column(String, nullable=False)
+
+
 class Event(Base):
     """Describes a single event stored in cache."""
 

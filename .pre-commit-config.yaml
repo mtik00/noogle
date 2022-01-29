@@ -4,8 +4,10 @@ repos:
     hooks:
     - id: black
       language_version: python3
+      exclude: ^alembic/
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v1.2.3
     hooks:
     - id: flake8
       args: [--max-line-length=131]
+      exclude: ^alembic/

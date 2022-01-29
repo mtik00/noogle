@@ -12,7 +12,7 @@ session = Session()
 
 
 def init():
-    from .models import Event  # noqa
+    from .models import Event, Structure, Thermostat  # noqa
 
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
