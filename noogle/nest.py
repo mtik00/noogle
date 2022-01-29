@@ -245,17 +245,6 @@ class NestAPI:
                 "N/A" if thermostat.eco == "MANUAL_ECO" else thermostat.setpoint_c,
             )
 
-    def set_away(self, structure, away="away", force=False):
-        """
-        Sets the `away` mode for the structure.
-        """
-        if (structure.away == away) and (not force):
-            return
-
-        payload = {"away": away}
-        url = f"/structures/{structure.structure_id}"
-        return self.put(url, payload)
-
     def set_temperature(self, structure, temp_f: int, comparison=operator.ne):
 
         thermostats = self._get_structure_thermostats(structure)
@@ -300,10 +289,7 @@ class NestAPI:
 
     def do_away(self):
         """
-        Sets up the structure and thermostat in *away* mode.
-
-        1.  Sets the structure to `away`
-        2.  Sets the `hvac_mode` to `eco`
+        Sets up the thermostat in eco mode.
         """
         self.load()
 
@@ -313,15 +299,11 @@ class NestAPI:
         if not structure:
             raise ValueError(f"Could not find structure in API: {structure_name}")
 
-        self.set_away(structure, "away")
         self.set_hvac_mode(structure, "eco")
 
     def do_home(self):
         """
-        Sets up the structure and thermostat in *home* mode.
-
-        1.  Sets the structure to `home`
-        2.  Sets the `hvac_mode` to `heat`
+        Sets up the thermostat in *home* mode.
         """
         self.load()
 
@@ -331,7 +313,6 @@ class NestAPI:
         if not structure:
             raise ValueError(f"Could not find structure in API: {structure_name}")
 
-        self.set_away(structure, "home")
         if is_winter():
             temp_f = settings.nest.winter_home_min_temp
             self.set_hvac_mode(structure, "heat")
@@ -350,14 +331,9 @@ class NestAPI:
         structure = self._get_structure_by_name(structure_name)
 
         if action.value == Action.home.value:
-            away = "home"
             mode = "heat"
         else:
-            away = "away"
             mode = "eco"
-
-        if structure.away != away:
-            errors.append(f"Structure is not marked as {away}!")
 
         bad_thermostats = [
             x for x in self._get_structure_thermostats(structure) if x.hvac_mode != mode

@@ -24,12 +24,10 @@ def create_folders() -> None:
 def create_env() -> None:
     template = Path("noogle", "cli", "dev", "templates", ".env").read_text()
     db_path = Path(".secrets", "data", "noogle.sqlite3").resolve()
-    calendar_token_file = Path(
-        ".secrets", "tokens", "calendar-oauth-client-secret.json"
-    ).resolve()
-    nest_token_file = Path(
-        ".secrets", "tokens", "nest-oauth-client-secret.json"
-    ).resolve()
+    token_folder = Path(".secrets", "tokens").resolve()
+    calendar_token_file = token_folder / "calendar-oauth-client-secret.json"
+    nest_token_file = token_folder / "nest-oauth-client-secret.json"
+
     for path in [Path(".env"), Path(".secrets", ".env")]:
         if not path.exists():
             print("Creating", path.resolve())
@@ -38,6 +36,7 @@ def create_env() -> None:
                     db_path=db_path,
                     calendar_token_file=calendar_token_file,
                     nest_token_file=nest_token_file,
+                    token_folder=token_folder,
                 )
             )
 

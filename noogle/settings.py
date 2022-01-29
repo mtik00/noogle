@@ -26,7 +26,7 @@ class Nest(BaseModel):
     structure: str
     thermostat: Optional[str]
     winter_home_min_temp: int = 65
-    token_file: Path
+    token_file: FilePath
 
 
 class Calendar(BaseModel):
@@ -35,13 +35,13 @@ class Calendar(BaseModel):
     default_away_time: time = time(hour=19)
     lookback: int = 2
     timezone: str = "MST"
-    token_file: Path
+    token_file: FilePath
 
 
 class General(BaseModel):
     debug: bool = False
     base_config_folder: DirectoryPath
-    token_folder: FilePath
+    token_folder: DirectoryPath
 
 
 class Mailgun(BaseModel):
@@ -85,10 +85,6 @@ class Settings(BaseSettings):
             __pydantic_self__.general.base_config_folder = (
                 __pydantic_self__.general.base_config_folder.resolve()
             )
-
-            __pydantic_self__.general.token_folder = Path(
-                __pydantic_self__.general.base_config_folder, "tokens"
-            ).resolve()
 
     class Config:
         env_prefix = "noogle_"
