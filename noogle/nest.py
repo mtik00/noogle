@@ -8,11 +8,10 @@ This module has the class used to control the Nest thermostat.
 import json
 import logging
 import operator
-import os
 import re
 import time
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict
 
 import requests
 
@@ -70,7 +69,7 @@ class NestAPI:
     verification_wait = 10
 
     def __init__(self, load=True):
-        creds = get_credentials()
+        creds = get_credentials(name="nest", oauth_token=settings.nest.token_file)
         self.token = creds.token
 
         self.thermostats: Dict[str, Thermostat] = {}
@@ -81,7 +80,7 @@ class NestAPI:
             self.load()
 
     def _get_token(self):
-        creds = get_credentials()
+        creds = get_credentials(name="nest", oauth_token=settings.nest.token_file)
         self.token = creds.token
 
     def load(self, force=False):

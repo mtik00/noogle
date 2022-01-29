@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import datetime
 from pathlib import Path
-from typing import Sequence, Optional
-
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+from typing import Optional, Sequence
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
 
 from .settings import settings
-
 
 SCOPES = [
     "https://www.googleapis.com/auth/calendar.readonly",
@@ -49,14 +44,12 @@ def login(oauth_token: Path, access_token: Path, scopes: Sequence[str]) -> Crede
 
 
 def get_credentials(
-    oauth_token: Optional[Path] = None,
+    name: str,
+    oauth_token: Path,
     access_token: Optional[Path] = None,
     scopes: Sequence[str] = SCOPES,
 ):
-    if not oauth_token:
-        oauth_token = settings.general.token_folder / "noogle-oauth-token.json"
-
     if not access_token:
-        access_token = settings.general.token_folder / "tmp-access-token.json"
+        access_token = settings.general.token_folder / f"tmp-{name}-access-token.json"
 
     return login(oauth_token, access_token, scopes)

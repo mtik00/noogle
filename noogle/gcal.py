@@ -3,9 +3,6 @@
 """
 This module holds the interface to Google calendar.
 """
-
-import argparse
-
 # Imports #####################################################################
 import arrow
 from apiclient import discovery
@@ -49,7 +46,9 @@ def get_next_gcal_events(max_results=10, q_filter="nest", since=None):
     """
     calendar_id = settings.calendar.name
 
-    credentials = get_credentials()
+    credentials = get_credentials(
+        name="calendar", oauth_token=settings.calendar.token_file
+    )
     service = discovery.build("calendar", "v3", credentials=credentials)
 
     if since:

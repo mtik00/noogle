@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-
 import os
 import shutil
-import subprocess
-import sys
 from getpass import getuser
 from pathlib import Path
 
@@ -27,10 +24,22 @@ def create_folders() -> None:
 def create_env() -> None:
     template = Path("noogle", "cli", "dev", "templates", ".env").read_text()
     db_path = Path(".secrets", "data", "noogle.sqlite3").resolve()
+    calendar_token_file = Path(
+        ".secrets", "tokens", "calendar-oauth-client-secret.json"
+    ).resolve()
+    nest_token_file = Path(
+        ".secrets", "tokens", "nest-oauth-client-secret.json"
+    ).resolve()
     for path in [Path(".env"), Path(".secrets", ".env")]:
         if not path.exists():
             print("Creating", path.resolve())
-            path.write_text(template.format(db_path=db_path))
+            path.write_text(
+                template.format(
+                    db_path=db_path,
+                    calendar_token_file=calendar_token_file,
+                    nest_token_file=nest_token_file,
+                )
+            )
 
 
 def create_logs() -> None:

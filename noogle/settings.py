@@ -23,10 +23,10 @@ class Nest(BaseModel):
     eco_temperature: int = 50
     maximum_hold_days: int = 10
     product_id: SecretStr
-    product_secret: SecretStr
     structure: str
     thermostat: Optional[str]
     winter_home_min_temp: int = 65
+    token_file: Path
 
 
 class Calendar(BaseModel):
@@ -35,12 +35,13 @@ class Calendar(BaseModel):
     default_away_time: time = time(hour=19)
     lookback: int = 2
     timezone: str = "MST"
+    token_file: Path
 
 
 class General(BaseModel):
     debug: bool = False
     base_config_folder: DirectoryPath
-    token_folder: Optional[FilePath]
+    token_folder: FilePath
 
 
 class Mailgun(BaseModel):

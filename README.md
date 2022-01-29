@@ -43,45 +43,65 @@ Initialize the database with:
 python -m noogle init db
 ```
 
-## Google OAuth 2.0 Setup
+# Authentication
 
-1.  Make sure you Nest account has been migrated to Google.
-    WARNING: You can't use a GSuite account for this as of 2022-JAN.  You must use a `gmail.com` account.
-1   Create a new GCP project: https://console.cloud.google.com/ called `noogle`
-1.  Add the "Calendar" and "Smart Device Management" APIs https://console.cloud.google.com/apis
-1.  Create a google a new _OAuth 2.0 Client ID_ https://console.cloud.google.com/apis/credentials
-1.  Download the OAuth 2.0 Client `json` file to `.secrets/tokens/google-oauth-client-secret.json`
-1.  Create a new "Nest Device Access" project: https://console.nest.google.com/device-access/project-list.  This is US$5 as of 2022-JAN.
-1.  Use your oauth client ID and your Nest device project ID and follow these directions: https://developers.google.com/nest/device-access/authorize
-    NOTE: You need to follow those and allow each "structure"
+These directions create separate credentials between Google Calendar and Nest Device Access.  This allows you to use different accounts as you see fit (e.g. you use a different account for Calendar than you do for Nest).
+
+This is the worst part if you are using multiple Google accounts.
+
+## Google OAuth 2.0 Setup -- Calendar
+
+1   Create a new GCP project called `noogle`: https://console.cloud.google.com/
+1.  Enable the "Google Calendar" and "Smart Device Management" APIs to  your project: https://console.cloud.google.com/apis/library
+1.  Configure the OAuth consent screen: https://console.cloud.google.com/apis/credentials/consent
+    - Choose "External" for User Type
+    - App name: <domain name> -- noogle
+    - Select your email for _User support email_
+    - Add your domain for _Authorized domains_
+    - Enter your email for _Developer contact information_
+    - Hit "Save and continue"
+    - Add scopes:
+        * Google Calendar API: .../auth/calendar.readonly
+        * Smart Device Management API: .../auth/sdm.service
+    - Hit "Save and continue"
+    - Add your user as a _Test user_
+    - Hit "Save and continue"
+1.  Create a google new credentials: https://console.cloud.google.com/apis/credentials
+    - Click "CREATE CREDENTIALS"
+    - Select "OAuth Client ID"
+    - Select "Desktop app" for _Application type_
+    - Select a name for it
+    - Click "Create"
+1.  Download the OAuth 2.0 Client `json` file to `.secrets/tokens/calendar-oauth-client-secret.json`
+1.  Set `.env` NOOGLE_CALENDAR__TOKEN_FILE to `.secrets/tokens/calendar-oauth-client-secret.json`
 1.  Run the sample script: `python sample-scripts/google.py`
 1.  Visit the URL to authorize the application
 1.  You should see a message like "Getting upcoming 10 events"
 
+## Google OAuth 2.0 Setup -- Nest
 
-1.  Create an application using [Google API](https://console.developers.google.com/flownest-token.jsons/enableapi?apiid=calendar&pli=1)
-1.  Download the credentials to `~/.secrets/tokens/google_client_secret.json`
-1.  Run the `noogle` setup for Google: `noogle setup gcal`
-1.  Follow the prompts to allow this computer to access your contacts.
-1.  Run the script again to ensure you have the credentials stored (you should not
-    be prompted again).
+If your "main" Calendar is tied to the same account as your Nest account, you should use the same credentials as you created above for Calendar.  Simply set `NOOGLE_NEST__TOKEN_FILE` to `.secrets/tokens/calendar-oauth-client-secret.json`.
 
-## Nest API Setup
+These directions are the case where the calendar you use day-to-day is a different Google account than your Nest account.  This is normal if your main Google account is a Workspace account (custom domain name using Gmail).  As of 2022-JAN, you cannot migrate your Nest Account to a Google Workspace account... bummer.
 
-1.  Sign in, or sign up for, a [Nest Developer Account](https://developers.nest.com/)
-1.  Click on 'Create New Product'
-1.  Once done, add the `OAuth` parameters to your environment setup file.  For example, add the following to `.env`:  
-    `NOOGLE_NEST__PRODUCT_ID=ABCDEFG`  
-    `NOOGLE_NEST__PRODUCT_SECRET=ABCDEFG`  
-1.  Run the `noogle` setup for Nest: `noogle setup nest`
-1.  If presented with a URL:
-    *   Go to the URL
-    *   Click the `Accept` button
-    *   Copy the *pincode*
-    *   Enter the *pincode* in to the prompt
-1.  Run the `noogle show structures` to ensure you have the credentials stored (you should not be prompted again).
+It's easiest to follow these directions by using an incognito window logged in to your Nest account.
 
-**NOTE**: If you change the permissions through the Nest API, you must delete `.secrets/tokens/nest-token.json` and re-run `noogle setup nest`.
+These are abreviate instructions.  See the instructions for Calendar above for more in-depth steps.
+
+1.  Make sure you Nest account has been migrated to Google.
+    WARNING: You can't use a GSuite account for this as of 2022-JAN.  You must use a `gmail.com` account.
+1   Create a new GCP project: https://console.cloud.google.com/ called `noogle`
+1.  Enable the "Smart Device Management" API https://console.cloud.google.com/apis/library
+1.  Configure the OAuth consent screen: https://console.cloud.google.com/apis/credentials/consent
+1.  Create a google a new _OAuth 2.0 Client ID_ https://console.cloud.google.com/apis/credentials
+1.  Download the OAuth 2.0 Client `json` file to `.secrets/tokens/nest-oauth-client-secret.json`
+1.  Set `.env` NOOGLE_NEST__TOKEN_FILE to `.secrets/tokens/nest-oauth-client-secret.json`
+1.  Create a new "Nest Device Access" project: https://console.nest.google.com/device-access/project-list.  This costs US$5 as of 2022-JAN.
+1.  Use your oauth client ID and your Nest device project ID and follow these directions: https://developers.google.com/nest/device-access/authorize
+    NOTE: You need to follow those and allow each "structure"
+1.  Run the sample script: `python sample-scripts/nest.py` with your Nest Project ID
+1.  Visit the URL to authorize the application
+1.  You should see a dump of your Nest devices
 
 # Docker / docker-compose
 

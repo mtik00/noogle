@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import datetime
+import json
+import sys
 from pathlib import Path
 from typing import Sequence
 
+import requests
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+
+base_api_url = (
+    "https://smartdevicemanagement.googleapis.com/v1/enterprises/{product_id}"
+)
 
 
 def login(oauth_token: Path, access_token: Path, scopes: Sequence[str]) -> Credentials:
@@ -40,48 +44,48 @@ def login(oauth_token: Path, access_token: Path, scopes: Sequence[str]) -> Crede
     return credentials
 
 
+def get(url, token: str, product_id: str):
+    """
+    Use the token to request the provided URL.
+    """
+    auth = "Bearer ".encode("ascii") + token.encode("ascii", "ignore")
+    headers = {"authorization": auth, "content-type": "application/json"}
+
+    response = requests.get(
+        base_api_url.format(product_id=product_id) + url,
+        headers=headers,
+        allow_redirects=False,
+    )
+
+    if response.status_code == 307:
+        response = requests.get(
+            response.headers["Location"], headers=headers, allow_redirects=False
+        )
+
+    response.raise_for_status()
+
+    return response.json()
+
+
 def main():
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
-    oauth_token = Path(".secrets", "tokens", "calendar-oauth-client-secret.json")
-    access_token = Path(".secrets", "tokens", "tmp-calendar-token.json")
+
+    if len(sys.argv) != 2:
+        print("ERROR: must enter the Nest product ID")
+        return
+
+    oauth_token = Path(".secrets", "tokens", "nest-oauth-client-secret.json")
+    access_token = Path(".secrets", "tokens", "tmp-nest-access-token.json")
     scopes = [
         "https://www.googleapis.com/auth/calendar.readonly",
         "https://www.googleapis.com/auth/sdm.service",
     ]
 
     creds = login(oauth_token, access_token, scopes)
-    try:
-        service = build("calendar", "v3", credentials=creds)
-
-        # Call the Calendar API
-        now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
-        print("Getting the upcoming 10 events")
-        events_result = (
-            service.events()
-            .list(
-                calendarId="primary",
-                timeMin=now,
-                maxResults=10,
-                singleEvents=True,
-                orderBy="startTime",
-            )
-            .execute()
-        )
-        events = events_result.get("items", [])
-
-        if not events:
-            print("No upcoming events found.")
-            return
-
-        # Prints the start and name of the next 10 events
-        for event in events:
-            start = event["start"].get("dateTime", event["start"].get("date"))
-            print(start, event["summary"])
-
-    except HttpError as error:
-        print("An error occurred: %s" % error)
+    data = get(url="/devices", token=creds.token, product_id=sys.argv[1])
+    print(json.dumps(data, sort_keys=True, indent=4))
 
 
 if __name__ == "__main__":
