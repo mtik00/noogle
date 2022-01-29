@@ -20,7 +20,6 @@ class Logging(BaseModel):
 
 
 class Nest(BaseModel):
-    eco_temperature: int = 50
     maximum_hold_days: int = 10
     product_id: SecretStr
     structure: str
