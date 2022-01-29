@@ -446,5 +446,5 @@ class NestAPI:
 def purge_db():
     """Removes Structures and Thermostats from the database"""
     session.query(ThermostatModel).delete()
-    session.query(Structure).delete()
+    session.query(StructureModel).delete()
     session.commit()
