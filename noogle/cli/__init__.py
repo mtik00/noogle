@@ -10,11 +10,11 @@ line.
 import click
 
 from .. import __version__ as library_version
-
 from ..db import session
 from .init import init
 from .logs import logs
 from .main import go
+from .purge import purge
 from .service import service
 from .set_ import set_
 from .settings import settings
@@ -61,12 +61,13 @@ def cli(ctx, quiet, debug):
     ctx.session = session
 
 
-cli.add_command(show)
-cli.add_command(init)
-cli.add_command(setup)
-cli.add_command(settings)
 cli.add_command(go)
-cli.add_command(set_)
-cli.add_command(service)
+cli.add_command(init)
 cli.add_command(logs)
+cli.add_command(purge)
+cli.add_command(service)
+cli.add_command(set_)
+cli.add_command(settings)
+cli.add_command(setup)
 cli.add_command(shell)
+cli.add_command(show)

@@ -8,6 +8,7 @@ import arrow
 from apiclient import discovery
 from googleapiclient.errors import HttpError
 
+from .db import session
 from .google_auth import get_credentials
 from .helpers import print_log
 from .models import Event
@@ -85,3 +86,8 @@ def get_next_gcal_events(max_results=10, q_filter="nest", since=None):
         raise
 
     return events_result.get("items", [])
+
+
+def purge_db():
+    """Removes Structures and Thermostats from the database"""
+    session.query(Event).delete()

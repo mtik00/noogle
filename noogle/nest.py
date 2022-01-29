@@ -15,9 +15,10 @@ from typing import Dict
 
 import requests
 
+from .db import session
 from .google_auth import get_credentials
 from .helpers import print_log
-from .models import Action
+from .models import Action, Thermostat as ThermostatModel, Structure
 from .settings import settings
 from .utils import is_winter
 
@@ -375,3 +376,10 @@ class NestAPI:
             raise Exception("Unknown action: {!r}".format(action))
 
         print_log("...OK")
+
+
+def purge_db():
+    """Removes Structures and Thermostats from the database"""
+    session.query(ThermostatModel).delete()
+    session.query(Structure).delete()
+    session.commit()
