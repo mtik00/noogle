@@ -18,7 +18,7 @@ import requests
 from .db import session
 from .google_auth import get_credentials
 from .helpers import print_log
-from .models import Action, Thermostat as ThermostatModel, Structure
+from .models import Action, Thermostat as ThermostatModel, Structure as StructureModel
 from .settings import settings
 from .utils import is_winter
 
@@ -54,15 +54,20 @@ class RateLimitExceeded(APIError):
         return f"<RateLimitExceeded: {self.response.text}"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class Thermostat:
-    device_id: str
+    name: str
     label: str
-    mode: str
-    eco: str
-    setpoint_c: float
-    structure_id: str
-    parent_id: str
+    structure_name: str
+    mode: str = ""
+    eco: str = ""
+    setpoint_c: float = 0.0
+
+
+@dataclass(frozen=True)
+class Structure:
+    name: str
+    custom_name: str
 
 
 class NestAPI:
@@ -74,6 +79,7 @@ class NestAPI:
         self.token = creds.token
 
         self.thermostats: Dict[str, Thermostat] = {}
+        self.structures: Dict[str, Structure] = {}
 
         self.__loaded = False
 
@@ -84,23 +90,52 @@ class NestAPI:
         creds = get_credentials(name="nest", oauth_token=settings.nest.token_file)
         self.token = creds.token
 
-    def load(self, force=False):
-        """
-        Reads the data structures from the API.
-        """
-        if self.__loaded and not force:
-            return
+    def _get_structures_from_db(self):
+        structures = {}
+        for structure in session.query(StructureModel).all():
+            structures[structure.name] = Structure(
+                name=structure.name, custom_name=structure.custom_name
+            )
+        return structures
 
-        self.__loaded = False
+    def _get_structures_from_api(self) -> Dict[str, Structure]:
+        structures = {}
+        data = self.get(url="/structures")
+        for item in data["structures"]:
+            name = item["name"]
+            custom_name = (
+                item.get("traits", {})
+                .get("sdm.structures.traits.Info", {})
+                .get("customName")
+                or ""
+            )
+            structure = Structure(
+                name=name,
+                custom_name=custom_name,
+            )
+            model = StructureModel(name=name, custom_name=custom_name)
+            session.add(model)
 
-        self.thermostats = {}
+            structures[name] = structure
+
+        session.commit()
+        return structures
+
+    def _get_thermostats_from_db(self):
+        thermostats = {}
+        for thermostat in session.query(ThermostatModel).all():
+            thermostats[thermostat.name] = Thermostat(
+                name=thermostat.name,
+                label=thermostat.label,
+                structure_name=thermostat.structure_name,
+            )
+        return thermostats
+
+    def _get_thermostats_from_api(self):
+        thermostats = {}
         data = self.get(url="/devices")
         for item in data["devices"]:
-            logging.debug(item)
-            device_id = item["name"].replace(
-                f"enterprises/{settings.nest.product_id.get_secret_value()}/devices/",
-                "",
-            )
+            name = item["name"]
             label = (
                 item.get("traits", {})
                 .get("sdm.devices.traits.Info", {})
@@ -120,20 +155,50 @@ class NestAPI:
                 )
                 or 0.0
             )
+
             parent_id = item["parentRelations"][0]["parent"]
-            structure_id = re.search(
-                ".*?(?P<structure>structures/.*?)/", parent_id
+            structure_name = re.search(
+                "(?P<structure>.*/structures/.*?)/room", parent_id
             ).group(1)
 
-            self.thermostats[label] = Thermostat(
-                device_id=device_id,
+            thermostats[label] = Thermostat(
+                name=name,
                 label=label,
                 mode=mode,
                 eco=eco,
                 setpoint_c=setpoint_c,
-                structure_id=structure_id,
-                parent_id=parent_id,
+                structure_name=structure_name,
             )
+
+            if (
+                not session.query(ThermostatModel)
+                .filter_by(name=name, structure_name=structure_name)
+                .count()
+            ):
+                thermostat = ThermostatModel(
+                    name=name, label=label, structure_name=structure_name
+                )
+                session.add(thermostat)
+
+        session.commit()
+        return thermostats
+
+    def load(self, force=False):
+        """
+        Reads the data structures from the API.
+        """
+        if self.__loaded and not force:
+            return
+
+        self.__loaded = False
+
+        self.structures = self._get_structures_from_db()
+        if not self.structures:
+            self.structures = self._get_structures_from_api()
+        logging.debug("found %s structures", len(self.structures))
+
+        self.thermostats = self._get_thermostats_from_api()
+        logging.debug("found %s thermostats", len(self.thermostats))
 
         self.__loaded = True
 
@@ -238,7 +303,7 @@ class NestAPI:
 
         for label, thermostat in self.thermostats.items():
             print(label)
-            print("    ID:", thermostat.device_id)
+            print("    ID:", thermostat.name)
             print("    Mode:", thermostat.mode)
             print("    ECO:", thermostat.eco)
             print(
