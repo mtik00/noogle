@@ -120,6 +120,11 @@ class NestAPI:
                 f"enterprises/{settings.nest.product_id.get_secret_value()}/structures"
             ),
         )
+
+        if "structures" not in data:
+            logging.error("data returned: %s", str(data))
+            raise KeyError("Invalid data returned; no structures found.")
+
         for item in data["structures"]:
             name = item["name"]
             custom_name = (
@@ -158,6 +163,11 @@ class NestAPI:
                 f"enterprises/{settings.nest.product_id.get_secret_value()}/devices"
             ),
         )
+
+        if "devices" not in data:
+            logging.error("data returned: %s", str(data))
+            raise KeyError("Invalid data returned; no devices found.")
+
         for item in data["devices"]:
             name = item["name"]
             label = (
@@ -304,6 +314,8 @@ class NestAPI:
 
         response.raise_for_status()
 
+        logging.debug("url: '%s'; code: %s", url, response.status_code)
+        logging.debug("sleeping %ss", wait)
         time.sleep(wait)
         return response.json()
 
