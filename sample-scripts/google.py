@@ -32,7 +32,7 @@ def login(oauth_token: Path, access_token: Path, scopes: Sequence[str]) -> Crede
             oauth_token,
             scopes,
         )
-        credentials = flow.run_local_server(port=0)
+        credentials = flow.run_console()
 
     # Save the access token
     access_token.write_text(credentials.to_json())
