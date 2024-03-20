@@ -36,7 +36,7 @@ google-auth-oauthlib = "^0.4.6"
 
 [tool.poetry.dev-dependencies]
 ipdb = "^0.13.9"
-black = "^21.12b0"
+black = "^24.3"
 pre-commit = "^2.16.0"
 mypy = "^0.931"
 types-requests = "^2.27.7"
